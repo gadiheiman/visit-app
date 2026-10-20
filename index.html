@@ -34,7 +34,6 @@ header.top h1{margin:0;font-size:1.1rem;font-weight:800}
 header.top .sub{font-size:.8rem;opacity:.8}
 .who select{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:8px 10px;max-width:190px}
 .who select option{color:#12303a}
-.demo{background:var(--warn-bg);color:var(--warn);font-size:.8rem;padding:6px 14px;text-align:center}
 main{padding-top:16px}
 h2{font-size:1.15rem;margin:22px 0 10px;font-weight:800}
 h3{font-size:1rem;margin:0 0 8px;font-weight:700}
@@ -42,22 +41,13 @@ h3{font-size:1rem;margin:0 0 8px;font-weight:700}
 .row{display:flex;gap:10px;align-items:center}
 .between{justify-content:space-between}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .muted{color:var(--ink2);font-size:.85rem}
-.kpi .n{font-size:1.7rem;font-weight:800;line-height:1.1}
-.kpi .l{font-size:.8rem;color:var(--ink2)}
 .pos{color:var(--good)} .neg{color:var(--bad)}
 .pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:700}
 .pill.good{background:var(--good-bg);color:var(--good)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.na{background:var(--line);color:var(--ink2)}
 .bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden}
 .bar>i{display:block;height:100%;background:var(--primary);border-radius:99px}
 .bar.warn>i{background:var(--warn)} .bar.bad>i{background:var(--bad)} .bar.good>i{background:var(--good)}
-.hero{display:flex;gap:16px;align-items:center}
-.ring{position:relative;width:128px;height:128px;flex:none}
-.ring svg{transform:rotate(-90deg)}
-.ring .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring .c b{font-size:2rem;font-weight:800;line-height:1}
-.ring .c span{font-size:.72rem;color:var(--ink2)}
 .btn{background:var(--primary);color:var(--primary-ink);border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;min-height:44px}
 .btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--primary)}
 .btn.small{padding:6px 12px;min-height:36px;font-size:.88rem}
@@ -88,8 +78,6 @@ nav.tabs button[aria-current="page"]{color:var(--primary);background:var(--soft)
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:.85rem;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
-@media (max-width:420px){.hero{flex-direction:column;align-items:flex-start}.grid3{grid-template-columns:1fr 1fr}}
-@media (prefers-reduced-motion: no-preference){.ring circle.v{transition:stroke-dashoffset .8s ease}}
 .cb,.cbh{display:grid;grid-template-columns:78px 1fr 46px 74px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line);font-size:.85rem}
 .cbh{font-size:.72rem;text-align:center}.cbh span:last-child,.cb .cs{text-align:left;direction:ltr}
 .cb .cl{white-space:nowrap}.cb .cv{text-align:center}.cb .cs{color:var(--ink2);font-size:.78rem}
@@ -132,13 +120,12 @@ const MAIL_DOMAIN='@visitapp.example.com';
 const sb=window.supabase.createClient(SB_URL,SB_KEY);
 const CAPS=['מרץ 2025','מאי 2025','יולי 2025','ספט׳ 2025','נוב׳ 2025','ינו׳ 2026','מרץ 2026','מאי 2026','יולי 2026','ספט׳ 2026','נוב׳ 2026'];
 const NC=CAPS.length;
-const Y26=[5,6,7,8,9,10], Y25=[0,1,2,3,4];
+const Y26=[5,6,7,8,9,10];
 const MGN={'חפר':'מנהלת חפר','שרון':'מנהלת שרון','שומרון':'מנהלת שומרון','בתי חולים':'בתי חולים'};
 const ROLE_NAMES={admin:'מנהל – גישה מלאה',viewall:'צפייה בכל המינהלות',coord:'המינהלת שלו/ה בלבד',hosp:'בתי החולים שלה בלבד'};
 const DEF_CHECK=['מעבר על יעד המצטרפים והביצוע בפועל','שיחה על מאזן המצטרפים והעוזבים','מעבר על סיבות העזיבה המובילות','מעבר על מקורות גיוס ותרומת עובדים','מעבר על יעד הלידים והטיפול בהם','קביעת תאריך למרתון גיוס','הגדרת משימות להמשך מול המרפאה'];
 let CL=[],REASONS=[],USERS=[],LAST_VS=[];
 let db={visits:[],log:[],settings:{weights:{target:60,cover:25,visits:15},checklist:DEF_CHECK.slice()}};
-function save(){}
 const S={uid:null,tab:'home',clinicId:null,edit:false,visitClinic:null,showVisit:null,q:'',lim:40,f:{mg:'',sector:'',kind:'',sort:'bal'},vf:{clinic:'',coord:'',rc:'',status:'',period:''},rep:'summary',homeRc:'',editVisit:null,confirmDel:null,busy:false};
 function me(){return USERS.find(u=>u.id===S.uid)||{id:null,name:'',title:'',role:'none',units:[]}}
 function userName(id){const u=USERS.find(x=>x.id===id);return u?u.name:'—'}
@@ -150,7 +137,8 @@ function mapClinic(r){
   const rs={};Object.keys(r.rs||{}).forEach(k=>{rs[k]=r.rs[k]});
   return {id:r.id,mg:r.mg,name:r.name,code:r.code,town:r.town,addr:r.addr,sector:r.sector,kind:r.kind,target:r.target,dr:r.dr,adm:r.adm,nur:r.nur,ins:r.ins,hospital:r.hospital,pool:r.pool,j,l,rs,j0:j.slice(),l0:l.slice(),updated:r.updated,source:r.source};
 }
-function mapVisit(r){return {id:r.id,clinicId:r.clinic_id,coordId:r.coord_id,date:r.vdate,time:r.vtime,purpose:r.purpose,people:r.people,checks:r.checks||[],summary:r.summary,tasks:r.tasks||[],edited:r.edited}}
+function vcl(v){return (v&&v.checklist&&v.checklist.length)?v.checklist:db.settings.checklist}
+function mapVisit(r){return {id:r.id,clinicId:r.clinic_id,coordId:r.coord_id,date:r.vdate,time:r.vtime,purpose:r.purpose,people:r.people,checks:r.checks||[],checklist:r.checklist||null,summary:r.summary,tasks:r.tasks||[],edited:r.edited}}
 async function fetchAll(table,order){
   let out=[],from=0;
   for(;;){const q=sb.from(table).select('*').range(from,from+999);const {data,error}=order?await q.order(order):await q;if(error)throw error;out=out.concat(data);if(data.length<1000)break;from+=1000}
@@ -240,22 +228,6 @@ function capTable(ser,list,a){
   if(a.rep)rows+='<tr><th>סה״כ 2026</th><th>'+(a.tt?Math.round(a.tt):'—')+'</th><th>'+a.J+'</th><th>'+a.L+'</th><th class="'+cls(a.bal)+'">'+sign(a.bal)+'</th></tr>';
   return '<div class="scroll"><table><thead><tr><th>קפיטציה</th><th>יעד מצטרפים</th><th>מצטרפים בפועל</th><th>עוזבים</th><th>מאזן</th></tr></thead><tbody>'+rows+'</tbody></table></div><div class="muted" style="margin-top:6px">היעד כולל רק יחידות שהוגדר להן יעד, ומוצג לקפיטציות 2026 בלבד. שורת הסיכום כוללת קפיטציות שדווחו בלבד.</div>';
 }
-function lab(i){const p=CAPS[i].split(' ');return [p[0],'’'+p[1].slice(2)]}
-function chart(vals){
-  const n=vals.length,W=n*30,H=150,mid=76;
-  const mx=Math.max(1,...vals.map(v=>v===null?0:Math.abs(v)));
-  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="מאזן לפי קפיטציה" style="display:block">';
-  s+='<line x1="0" x2="'+W+'" y1="'+mid+'" y2="'+mid+'" stroke="var(--line)"/>';
-  vals.forEach((v,i)=>{
-    const x=(n-1-i)*30+5,cx=x+10,L=lab(i);
-    if(v===null){s+='<text x="'+cx+'" y="'+(mid-4)+'" font-size="9" fill="var(--ink2)" text-anchor="middle">—</text>'}
-    else{const h=Math.max(1,Math.round(Math.abs(v)/mx*54)),y=v>=0?mid-h:mid;
-      s+='<rect x="'+x+'" y="'+y+'" width="20" height="'+h+'" rx="3" fill="'+(v>=0?'var(--good)':'var(--bad)')+'"/>';
-      s+='<text x="'+cx+'" y="'+(v>=0?y-3:y+h+10)+'" font-size="9" font-weight="700" fill="var(--ink)" text-anchor="middle">'+sign(v)+'</text>'}
-    s+='<text x="'+cx+'" y="'+(H-17)+'" font-size="7.5" fill="var(--ink2)" text-anchor="middle">'+esc(L[0])+'</text><text x="'+cx+'" y="'+(H-7)+'" font-size="7.5" fill="var(--ink2)" text-anchor="middle">'+esc(L[1])+'</text>';
-  });
-  return s+'</svg>';
-}
 function openTasks(clinics){
   const ids=new Set(clinics.map(c=>c.id)),r=[];
   db.visits.forEach(v=>{if(!ids.has(v.clinicId))return;v.tasks.forEach((t,i)=>{if(!t.done)r.push({v,t,i})})});
@@ -269,11 +241,6 @@ function reasonTotals(list,idx){
 }
 
 /* ---------- בית ---------- */
-function ring(p){
-  const r=54,c=2*Math.PI*r,off=c*(1-(p||0)/100);
-  const col=p===null?'var(--line)':p>=85?'var(--good)':p>=60?'var(--warn)':'var(--bad)';
-  return '<div class="ring"><svg width="128" height="128" viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="'+r+'" fill="none" stroke="var(--line)" stroke-width="12"/><circle class="v" cx="64" cy="64" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'"/></svg><div class="c"><b>'+(p===null?'—':p+'%')+'</b><span>ציון מתחילת השנה</span></div></div>';
-}
 function scopeTitle(){const u=me();return u.role==='coord'?MGN[u.mg]:u.role==='hosp'?'בתי החולים שלך':'כל המינהלות'}
 function viewHome(){
   const u=me(),cl=visibleClinics(),a=agg(cl),ser=capSeries(cl);
@@ -336,7 +303,7 @@ function viewClinic(id){
   const vs=db.visits.filter(v=>v.clinicId===c.id).sort((a,b)=>b.date.localeCompare(a.date));
   const rows=CAPS.map((nm,i)=>{const has=c.j[i]!==null&&c.l[i]!==null,b=has?c.j[i]-c.l[i]:null,is26=Y26.indexOf(i)>=0;if(!is26)return '';
     return '<tr><td>'+esc(nm)+'</td><td>'+(is26&&c.target>0?c.target:'—')+'</td><td>'+(has?c.j[i]:'—')+'</td><td>'+(has?c.l[i]:'—')+'</td><td class="'+(b>0?'pos':b<0?'neg':'')+'">'+(has?sign(b):'—')+'</td></tr>'}).join('')+(x.n?'<tr><th>סה״כ 2026</th><th>'+(x.yt?Math.round(x.yt):'—')+'</th><th>'+x.j+'</th><th>'+x.l+'</th><th class="'+(x.bal>0?'pos':x.bal<0?'neg':'')+'">'+sign(x.bal)+'</th></tr>':'');
-  const r26=reasonTotals([c],Y26.slice(0,5)),r25=reasonTotals([c],Y25);
+  const r26=reasonTotals([c],Y26.slice(0,5));
   const rk=Object.keys(r26).sort((a,b)=>(r26[b]||0)-(r26[a]||0));
   const tot26=Object.values(r26).reduce((a,b)=>a+b,0);
   const info=[['ישוב',c.town],['כתובת',c.addr],['מגזר',c.sector],['סוג יחידה',c.kind],['מנהל רפואי',c.dr],['מנהל אדמיניסטרטיבי',c.adm],['מנהל סיעוד',c.nur],['מספר מבוטחים',c.ins!=null?c.ins.toLocaleString('he-IL'):null],['קוד מרפאה',c.code]].filter(r=>r[1]!==null&&r[1]!==undefined&&r[1]!=='');
@@ -355,13 +322,14 @@ function editForm(c){
   const adm=me().role==='admin';
   return '<div class="card" id="editBox"><h3>עדכון נתונים</h3><div class="muted">נתונים שיובאו מהקובץ ננעלים לעריכה, וניתן לתקן אותם רק על ידי מנהל. שדה ריק נשמר כ״לא דווח״ ולא כאפס. כל שינוי נרשם ביומן.</div>'+
   '<div class="scroll"><table><thead><tr><th>קפיטציה</th><th>מצטרפים</th><th>עוזבים</th></tr></thead><tbody>'+CAPS.map((nm,i)=>{
+    if(i<5)return '';
     const lj=!adm&&c.j0[i]!==null,ll=!adm&&c.l0[i]!==null;
     return '<tr><td>'+esc(nm)+'</td><td><input type="number" inputmode="numeric" id="cj'+i+'" value="'+(c.j[i]===null?'':c.j[i])+'"'+(lj?' disabled':'')+'></td><td><input type="number" inputmode="numeric" id="cl'+i+'" value="'+(c.l[i]===null?'':c.l[i])+'"'+(ll?' disabled':'')+'></td></tr>'}).join('')+'</tbody></table></div>'+
   (canEditTargets()&&!c.pool?'<label for="e_t">יעד מצטרפים לקפיטציה</label><input type="number" inputmode="numeric" id="e_t" value="'+(c.target>0?c.target:'')+'">':'')+
   '<div class="row" style="margin-top:14px"><button class="btn" data-act="saveEdit" data-id="'+c.id+'">שמירת שינויים</button><button class="btn ghost" data-act="toggleEdit">ביטול</button></div></div>';
 }
 function visitItem(v){
-  const n=db.settings.checklist.length,done=v.checks.filter(Boolean).length,p=n?Math.round(done/n*100):0,open=v.tasks.filter(t=>!t.done).length;
+  const n=vcl(v).length,done=v.checks.filter(Boolean).length,p=n?Math.round(done/n*100):0,open=v.tasks.filter(t=>!t.done).length;
   return '<div class="item" data-act="showVisit" data-id="'+v.id+'" tabindex="0" role="button"><div><div class="t">'+fmtD(v.date)+' · '+esc(clinicName(v.clinicId))+'</div><div class="muted">'+esc(userName(v.coordId))+' · '+esc(v.purpose||'ללא מטרה')+(open?' · '+open+' משימות פתוחות':'')+'</div></div><span class="pill '+tone(p)+'">'+p+'%</span></div>';
 }
 
@@ -410,7 +378,7 @@ function viewVisits(){
 function canDeleteVisit(){const r=me().role;return r==='admin'||r==='viewall'}
 function viewVisitDetail(id){
   const v=db.visits.find(x=>x.id===id);if(!v||!getClinic(v.clinicId)){S.showVisit=null;return viewVisits()}
-  const cl=db.settings.checklist;
+  const cl=vcl(v);
   return '<button class="back" data-act="backVisits">‹ חזרה</button><div class="card"><h3>'+esc(clinicName(v.clinicId))+' · '+fmtD(v.date)+' '+esc(v.time||'')+'</h3><div class="muted">'+esc(userName(v.coordId))+(v.people?' · משתתפים: '+esc(v.people):'')+'</div><div class="muted">מטרה: '+esc(v.purpose||'—')+'</div>'+(v.edited?'<div class="muted">נערך ב־'+fmtD(v.edited)+'</div>':'')+
   '<h3 style="margin-top:12px">צ׳ק ליסט</h3>'+cl.map((t,i)=>'<div class="check"><span aria-hidden="true">'+(v.checks[i]?'✅':'⬜')+'</span><span>'+esc(t)+'</span></div>').join('')+
   '<h3 style="margin-top:12px">סיכום</h3><div>'+esc(v.summary||'—').replace(/\n/g,'<br>')+'</div>'+
@@ -421,7 +389,7 @@ function viewVisitDetail(id){
 function viewVisitForm(cid){
   const c=getClinic(cid);if(!c){S.visitClinic=null;S.editVisit=null;return viewVisits()}
   const ev=S.editVisit?db.visits.find(x=>x.id===S.editVisit):null;
-  const cl=db.settings.checklist,x=m(c),now=new Date();
+  const cl=ev?vcl(ev):db.settings.checklist,x=m(c),now=new Date();
   return '<button class="back" data-act="backVisits">‹ ביטול</button><div class="card"><h3>'+(ev?'עריכת ביקור':'דיווח ביקור')+' – '+esc(c.name)+'</h3><div class="muted">'+esc([c.town,MGN[c.mg]].filter(Boolean).join(' · '))+'</div>'+
   (x.n?'<div class="muted" style="margin-top:6px">נתוני פתיחה: מצטרפים '+x.j+', עוזבים '+x.l+', מאזן '+sign(x.bal)+(x.pct!==null?', '+Math.round(x.pct)+'% מהיעד':'')+'</div>':'')+
   '<div class="grid2"><div><label for="v_date">תאריך</label><input type="date" id="v_date" value="'+(ev?esc(ev.date):TODAY)+'"></div><div><label for="v_time">שעה</label><input type="time" id="v_time" value="'+(ev?esc(ev.time||''):pad(now.getHours())+':'+pad(now.getMinutes()))+'"></div></div>'+
@@ -577,7 +545,7 @@ document.addEventListener('change',e=>{
   if(t.dataset&&t.dataset.cf){S.f[t.dataset.cf]=t.value;S.lim=40;render();return}
   if(t.dataset&&t.dataset.f){S.vf[t.dataset.f]=t.value;render();return}
   if(t.matches&&t.matches('input[type=checkbox][data-act="toggleTask"]')){toggleTaskSrv(t.dataset.v,Number(t.dataset.i),t.checked);return}
-  if(t.classList&&t.classList.contains('vchk')){$('#chkCount').textContent=document.querySelectorAll('.vchk:checked').length+' מתוך '+db.settings.checklist.length}
+  if(t.classList&&t.classList.contains('vchk')){$('#chkCount').textContent=document.querySelectorAll('.vchk:checked').length+' מתוך '+document.querySelectorAll('.vchk').length}
 });
 document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;S.lim=40;const p=e.target.selectionStart;render();const q=$('#q');q.focus();q.setSelectionRange(p,p)}});
 
@@ -585,17 +553,18 @@ async function saveVisit(cid){
   const c=getClinic(cid);if(!c||S.busy)return;
   const ev=S.editVisit?db.visits.find(x=>x.id===S.editVisit):null;
   if(!ev&&!canVisit())return;
-  const checks=db.settings.checklist.map((_,i)=>{const b=document.querySelector('.vchk[data-i="'+i+'"]');return b&&b.checked?1:0});
+  const cl=ev?vcl(ev).slice():db.settings.checklist.slice();
+  const checks=cl.map((_,i)=>{const b=document.querySelector('.vchk[data-i="'+i+'"]');return b&&b.checked?1:0});
   const tasks=[...document.querySelectorAll('#taskRows > .card')].map(r=>({text:r.querySelector('.t_text').value.trim(),owner:r.querySelector('.t_owner').value.trim(),due:r.querySelector('.t_due').value,done:r.dataset.done==='1'})).filter(t=>t.text);
   const f={date:$('#v_date').value||TODAY,time:$('#v_time').value,purpose:$('#v_purpose').value.trim(),people:$('#v_people').value.trim(),checks,summary:$('#v_sum').value.trim(),tasks};
-  const row={vdate:f.date,vtime:f.time,purpose:f.purpose,people:f.people,checks:f.checks,summary:f.summary,tasks:f.tasks};
+  const row={vdate:f.date,vtime:f.time,purpose:f.purpose,people:f.people,checks:f.checks,checklist:cl,summary:f.summary,tasks:f.tasks};
   S.busy=true;
   try{
     if(ev){
       row.edited=TODAY;
       const {data,error}=await sb.from('visits').update(row).eq('id',ev.id).select();
       if(error)throw error;if(!data.length)throw new Error('אין הרשאה לעדכן את הביקור');
-      Object.assign(ev,f,{edited:TODAY});logChange('עריכת ביקור ב'+c.name);S.editVisit=null;S.visitClinic=null;S.showVisit=ev.id;toast('הביקור עודכן');
+      Object.assign(ev,f,{edited:TODAY,checklist:cl});logChange('עריכת ביקור ב'+c.name);S.editVisit=null;S.visitClinic=null;S.showVisit=ev.id;toast('הביקור עודכן');
     }else{
       const {data,error}=await sb.from('visits').insert(Object.assign({clinic_id:cid,coord_id:me().id},row)).select();
       if(error)throw error;
@@ -657,7 +626,7 @@ function syncCheck(){document.querySelectorAll('.ck_in').forEach(i=>{db.settings
 function copyVisit(id){
   const v=db.visits.find(x=>x.id===id);if(!v)return;
   const L=['סיכום ביקור – '+clinicName(v.clinicId)+' – '+fmtD(v.date),'מתעד/ת: '+userName(v.coordId),'מטרה: '+(v.purpose||'—'),'','צ׳ק ליסט:'];
-  db.settings.checklist.forEach((t,i)=>L.push((v.checks[i]?'✔ ':'✘ ')+t));
+  vcl(v).forEach((t,i)=>L.push((v.checks[i]?'✔ ':'✘ ')+t));
   L.push('','סיכום: '+(v.summary||'—'),'','משימות:');
   if(v.tasks.length)v.tasks.forEach(t=>L.push('- '+t.text+' ('+(t.owner||'')+', עד '+fmtD(t.due)+')'));else L.push('אין');
   copyText(L.join('\n'));
@@ -672,12 +641,12 @@ function exportVisits(){
   if(typeof XLSX==='undefined'){toast('רכיב הייצוא לא נטען. נסו לרענן את הדף');return}
   const vs=LAST_VS.slice().sort((a,b)=>a.date.localeCompare(b.date)||String(a.time||'').localeCompare(String(b.time||'')));
   if(!vs.length){toast('אין ביקורים לייצוא');return}
-  const cl=db.settings.checklist;
+  const allItems=[];vs.forEach(v=>vcl(v).forEach(t=>{if(allItems.indexOf(t)<0)allItems.push(t)}));
   const cOf=v=>CL.find(x=>x.id===v.clinicId)||{};
   const rows=vs.map(v=>{
-    const c=cOf(v),done=v.checks.filter(Boolean).length;
-    const o={'תאריך':v.date,'שעה':v.time||'','מינהלת':MGN[c.mg]||'','מרפאה':c.name||'','ישוב':c.town||'','מתעד/ת':userName(v.coordId),'מטרת הביקור':v.purpose||'','משתתפים':v.people||'','השלמת צ׳ק ליסט':cl.length?Math.round(done/cl.length*100)+'%':''};
-    cl.forEach((t,i)=>{o['✓ '+t]=v.checks[i]?'✔':'✘'});
+    const c=cOf(v),vc=vcl(v),done=v.checks.filter(Boolean).length;
+    const o={'תאריך':v.date,'שעה':v.time||'','מינהלת':MGN[c.mg]||'','מרפאה':c.name||'','ישוב':c.town||'','מתעד/ת':userName(v.coordId),'מטרת הביקור':v.purpose||'','משתתפים':v.people||'','השלמת צ׳ק ליסט':vc.length?Math.round(done/vc.length*100)+'%':''};
+    allItems.forEach(t=>{const k=vc.indexOf(t);o['✓ '+t]=k<0?'':(v.checks[k]?'✔':'✘')});
     o['סיכום']=v.summary||'';o['משימות פתוחות']=v.tasks.filter(t=>!t.done).length;o['נערך ב־']=v.edited||'';
     return o;
   });
