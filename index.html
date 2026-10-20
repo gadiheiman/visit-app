@@ -110,6 +110,7 @@ nav.tabs button[aria-current="page"]{color:var(--primary);background:var(--soft)
 <nav class="tabs" aria-label="ניווט ראשי"><div class="in" id="tabs"></div></nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 
 (function(){
@@ -135,7 +136,7 @@ const Y26=[5,6,7,8,9,10], Y25=[0,1,2,3,4];
 const MGN={'חפר':'מנהלת חפר','שרון':'מנהלת שרון','שומרון':'מנהלת שומרון','בתי חולים':'בתי חולים'};
 const ROLE_NAMES={admin:'מנהל – גישה מלאה',viewall:'צפייה בכל המינהלות',coord:'המינהלת שלו/ה בלבד',hosp:'בתי החולים שלה בלבד'};
 const DEF_CHECK=['מעבר על יעד המצטרפים והביצוע בפועל','שיחה על מאזן המצטרפים והעוזבים','מעבר על סיבות העזיבה המובילות','מעבר על מקורות גיוס ותרומת עובדים','מעבר על יעד הלידים והטיפול בהם','קביעת תאריך למרתון גיוס','הגדרת משימות להמשך מול המרפאה'];
-let CL=[],REASONS=[],USERS=[];
+let CL=[],REASONS=[],USERS=[],LAST_VS=[];
 let db={visits:[],log:[],settings:{weights:{target:60,cover:25,visits:15},checklist:DEF_CHECK.slice()}};
 function save(){}
 const S={uid:null,tab:'home',clinicId:null,edit:false,visitClinic:null,showVisit:null,q:'',lim:40,f:{mg:'',sector:'',kind:'',sort:'bal'},vf:{clinic:'',coord:'',rc:'',status:'',period:''},rep:'summary',homeRc:'',editVisit:null,confirmDel:null,busy:false};
@@ -380,6 +381,7 @@ function viewVisits(){
   if(F.coord)vs=vs.filter(v=>v.coordId===F.coord);
   if(F.status==='open')vs=vs.filter(v=>v.tasks.some(t=>!t.done));
   if(F.period){const lim=addDays(-Number(F.period));vs=vs.filter(v=>v.date>=lim)}
+  LAST_VS=vs;
   const stale=cl.filter(c=>{const d=lastVisit(c.id);return !d||d<lim20}).sort((a,b)=>{const pa=m(a).pct,pb=m(b).pct;return (pa===null?999:pa)-(pb===null?999:pb)});
   const who=[...new Set(visibleVisits().map(v=>v.coordId))];
   const sorted=cl.slice().sort((a,b)=>a.name.localeCompare(b.name,'he'));
@@ -399,7 +401,7 @@ function viewVisits(){
   return '<h2 style="margin-top:4px">ביקורים</h2>'+
   (cv?'<div class="card"><h3>דיווח ביקור חדש</h3><label for="v_pick">בחירת יחידה</label><select id="v_pick"><option value="">בחרו מרפאה</option>'+sorted.map(c=>'<option value="'+c.id+'">'+esc(c.name)+'</option>').join('')+'</select><button class="btn" data-act="newVisitPick" style="width:100%;margin-top:10px">פתיחת טופס ביקור</button></div>':dash)+
   (stale.length?'<div class="card"><h3>ללא ביקור מעל 20 יום ('+stale.length+')</h3><div class="muted">ממוינות לפי ביצוע נמוך מול היעד:</div><div class="chips">'+stale.slice(0,10).map(c=>'<span class="chip" data-act="openClinic" data-id="'+c.id+'" role="button" tabindex="0">'+esc(c.name)+'</span>').join('')+(stale.length>10?'<span class="muted">ועוד '+(stale.length-10)+'</span>':'')+'</div></div>':'')+
-  '<div class="card"><h3>היסטוריית ביקורים</h3><div class="grid2"><div><label for="f_clinic">מרפאה</label><select id="f_clinic" data-f="clinic"><option value="">הכול</option>'+sorted.map(c=>'<option value="'+c.id+'"'+(F.clinic===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></div>'+
+  '<div class="card"><div class="row between"><h3 style="margin:0">היסטוריית ביקורים</h3>'+(canExport()?'<button class="btn small" data-act="exportVisits">ייצוא לאקסל ('+vs.length+')</button>':'')+'</div><div class="grid2"><div><label for="f_clinic">מרפאה</label><select id="f_clinic" data-f="clinic"><option value="">הכול</option>'+sorted.map(c=>'<option value="'+c.id+'"'+(F.clinic===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></div>'+
   (cv&&who.length>1?'<div><label for="f_coord">מתעד/ת</label><select id="f_coord" data-f="coord"><option value="">הכול</option>'+who.map(id=>'<option value="'+id+'"'+(F.coord===id?' selected':'')+'>'+esc(userName(id))+'</option>').join('')+'</select></div>':'')+
   '<div><label for="f_period">תקופה</label><select id="f_period" data-f="period"><option value="">כל הזמן</option><option value="7"'+(F.period==='7'?' selected':'')+'>שבוע אחרון</option><option value="30"'+(F.period==='30'?' selected':'')+'>30 ימים</option><option value="90"'+(F.period==='90'?' selected':'')+'>90 ימים</option></select></div>'+
   '<div><label for="f_status">סטטוס משימות</label><select id="f_status" data-f="status"><option value="">הכול</option><option value="open"'+(F.status==='open'?' selected':'')+'>עם משימות פתוחות</option></select></div></div>'+
@@ -553,6 +555,7 @@ document.addEventListener('click',e=>{
     case 'copyVisit':copyVisit(el.dataset.v);break;
     case 'copySummary':copyText($('#sumTxt').textContent);break;
     case 'exportCsv':exportCsv();break;
+    case 'exportVisits':exportVisits();break;
     case 'saveSettings':saveSettings();break;
     case 'addCheck':syncCheck();db.settings.checklist.push('סעיף חדש');render();break;
     case 'delCheck':syncCheck();db.settings.checklist.splice(Number(el.dataset.i),1);render();break;
@@ -664,6 +667,32 @@ function copyText(t){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,()=>fb(t,done))}else fb(t,done);
 }
 function fb(t,cb){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');cb()}catch(e){toast('ההעתקה לא נתמכת בדפדפן')}a.remove()}
+function exportVisits(){
+  if(!canExport())return;
+  if(typeof XLSX==='undefined'){toast('רכיב הייצוא לא נטען. נסו לרענן את הדף');return}
+  const vs=LAST_VS.slice().sort((a,b)=>a.date.localeCompare(b.date)||String(a.time||'').localeCompare(String(b.time||'')));
+  if(!vs.length){toast('אין ביקורים לייצוא');return}
+  const cl=db.settings.checklist;
+  const cOf=v=>CL.find(x=>x.id===v.clinicId)||{};
+  const rows=vs.map(v=>{
+    const c=cOf(v),done=v.checks.filter(Boolean).length;
+    const o={'תאריך':v.date,'שעה':v.time||'','מינהלת':MGN[c.mg]||'','מרפאה':c.name||'','ישוב':c.town||'','מתעד/ת':userName(v.coordId),'מטרת הביקור':v.purpose||'','משתתפים':v.people||'','השלמת צ׳ק ליסט':cl.length?Math.round(done/cl.length*100)+'%':''};
+    cl.forEach((t,i)=>{o['✓ '+t]=v.checks[i]?'✔':'✘'});
+    o['סיכום']=v.summary||'';o['משימות פתוחות']=v.tasks.filter(t=>!t.done).length;o['נערך ב־']=v.edited||'';
+    return o;
+  });
+  const trows=[];
+  vs.forEach(v=>{const c=cOf(v);v.tasks.forEach(t=>trows.push({'תאריך ביקור':v.date,'מרפאה':c.name||'','מתעד/ת':userName(v.coordId),'משימה':t.text,'אחראי':t.owner||'','תאריך יעד':t.due||'','בוצע':t.done?'כן':'לא','באיחור':(!t.done&&t.due&&t.due<TODAY)?'כן':''}))});
+  const wb=XLSX.utils.book_new();
+  const ws1=XLSX.utils.json_to_sheet(rows);
+  ws1['!cols']=Object.keys(rows[0]).map(k=>({wch:k==='סיכום'?45:Math.min(34,Math.max(11,k.length+4))}));
+  XLSX.utils.book_append_sheet(wb,ws1,'ביקורים');
+  if(trows.length){const ws2=XLSX.utils.json_to_sheet(trows);ws2['!cols']=[{wch:13},{wch:24},{wch:12},{wch:40},{wch:12},{wch:12},{wch:8},{wch:9}];XLSX.utils.book_append_sheet(wb,ws2,'משימות')}
+  wb.Workbook={Views:[{RTL:true}]};
+  XLSX.writeFile(wb,'visits_'+TODAY+'.xlsx');
+  logChange('ייצוא ביקורים לאקסל ('+vs.length+' ביקורים)');
+  toast('הקובץ הורד');
+}
 function exportCsv(){
   if(!canExport())return;
   const head=['מינהלת','מרפאה','ישוב','מגזר','מבוטחים','יעד לקפיטציה','יעד שנתי','מצטרפים 2026','עוזבים 2026','מאזן 2026','אחוז מהיעד'].concat(CAPS.map(x=>'מאזן '+x));
