@@ -5,11 +5,90 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>מערכת רכזים – מרפאות וביצועים</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- עיצוב: סדר הטעינה חשוב (משתנים, בסיס, קומפוננטות, מסכים) -->
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/screens.css">
+<style>
+/* משתני עיצוב: צבעים, ערכת צבעים כהה וגלישת אזורי מסך בטוחים */
+:root{
+  --bg:#edf2f3; --surface:#ffffff; --ink:#12303a; --ink2:#4d6670; --line:#d5e0e3;
+  --primary:#17766f; --primary-ink:#ffffff; --soft:#dff0ee;
+  --warn:#b97a00; --warn-bg:#fdf1d4; --bad:#b83a30; --bad-bg:#fbe3e0; --good:#1d7a45; --good-bg:#dff3e6;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1a1f; --surface:#15272e; --ink:#e6f0f2; --ink2:#9db5bc; --line:#274047;
+    --primary:#3bb5ab; --primary-ink:#06201d; --soft:#16393a;
+    --warn:#f0b84a; --warn-bg:#3a2e12; --bad:#ff8a7e; --bad-bg:#40201c; --good:#6fd39a; --good-bg:#16372a;
+  }
+}
+/* בסיס: איפוס, טיפוגרפיה, כפתורים, שדות טופס, כותרת עליונה וסרגל ניווט תחתון */
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.45}
+body{min-height:100vh;padding-bottom:84px}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+header.top{background:var(--ink);color:#fff;padding:14px 0 16px}
+:root[data-theme="dark"] header.top{background:#0a1418}
+header.top .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between}
+header.top h1{margin:0;font-size:1.1rem;font-weight:800}
+header.top .sub{font-size:.8rem;opacity:.8}
+main{padding-top:16px}
+h2{font-size:1.15rem;margin:22px 0 10px;font-weight:800}
+h3{font-size:1rem;margin:0 0 8px;font-weight:700}
+.btn{background:var(--primary);color:var(--primary-ink);border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;min-height:44px}
+.btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--primary)}
+.btn.small{padding:6px 12px;min-height:36px;font-size:.88rem}
+.btn.danger{background:var(--bad);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+input,select,textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:44px}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-size:.85rem;color:var(--ink2);margin:10px 0 4px}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:20}
+nav.tabs .in{max-width:760px;margin:0 auto;display:flex;gap:2px}
+nav.tabs button{flex:1;background:none;border:0;padding:8px 2px;border-radius:10px;font-size:.74rem;color:var(--ink2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button .ic{font-size:1.25rem;line-height:1}
+nav.tabs button[aria-current="page"]{color:var(--primary);background:var(--soft);font-weight:700}
+.back{background:none;border:0;color:var(--primary);font-weight:700;padding:6px 0;cursor:pointer}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;z-index:30;font-size:.9rem}
+/* קומפוננטות משותפות: כרטיסים, תגיות, טבלאות, רשימות, צ'יפים, שורות סטטיסטיקה */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:10px;align-items:center}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.muted{color:var(--ink2);font-size:.85rem}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:700}
+.pill.good{background:var(--good-bg);color:var(--good)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.na{background:var(--line);color:var(--ink2)}
+.list .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.list .item:last-child{border-bottom:0}
+.list .item .t{font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--ink2);font-size:.8rem}
+.scroll{overflow-x:auto}
+.check{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.check input{width:22px;height:22px;min-height:0;margin-top:2px;flex:none}
+.empty{text-align:center;color:var(--ink2);padding:18px 6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:.85rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+.s1{display:flex;justify-content:space-between;gap:8px;margin-top:10px;white-space:nowrap;font-size:.9rem;color:var(--ink2)}.s1 b{font-size:1.05rem;color:var(--ink);font-weight:800}.s1 b.pos{color:var(--good)}.s1 b.neg{color:var(--bad)}
+.row3{display:flex;gap:6px;margin-top:14px}.row3 .btn{flex:1;min-width:0;padding:10px 4px;font-size:.82rem;white-space:nowrap}
+/* סגנונות ייעודיים למסכים: דשבורד הבית, נתוני מרפאה, מעקב לידים */
+.dash .card{margin-bottom:12px;padding:12px}.dash h3{font-size:.95rem}.big{font-size:2.1rem;font-weight:800;line-height:1.1;margin:4px 0}.big.pos{color:var(--good)}.big.neg{color:var(--bad)}.s2{display:flex;flex-direction:column;gap:5px;margin-top:10px;font-size:.85rem;color:var(--ink2)}.s2 span{display:flex;justify-content:space-between;gap:6px}.s2 b{color:var(--ink);font-weight:800}.s2 b.pos{color:var(--good)}.s2 b.neg{color:var(--bad)}
+.kv{display:flex;flex-direction:column;margin-bottom:8px;font-size:.88rem}.kv span{color:var(--ink2);font-size:.75rem}.kv b{font-weight:700;overflow-wrap:anywhere}
+/* תגית גודל מרפאה */
+.size{display:inline-block;border-radius:6px;padding:1px 8px;font-size:.72rem;font-weight:700;background:var(--soft);color:var(--primary)}
+/* מעקב לידים */
+.pill.info{background:var(--soft);color:var(--primary)}
+.pill.na{background:var(--line);color:var(--ink2)}
+.lead-fu{margin-top:10px;padding:10px;border-radius:12px;background:var(--warn-bg)}
+.lead-fu label{color:var(--warn);margin-top:0}
+.lead-table td,.lead-table th{white-space:nowrap}
+.field-err{color:var(--bad);font-weight:700;margin-top:10px}
+[hidden]{display:none!important}
+</style>
 </head>
 <body>
 <header class="top"><div class="wrap">
@@ -25,7 +104,3386 @@
 <!-- ספריות חיצוניות (גרסאות נעולות): Supabase לחיבור לשרת, SheetJS לייצוא לאקסל -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<!-- קוד האפליקציה: מודולים (ES modules). נקודת הכניסה היא js/main.js -->
-<script type="module" src="js/main.js"></script>
+<script>
+(function () {
+'use strict';
+/* מנגנון מודולים מינימלי: __defs מחזיק את קוד כל מודול, __req טוען מודול פעם אחת ומחזיר את ה-exports שלו */
+const __defs = {};
+const __cache = {};
+function __req(key) {
+  if (__cache[key]) return __cache[key];
+  const exports = {};
+  __cache[key] = exports;
+  __defs[key](exports);
+  return exports;
+}
+/* ===== js/api/auth.js ===== */
+__defs['js/api/auth.js'] = function (__exports) {
+/**
+ * api/auth.js - כניסה, יציאה והחלפת סיסמה.
+ * שם המשתמש הוא שם קצר (igal, daniel...); מאחורי הקלעים הוא מומר לכתובת דוא"ל פנימית.
+ */
+const { sb } = __req('js/api/client.js');
+const { MAIL_DOMAIN } = __req('js/config.js');
+
+/** כניסה. מחזיר { userId } או { error } */
+async function signIn(username, password) {
+  const email = username.trim().toLowerCase() + MAIL_DOMAIN;
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error || !data || !data.user) return { error: error || new Error('כניסה נכשלה') };
+  return { userId: data.user.id };
+}
+
+/** יציאה מהמערכת */
+function signOut() {
+  return sb.auth.signOut();
+}
+
+/** מזהה המשתמש אם קיימת כניסה פעילה (למשל אחרי רענון הדף), אחרת null */
+async function currentUserId() {
+  const { data } = await sb.auth.getSession();
+  return data && data.session ? data.session.user.id : null;
+}
+
+/** מאזין ליציאה מהמערכת (גם כשהחיבור פג תוקף) */
+function onSignedOut(callback) {
+  sb.auth.onAuthStateChange(event => {
+    if (event === 'SIGNED_OUT') callback();
+  });
+}
+
+/** החלפת הסיסמה של המשתמש המחובר */
+async function changePassword(newPassword) {
+  const { error } = await sb.auth.updateUser({ password: newPassword });
+  return { error };
+}
+
+__exports.signIn = signIn;
+__exports.signOut = signOut;
+__exports.currentUserId = currentUserId;
+__exports.onSignedOut = onSignedOut;
+__exports.changePassword = changePassword;
+};
+
+/* ===== js/api/client.js ===== */
+__defs['js/api/client.js'] = function (__exports) {
+/**
+ * api/client.js - יצירת לקוח Supabase יחיד לכל האפליקציה.
+ * ספריית Supabase נטענת כסקריפט רגיל ב-index.html ומוגדרת כ-window.supabase.
+ */
+const { SB_URL, SB_KEY } = __req('js/config.js');
+
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+__exports.sb = sb;
+};
+
+/* ===== js/api/clinicsApi.js ===== */
+__defs['js/api/clinicsApi.js'] = function (__exports) {
+/**
+ * api/clinicsApi.js - עדכון נתוני מרפאה.
+ * הכתיבה עוברת דרך פונקציית שרת (save_clinic_data) שאוכפת את הכללים:
+ * מנהל משנה הכול, ורכז רק משלים ערכים חסרים ביחידות שלו.
+ */
+const { sb } = __req('js/api/client.js');
+const { mapClinic } = __req('js/api/mappers.js');
+
+/** שומר מצטרפים ועוזבים (מערכים של כל הקפיטציות) ויעד, ומחזיר את המרפאה המעודכנת */
+async function saveClinicData(clinicId, joiners, leavers, target) {
+  const { error } = await sb.rpc('save_clinic_data', { p_id: clinicId, p_j: joiners, p_l: leavers, p_target: target });
+  if (error) return { error };
+  const { data } = await sb.from('clinics').select('*').eq('id', clinicId);
+  return { clinic: data && data[0] ? mapClinic(data[0]) : null };
+}
+
+__exports.saveClinicData = saveClinicData;
+};
+
+/* ===== js/api/leadsApi.js ===== */
+__defs['js/api/leadsApi.js'] = function (__exports) {
+/**
+ * api/leadsApi.js - כתיבה של לידים לשרת.
+ * הערה: בעלות על ליד נקבעת בשרת לפי המשתמש המחובר, ולא ניתנת לשינוי אחרי היצירה.
+ */
+const { sb } = __req('js/api/client.js');
+const { mapLead } = __req('js/api/mappers.js');
+
+const DUPLICATE_ID_CODE = '23505'; // קוד שגיאה של Postgres: ערך כפול בשדה ייחודי
+
+/** מתרגם שגיאת שרת להודעה בעברית */
+function leadErrorText(error) {
+  if (!error) return '';
+  if (error.code === DUPLICATE_ID_CODE) return 'ליד עם ת.ז זו כבר קיים במערכת (אצלך או אצל רכז אחר).';
+  return error.message || 'השמירה נכשלה';
+}
+
+function toRow(lead) {
+  return {
+    id_number: lead.idNumber || null,               // ת.ז אינה חובה
+    first_name: lead.firstName, last_name: lead.lastName,
+    phone: lead.phone, city: lead.city, source: lead.source,
+    referrer_name: lead.referrerName || null, event_location: lead.eventLocation || null,
+    status: lead.status, followup_at: lead.followupAt,
+  };
+}
+
+async function insertLead(lead) {
+  const { data, error } = await sb.from('leads').insert(toRow(lead)).select();
+  return { lead: data && data[0] ? mapLead(data[0]) : null, error };
+}
+
+/** מעדכן סטטוס ומועד שיחה נוספת בלבד (שאר השדות קבועים אחרי היצירה) */
+async function updateLeadStatus(id, status, followupAt) {
+  const { data, error } = await sb.from('leads').update({ status, followup_at: followupAt }).eq('id', id).select();
+  return { lead: data && data[0] ? mapLead(data[0]) : null, error };
+}
+
+async function deleteLead(id) {
+  const { data, error } = await sb.from('leads').delete().eq('id', id).select();
+  return { ok: !error && data && data.length > 0, error };
+}
+
+__exports.leadErrorText = leadErrorText;
+__exports.insertLead = insertLead;
+__exports.updateLeadStatus = updateLeadStatus;
+__exports.deleteLead = deleteLead;
+};
+
+/* ===== js/api/loaders.js ===== */
+__defs['js/api/loaders.js'] = function (__exports) {
+/**
+ * api/loaders.js - טעינת נתונים מהשרת אל ה-store.
+ */
+const { sb } = __req('js/api/client.js');
+const { store } = __req('js/core/state.js');
+const { mapProfile, mapClinic, mapVisit, mapLead } = __req('js/api/mappers.js');
+
+const PAGE = 1000; // השרת מחזיר עד 1000 שורות בקריאה
+
+/** קורא את כל השורות של טבלה (בדפים), עם מיון אופציונלי */
+async function fetchAll(table, orderBy) {
+  let rows = [];
+  for (let from = 0; ; from += PAGE) {
+    const query = sb.from(table).select('*').range(from, from + PAGE - 1);
+    const { data, error } = orderBy ? await query.order(orderBy) : await query;
+    if (error) throw error;
+    rows = rows.concat(data);
+    if (data.length < PAGE) break;
+  }
+  return rows;
+}
+
+async function loadVisits() {
+  const rows = await fetchAll('visits', 'vdate');
+  store.visits = rows.map(mapVisit).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+async function loadLeads() {
+  const rows = await fetchAll('leads', 'created_at');
+  store.leads = rows.map(mapLead).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/** יומן שינויים (קריאה מותרת למנהל בלבד, לכן למשתמשים אחרים התוצאה ריקה) */
+async function loadLog() {
+  const { data } = await sb.from('change_log').select('*').order('ts', { ascending: false }).limit(15);
+  store.log = (data || []).map(r => ({
+    when: new Date(r.ts).toLocaleString('he-IL'), user: r.user_name, what: r.what,
+  }));
+}
+
+/** טוען הגדרה שנשמרה בטבלת settings אל store.settings */
+function applySetting(row) {
+  if (row.key === 'checklist') store.settings.checklist = row.value;
+  if (row.key === 'lead_sources') store.settings.leadSources = row.value;
+  if (row.key === 'size_thresholds') store.settings.sizeThresholds = row.value;
+}
+
+/** טעינה מלאה אחרי כניסה */
+async function loadAll() {
+  const [profiles, clinics, reasons, settings] = await Promise.all([
+    fetchAll('profiles'), fetchAll('clinics'), fetchAll('reasons', 'idx'), fetchAll('settings'),
+  ]);
+  store.users = profiles.map(mapProfile);
+  store.clinics = clinics.map(mapClinic);
+  store.reasons = [];
+  reasons.forEach(r => { store.reasons[r.idx] = r.name; });
+  settings.forEach(applySetting);
+  await Promise.all([loadVisits(), loadLeads()]);
+}
+
+__exports.loadVisits = loadVisits;
+__exports.loadLeads = loadLeads;
+__exports.loadLog = loadLog;
+__exports.loadAll = loadAll;
+};
+
+/* ===== js/api/logApi.js ===== */
+__defs['js/api/logApi.js'] = function (__exports) {
+/**
+ * api/logApi.js - רישום פעולות ביומן השינויים.
+ * הרישום נעשה "ברקע": כישלון ביומן לא מפריע למשתמש.
+ * חשוב: לא רושמים ביומן מידע אישי (ת.ז, טלפון, שמות לידים).
+ */
+const { sb } = __req('js/api/client.js');
+const { me } = __req('js/domain/permissions.js');
+
+function logChange(what) {
+  const user = me();
+  sb.from('change_log').insert({ user_id: user.id, user_name: user.name, what }).then(() => {}, () => {});
+}
+
+__exports.logChange = logChange;
+};
+
+/* ===== js/api/mappers.js ===== */
+__defs['js/api/mappers.js'] = function (__exports) {
+/**
+ * api/mappers.js - המרת שורות מבסיס הנתונים (שמות שדות באנגלית עם קו תחתון)
+ * לאובייקטים שהאפליקציה עובדת איתם. מקום אחד שמכיר את מבנה הטבלאות.
+ */
+const { CAP_COUNT } = __req('js/config.js');
+
+/** משלים מערך קפיטציות לאורך המלא (ערכים חסרים הם null = "לא דווח") */
+function padCaps(arr) {
+  const out = (arr || []).slice();
+  while (out.length < CAP_COUNT) out.push(null);
+  return out;
+}
+
+function mapProfile(r) {
+  return { id: r.id, username: r.username, name: r.name, title: r.title, role: r.role, mg: r.mg, units: r.units || [] };
+}
+
+/** j0 ו-l0 הם עותק של הערכים כפי שנטענו: ערך שכבר קיים ננעל לעריכה עבור רכזים */
+function mapClinic(r) {
+  const j = padCaps(r.j);
+  const l = padCaps(r.l);
+  return {
+    id: r.id, mg: r.mg, name: r.name, code: r.code, town: r.town, addr: r.addr,
+    sector: r.sector, kind: r.kind, target: r.target, dr: r.dr, adm: r.adm, nur: r.nur,
+    ins: r.ins, hospital: r.hospital, pool: r.pool,
+    j, l, j0: j.slice(), l0: l.slice(), rs: r.rs || {},
+    updated: r.updated, source: r.source,
+  };
+}
+
+function mapVisit(r) {
+  return {
+    id: r.id, clinicId: r.clinic_id, coordId: r.coord_id, date: r.vdate, time: r.vtime,
+    purpose: r.purpose, people: r.people, checks: r.checks || [], checklist: r.checklist || null,
+    summary: r.summary, tasks: r.tasks || [], edited: r.edited,
+  };
+}
+
+function mapLead(r) {
+  return {
+    id: r.id, ownerId: r.owner_id, idNumber: r.id_number, firstName: r.first_name, lastName: r.last_name,
+    phone: r.phone, city: r.city, source: r.source, referrerName: r.referrer_name, eventLocation: r.event_location,
+    status: r.status, followupAt: r.followup_at, createdAt: r.created_at,
+  };
+}
+
+__exports.mapProfile = mapProfile;
+__exports.mapClinic = mapClinic;
+__exports.mapVisit = mapVisit;
+__exports.mapLead = mapLead;
+};
+
+/* ===== js/api/settingsApi.js ===== */
+__defs['js/api/settingsApi.js'] = function (__exports) {
+/**
+ * api/settingsApi.js - שמירת הגדרות מערכת (למנהל בלבד, נאכף בשרת).
+ * מפתחות: checklist, lead_sources, size_thresholds
+ */
+const { sb } = __req('js/api/client.js');
+
+async function saveSetting(key, value) {
+  const { error } = await sb.from('settings').upsert({ key, value });
+  return { error };
+}
+
+__exports.saveSetting = saveSetting;
+};
+
+/* ===== js/api/visitsApi.js ===== */
+__defs['js/api/visitsApi.js'] = function (__exports) {
+/**
+ * api/visitsApi.js - כתיבה של ביקורים לשרת.
+ * כל פונקציה מחזירה { data, error }. כשהרשאה נדחתה השרת מחזיר 0 שורות, ולכן בודקים גם data.length.
+ */
+const { sb } = __req('js/api/client.js');
+const { mapVisit } = __req('js/api/mappers.js');
+
+/** שדות הביקור כפי שהם נשמרים בטבלה */
+function toRow(v) {
+  return {
+    vdate: v.date, vtime: v.time, purpose: v.purpose, people: v.people,
+    checks: v.checks, checklist: v.checklist, summary: v.summary, tasks: v.tasks,
+  };
+}
+
+async function insertVisit(clinicId, coordId, visit) {
+  const { data, error } = await sb.from('visits').insert({ clinic_id: clinicId, coord_id: coordId, ...toRow(visit) }).select();
+  return { visit: data && data[0] ? mapVisit(data[0]) : null, error };
+}
+
+async function updateVisit(id, visit, editedOn) {
+  const { data, error } = await sb.from('visits').update({ ...toRow(visit), edited: editedOn }).eq('id', id).select();
+  return { ok: !error && data && data.length > 0, error };
+}
+
+async function updateVisitTasks(id, tasks) {
+  const { data, error } = await sb.from('visits').update({ tasks }).eq('id', id).select();
+  return { ok: !error && data && data.length > 0, error };
+}
+
+async function deleteVisit(id) {
+  const { data, error } = await sb.from('visits').delete().eq('id', id).select();
+  return { ok: !error && data && data.length > 0, error };
+}
+
+__exports.insertVisit = insertVisit;
+__exports.updateVisit = updateVisit;
+__exports.updateVisitTasks = updateVisitTasks;
+__exports.deleteVisit = deleteVisit;
+};
+
+/* ===== js/config.js ===== */
+__defs['js/config.js'] = function (__exports) {
+/**
+ * config.js - קבועי המערכת במקום אחד.
+ * כאן משנים מספרים, שמות ורשימות ברירת מחדל. אין כאן לוגיקה.
+ */
+
+// ---------- חיבור ל-Supabase ----------
+// המפתח הוא "anon" ציבורי בכוונה: ההגנה האמיתית היא כללי ההרשאה (RLS) בבסיס הנתונים.
+const SB_URL = 'https://afdiyssnlugstzrecxqq.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmZGl5c3NubHVnc3R6cmVjeHFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTI0OTMsImV4cCI6MjEwODA4ODQ5M30.tJl5G5O-QF1ABdku94uEJL0RFYBt2irIxn80ExfepAY';
+// שם המשתמש שמוקלד במסך הכניסה מומר לכתובת דוא"ל פנימית בעזרת הסיומת הזו
+const MAIL_DOMAIN = '@visitapp.example.com';
+
+// ---------- קפיטציות ----------
+// הסדר חשוב: המיקום ברשימה הוא האינדקס במערכי j ו-l בבסיס הנתונים.
+const CAPS = [
+  'מרץ 2025', 'מאי 2025', 'יולי 2025', 'ספט׳ 2025', 'נוב׳ 2025',
+  'ינו׳ 2026', 'מרץ 2026', 'מאי 2026', 'יולי 2026', 'ספט׳ 2026', 'נוב׳ 2026',
+];
+const CAP_COUNT = CAPS.length;
+const FIRST_CAP_2026 = 5;                       // אינדקס הקפיטציה הראשונה של 2026
+const CAPS_2026 = [5, 6, 7, 8, 9, 10];          // אינדקסי קפיטציות 2026
+const CAPS_PER_YEAR = 6;
+
+// ---------- שמות להצגה ----------
+const MG_NAMES = {
+  'חפר': 'מנהלת חפר',
+  'שרון': 'מנהלת שרון',
+  'שומרון': 'מנהלת שומרון',
+  'בתי חולים': 'בתי חולים',
+};
+const ROLE_NAMES = {
+  admin: 'מנהל – גישה מלאה',
+  viewall: 'צפייה בכל המינהלות',
+  coord: 'המינהלת שלו/ה בלבד',
+  hosp: 'בתי החולים שלה בלבד',
+};
+
+// ---------- ספי תצוגה ----------
+const TARGET_ALERT_PCT = 70;      // מתחת לאחוז הזה מהיעד מרפאה נחשבת "בפיגור"
+const BELOW_PREVIEW_COUNT = 8;    // כמה מרפאות מוצגות לפני לחיצה על "הצגת הכל"
+const VISIT_STALE_DAYS = 20;      // מרפאה ללא ביקור מעל מספר הימים הזה מסומנת
+const LIST_PAGE_SIZE = 40;        // גודל "עמוד" ברשימת היחידות
+
+// ---------- ברירות מחדל להגדרות שנשמרות בבסיס הנתונים (טבלת settings) ----------
+const DEFAULT_CHECKLIST = [
+  'מעבר על יעד המצטרפים והביצוע בפועל',
+  'שיחה על מאזן המצטרפים והעוזבים',
+  'מעבר על סיבות העזיבה המובילות',
+  'מעבר על מקורות גיוס ותרומת עובדים',
+  'מעבר על יעד הלידים והטיפול בהם',
+  'קביעת תאריך למרתון גיוס',
+  'הגדרת משימות להמשך מול המרפאה',
+];
+const DEFAULT_LEAD_SOURCES = ['פנייה ישירה', 'תרומת עובדים', 'פעילות שטח', 'מרתון גיוס', 'אחר'];
+// מקורות שפותחים שדה נוסף בטופס (השם חייב להיות זהה לשם ברשימת המקורות במסך הניהול)
+const LEAD_SOURCE_EMPLOYEE = 'תרומת עובדים';                  // נפתח: שם העובד הממליץ
+const LEAD_SOURCES_EVENT = ['פעילות שטח', 'מרתון גיוס'];      // נפתח: מיקום האירוע
+// גודל מרפאה לפי מספר מבוטחים: בינונית מ-medium, גדולה מ-large, מתחת לזה קטנה
+const DEFAULT_SIZE_THRESHOLDS = { medium: 3000, large: 8000 };
+
+// ---------- לידים ----------
+const LEAD_STATUSES = ['חדש', 'אין מענה', 'המשך טיפול', 'לא מעוניין', 'בוצע מעבר'];
+const LEAD_STATUS_FOLLOWUP = 'המשך טיפול';   // הסטטוס שמחייב מועד לשיחה נוספת
+
+__exports.SB_URL = SB_URL;
+__exports.SB_KEY = SB_KEY;
+__exports.MAIL_DOMAIN = MAIL_DOMAIN;
+__exports.CAPS = CAPS;
+__exports.CAP_COUNT = CAP_COUNT;
+__exports.FIRST_CAP_2026 = FIRST_CAP_2026;
+__exports.CAPS_2026 = CAPS_2026;
+__exports.CAPS_PER_YEAR = CAPS_PER_YEAR;
+__exports.MG_NAMES = MG_NAMES;
+__exports.ROLE_NAMES = ROLE_NAMES;
+__exports.TARGET_ALERT_PCT = TARGET_ALERT_PCT;
+__exports.BELOW_PREVIEW_COUNT = BELOW_PREVIEW_COUNT;
+__exports.VISIT_STALE_DAYS = VISIT_STALE_DAYS;
+__exports.LIST_PAGE_SIZE = LIST_PAGE_SIZE;
+__exports.DEFAULT_CHECKLIST = DEFAULT_CHECKLIST;
+__exports.DEFAULT_LEAD_SOURCES = DEFAULT_LEAD_SOURCES;
+__exports.LEAD_SOURCE_EMPLOYEE = LEAD_SOURCE_EMPLOYEE;
+__exports.LEAD_SOURCES_EVENT = LEAD_SOURCES_EVENT;
+__exports.DEFAULT_SIZE_THRESHOLDS = DEFAULT_SIZE_THRESHOLDS;
+__exports.LEAD_STATUSES = LEAD_STATUSES;
+__exports.LEAD_STATUS_FOLLOWUP = LEAD_STATUS_FOLLOWUP;
+};
+
+/* ===== js/core/bus.js ===== */
+__defs['js/core/bus.js'] = function (__exports) {
+/**
+ * core/bus.js - "מתווך" קטן שמונע תלויות מעגליות בין מסכים לבין הניווט.
+ *
+ * מסכים צריכים לבקש "צייר מחדש" או "עבור למסך אחר", אבל הם לא צריכים להכיר את הנתב.
+ * הנתב רושם את הפונקציות האמיתיות פעם אחת באתחול (ב-main.js).
+ */
+let renderer = () => {};
+let navigator = () => {};
+
+const setRenderer = fn => { renderer = fn; };
+const setNavigator = fn => { navigator = fn; };
+
+/** מצייר מחדש את המסך הנוכחי */
+const requestRender = () => renderer();
+
+/** עובר למסך אחר: navigate('clinics', { clinicId: 'חפר-5182' }) */
+const navigate = (tab, extraUiState) => navigator(tab, extraUiState);
+
+__exports.setRenderer = setRenderer;
+__exports.setNavigator = setNavigator;
+__exports.requestRender = requestRender;
+__exports.navigate = navigate;
+};
+
+/* ===== js/core/dom.js ===== */
+__defs['js/core/dom.js'] = function (__exports) {
+/**
+ * core/dom.js - עזרים קטנים לעבודה עם הדף.
+ */
+
+/** קיצור ל-querySelector */
+const $ = selector => document.querySelector(selector);
+
+/** הודעה קצרה בתחתית המסך שנעלמת מעצמה */
+function toast(text) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = text;
+  el.setAttribute('role', 'status');
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+/** טקסט שגיאה קריא מתוך שגיאה של שרת */
+function errorText(error) {
+  return error && error.message ? error.message : 'שגיאה לא צפויה';
+}
+
+/**
+ * מצייר מחדש ומחזיר את הפוקוס (ואת מיקום הסמן) לשדה שהמשתמש הקליד בו.
+ * נדרש בחיפוש חי, כי ציור מחדש מוחק את השדה ויוצר אותו מחדש.
+ */
+function rerenderKeepingFocus(fieldId, rerender) {
+  const old = document.getElementById(fieldId);
+  const caret = old ? old.selectionStart : 0;
+  rerender();
+  const fresh = document.getElementById(fieldId);
+  if (fresh) {
+    fresh.focus();
+    fresh.setSelectionRange(caret, caret);
+  }
+}
+
+/** גולל לראש הדף */
+function scrollTop() {
+  window.scrollTo(0, 0);
+}
+
+__exports.toast = toast;
+__exports.errorText = errorText;
+__exports.rerenderKeepingFocus = rerenderKeepingFocus;
+__exports.scrollTop = scrollTop;
+__exports.$ = $;
+};
+
+/* ===== js/core/events.js ===== */
+__defs['js/core/events.js'] = function (__exports) {
+/**
+ * core/events.js - ניהול אירועים מרוכז ("האזנה אחת לכל הדף").
+ *
+ * במקום להצמיד מאזין לכל כפתור, כל אלמנט ב-HTML מצהיר מה הוא עושה באמצעות מאפיין data:
+ *   data-act="saveVisit"  - פעולה בלחיצה
+ *   data-chg="leadStatus" - פעולה בשינוי ערך (select, checkbox, תאריך)
+ *   data-inp="searchLeads"- פעולה בכל הקלדה
+ *   data-enter="login"    - פעולה בלחיצה על Enter בתוך השדה
+ *
+ * כל מסך מייצא אובייקט handlers עם פונקציות בשמות האלה, ו-main.js רושם אותן כאן.
+ * פונקציית פעולה מקבלת (element, event) ויכולה לקרוא מאפייני data נוספים דרך element.dataset.
+ */
+const handlers = new Map();
+
+/** רושם פעולות של מסך. שם כפול בין מסכים הוא שגיאה ולכן נזרקת חריגה. */
+function registerHandlers(map) {
+  Object.keys(map).forEach(name => {
+    if (handlers.has(name)) throw new Error(`שם פעולה כפול: ${name}`);
+    handlers.set(name, map[name]);
+  });
+}
+
+function run(name, el, event) {
+  const fn = handlers.get(name);
+  if (fn) fn(el, event);
+}
+
+/** מחבר את מאזיני הדף. נקרא פעם אחת באתחול. */
+function initEvents() {
+  document.addEventListener('click', event => {
+    const el = event.target.closest('[data-act]');
+    if (el) run(el.dataset.act, el, event);
+  });
+
+  document.addEventListener('change', event => {
+    const el = event.target.closest('[data-chg]');
+    if (el) run(el.dataset.chg, el, event);
+  });
+
+  document.addEventListener('input', event => {
+    const el = event.target.closest('[data-inp]');
+    if (el) run(el.dataset.inp, el, event);
+  });
+
+  document.addEventListener('keydown', event => {
+    // Enter או רווח על אלמנט שמתנהג ככפתור (נגישות מקלדת)
+    if ((event.key === 'Enter' || event.key === ' ') && event.target.matches && event.target.matches('[role="button"][data-act]')) {
+      event.preventDefault();
+      event.target.click();
+      return;
+    }
+    // Enter בתוך שדה שמוגדר data-enter
+    if (event.key === 'Enter' && event.target.dataset && event.target.dataset.enter) {
+      run(event.target.dataset.enter, event.target, event);
+    }
+  });
+}
+
+__exports.registerHandlers = registerHandlers;
+__exports.initEvents = initEvents;
+};
+
+/* ===== js/core/session.js ===== */
+__defs['js/core/session.js'] = function (__exports) {
+/**
+ * core/session.js - תחילת וסיום "ישיבה" של משתמש: טעינת הנתונים אחרי כניסה וניקוי ביציאה.
+ */
+const { ui, resetUi, clearStore } = __req('js/core/state.js');
+const { requestRender } = __req('js/core/bus.js');
+const { $ } = __req('js/core/dom.js');
+const { loadAll } = __req('js/api/loaders.js');
+const { signOut } = __req('js/api/auth.js');
+const { me } = __req('js/domain/permissions.js');
+const { errorText } = __req('js/core/dom.js');
+
+/**
+ * נקרא אחרי כניסה מוצלחת (או כשמתגלה כניסה קיימת בטעינת הדף).
+ * @returns {Promise<{error?:string}>}
+ */
+async function startSession(userId) {
+  ui.userId = userId;
+  $('#app').innerHTML = '<div class="empty">טוען נתונים…</div>';
+  try {
+    await loadAll();
+  } catch (e) {
+    ui.userId = null;
+    return { error: 'שגיאה בטעינת הנתונים: ' + errorText(e) };
+  }
+  if (me().role === 'none') {
+    await signOut();
+    ui.userId = null;
+    return { error: 'למשתמש הזה אין הרשאות במערכת' };
+  }
+  resetUi();
+  requestRender();
+  return {};
+}
+
+/** ניקוי כל מה שנטען, כדי שמשתמש הבא באותו דפדפן לא יראה שאריות */
+function endSession() {
+  clearStore();
+  resetUi();
+  ui.userId = null;
+}
+
+__exports.startSession = startSession;
+__exports.endSession = endSession;
+};
+
+/* ===== js/core/state.js ===== */
+__defs['js/core/state.js'] = function (__exports) {
+/**
+ * core/state.js - מקום אחד לכל מצב האפליקציה.
+ *
+ *  store - הנתונים שנטענו מהשרת (מרפאות, ביקורים, לידים, משתמשים והגדרות).
+ *  ui    - מצב התצוגה (איזה מסך פתוח, מה מסונן, מה בעריכה).
+ *
+ * שני האובייקטים משותפים לכל המודולים, ולכן משנים את התכונות שלהם ולא מחליפים את האובייקט עצמו.
+ */
+const { DEFAULT_CHECKLIST, DEFAULT_LEAD_SOURCES, DEFAULT_SIZE_THRESHOLDS, LIST_PAGE_SIZE } = __req('js/config.js');
+
+/** נתונים מהשרת */
+const store = {
+  users: [],          // פרופילים של כל המשתמשים (שם, תפקיד, מינהלת)
+  clinics: [],        // רק המרפאות שמותר למשתמש הנוכחי לראות (הסינון נעשה בשרת)
+  reasons: [],        // שמות סיבות העזיבה לפי אינדקס
+  visits: [],         // ביקורים
+  leads: [],          // לידים (רק של המשתמש, או כולם למנהל)
+  log: [],            // יומן שינויים (למנהל בלבד)
+  settings: {
+    checklist: DEFAULT_CHECKLIST.slice(),
+    leadSources: DEFAULT_LEAD_SOURCES.slice(),
+    sizeThresholds: { ...DEFAULT_SIZE_THRESHOLDS },
+  },
+};
+
+/** מצב התחלתי של מסך הלידים */
+function emptyLeadsUi() {
+  return {
+    draft: {
+      idNumber: '', firstName: '', lastName: '', phone: '', city: '', source: '', referrer: '', eventLocation: '',
+      status: 'חדש', followup: '',
+    },
+    error: '',
+    statusFilter: '',
+    search: '',
+    coordFilter: '',
+    editId: null,
+    editDraft: { status: '', followup: '' },
+    editError: '',
+    confirmDelete: null,
+    shown: [],        // הלידים שמוצגים כרגע בטבלה (לייצוא לאקסל)
+  };
+}
+
+/** מצב תצוגה */
+const ui = {
+  userId: null,             // מזהה המשתמש המחובר
+  tab: 'home',              // המסך הפעיל
+  busy: false,              // true בזמן שמירה, למניעת לחיצה כפולה
+  // מרפאות
+  clinicId: null,           // מרפאה פתוחה (דף מרפאה)
+  editClinic: false,        // טופס עריכת נתוני מרפאה פתוח
+  search: '',
+  limit: LIST_PAGE_SIZE,
+  filters: { mg: '', sector: '', kind: '', sort: 'bal' },
+  // ביקורים
+  visitClinic: null,        // מרפאה שבה ממלאים טופס ביקור
+  showVisit: null,          // ביקור פתוח לצפייה
+  editVisit: null,          // ביקור בעריכה
+  confirmDeleteVisit: null,
+  visitFilters: { clinic: '', coord: '', rc: '', status: '', period: '' },
+  visitsShown: [],          // הביקורים שמוצגים כרגע (לייצוא לאקסל)
+  // בית
+  homeCoord: '',            // סינון לפי רכז בכרטיס הביקורים
+  showAllBelow: false,      // הרשימה המלאה של מרפאות מתחת ליעד
+  belowIncludeSmall: false, // כולל מרפאות קטנות ברשימה המלאה
+  // לידים
+  leads: emptyLeadsUi(),
+};
+
+/** מאפס את מצב התצוגה (בכניסה ובצאת מהמערכת) */
+function resetUi() {
+  const fresh = {
+    tab: 'home', busy: false, clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
+    filters: { mg: '', sector: '', kind: '', sort: 'bal' },
+    visitClinic: null, showVisit: null, editVisit: null, confirmDeleteVisit: null,
+    visitFilters: { clinic: '', coord: '', rc: '', status: '', period: '' }, visitsShown: [],
+    homeCoord: '', showAllBelow: false, belowIncludeSmall: false, leads: emptyLeadsUi(),
+  };
+  Object.assign(ui, fresh);
+}
+
+/** מנקה את כל הנתונים שנטענו (ביציאה מהמערכת) */
+function clearStore() {
+  store.users = []; store.clinics = []; store.reasons = []; store.visits = [];
+  store.leads = []; store.log = [];
+}
+
+__exports.emptyLeadsUi = emptyLeadsUi;
+__exports.resetUi = resetUi;
+__exports.clearStore = clearStore;
+__exports.store = store;
+__exports.ui = ui;
+};
+
+/* ===== js/domain/checklist.js ===== */
+__defs['js/domain/checklist.js'] = function (__exports) {
+/**
+ * domain/checklist.js - צ'ק ליסט של ביקור.
+ * כל ביקור שומר עותק של הסעיפים שהיו בזמן הביקור, כדי ששינוי הרשימה בהמשך
+ * לא יעוות סימונים של ביקורים ישנים.
+ */
+const { store } = __req('js/core/state.js');
+
+/** הסעיפים של ביקור מסוים (העותק השמור, ואם אין, הרשימה הנוכחית) */
+function visitChecklist(visit) {
+  return visit && visit.checklist && visit.checklist.length ? visit.checklist : store.settings.checklist;
+}
+
+/** אחוז הסעיפים שסומנו בביקור */
+function completionPct(visit) {
+  const items = visitChecklist(visit);
+  if (!items.length) return 0;
+  return Math.round(visit.checks.filter(Boolean).length / items.length * 100);
+}
+
+__exports.visitChecklist = visitChecklist;
+__exports.completionPct = completionPct;
+};
+
+/* ===== js/domain/metrics.js ===== */
+__defs['js/domain/metrics.js'] = function (__exports) {
+/**
+ * domain/metrics.js - כל החישובים של המערכת. פונקציות טהורות: מקבלות נתונים ומחזירות מספרים,
+ * בלי לצייר דבר. כך קל לבדוק אותן ולשנות כללי חישוב במקום אחד.
+ *
+ * מושגים:
+ *  - יעד: מספר מצטרפים לקפיטציה (נקבע מראש לכל קפיטציות 2026).
+ *  - אחוז מהיעד: מצטרפים בפועל חלקי (יעד x מספר הקפיטציות שדווחו).
+ *  - מאזן: מצטרפים פחות עוזבים.
+ */
+const { store } = __req('js/core/state.js');
+const { CAPS_2026, CAPS_PER_YEAR, CAP_COUNT, FIRST_CAP_2026, TARGET_ALERT_PCT } = __req('js/config.js');
+
+/** האם נתוני קפיטציה דווחו (גם מצטרפים וגם עוזבים) */
+function isReported(clinic, capIndex) {
+  return clinic.j[capIndex] !== null && clinic.l[capIndex] !== null;
+}
+
+/**
+ * סטטיסטיקה של מרפאה אחת ל-2026.
+ * @returns {{j,l,bal,n,tg,yt,ya,pct}} n = קפיטציות שדווחו, tg = יעד לקפיטציה,
+ *   yt = יעד יחסי (tg x n), ya = יעד שנתי, pct = אחוז מהיעד היחסי (או null אם אין יעד)
+ */
+function clinicStats(clinic) {
+  let joiners = 0, leavers = 0, reported = 0;
+  CAPS_2026.forEach(i => {
+    if (isReported(clinic, i)) {
+      joiners += clinic.j[i];
+      leavers += clinic.l[i];
+      reported++;
+    }
+  });
+  const perCap = clinic.target > 0 ? clinic.target : null;
+  const relative = perCap ? perCap * reported : null;
+  return {
+    j: joiners, l: leavers, bal: joiners - leavers, n: reported,
+    tg: perCap, yt: relative, ya: perCap ? perCap * CAPS_PER_YEAR : null,
+    pct: relative ? (joiners / relative) * 100 : null,
+  };
+}
+
+/** סיכום של קבוצת מרפאות (מינהלת, כל היחידות וכו') */
+function aggregate(clinics) {
+  let J = 0, L = 0, withTargetJ = 0, relTarget = 0, annualTarget = 0, maxReported = 0, reportingClinics = 0;
+  clinics.forEach(c => {
+    const s = clinicStats(c);
+    J += s.j;
+    L += s.l;
+    if (s.n > maxReported) maxReported = s.n;
+    if (s.n) reportingClinics++;
+    if (s.yt) { withTargetJ += s.j; relTarget += s.yt; annualTarget += s.ya; }
+  });
+  return {
+    J, L, bal: J - L,
+    jt: withTargetJ, tt: relTarget, ta: annualTarget,
+    nmax: maxReported, reporting: reportingClinics,
+    targetPct: relTarget ? (withTargetJ / relTarget) * 100 : null,
+  };
+}
+
+/**
+ * סיכום לפי קפיטציה לקבוצת מרפאות: מצטרפים, עוזבים, מאזן ויעד (רק 2026).
+ * איבר null = אף יחידה לא דיווחה על הקפיטציה.
+ */
+function capSeries(clinics) {
+  const series = [];
+  for (let i = 0; i < CAP_COUNT; i++) {
+    let j = 0, l = 0, any = false, targetOfReporters = 0;
+    clinics.forEach(c => {
+      if (!isReported(c, i)) return;
+      j += c.j[i];
+      l += c.l[i];
+      any = true;
+      if (c.target > 0 && i >= FIRST_CAP_2026) targetOfReporters += c.target;
+    });
+    series.push(any ? { j, l, bal: j - l, tt: targetOfReporters } : null);
+  }
+  return series;
+}
+
+/** האינדקס של הקפיטציה האחרונה שדווחה בקבוצה, או -1 */
+function lastReportedCap(series) {
+  for (let i = series.length - 1; i >= 0; i--) if (series[i]) return i;
+  return -1;
+}
+
+/** סכום סיבות עזיבה לפי סיבה, בטווח קפיטציות. מחזיר { אינדקס סיבה: סכום } */
+function reasonTotals(clinics, capIndexes) {
+  const totals = {};
+  clinics.forEach(c => {
+    Object.keys(c.rs).forEach(reason => {
+      const perCap = c.rs[reason];
+      const sum = capIndexes.reduce((s, i) => s + (perCap[i] || 0), 0);
+      if (sum) totals[reason] = (totals[reason] || 0) + sum;
+    });
+  });
+  return totals;
+}
+
+/** כל המשימות הפתוחות בביקורים של קבוצת מרפאות */
+function openTasks(clinics) {
+  const ids = new Set(clinics.map(c => c.id));
+  const result = [];
+  store.visits.forEach(visit => {
+    if (!ids.has(visit.clinicId)) return;
+    visit.tasks.forEach((task, index) => {
+      if (!task.done) result.push({ visit, task, index });
+    });
+  });
+  return result;
+}
+
+/** תאריך הביקור האחרון במרפאה, או null */
+function lastVisitDate(clinicId) {
+  let last = null;
+  store.visits.forEach(v => {
+    if (v.clinicId === clinicId && (!last || v.date > last)) last = v.date;
+  });
+  return last;
+}
+
+/** האם יעד המשימה עבר (ולא בוצעה) */
+function isOverdue(task, today) {
+  return !task.done && task.due && task.due < today;
+}
+
+// ---------- גודל מרפאה ----------
+
+/** גודל לפי מספר מבוטחים: 'large' | 'medium' | 'small', או null למאגרים, בתי חולים ויחידות ללא נתון */
+function sizeOf(clinic) {
+  if (clinic.pool || clinic.hospital || clinic.ins === null || clinic.ins === undefined) return null;
+  const { medium, large } = store.settings.sizeThresholds;
+  if (clinic.ins >= large) return 'large';
+  if (clinic.ins >= medium) return 'medium';
+  return 'small';
+}
+
+const SIZE_LABELS = { large: 'גדולה', medium: 'בינונית', small: 'קטנה' };
+
+// ---------- מרפאות בפיגור ----------
+
+/**
+ * מרפאות שמתחת לאחוז היעד, מהנמוכה לגבוהה.
+ * @param {boolean} includeSmall האם לכלול גם מרפאות קטנות (ברירת מחדל: רק בינוניות וגדולות)
+ * @returns {{clinic, stats, size}[]}
+ */
+function belowTargetClinics(clinics, includeSmall = false) {
+  return clinics
+    .filter(c => !c.pool && !c.hospital)
+    .map(clinic => ({ clinic, stats: clinicStats(clinic), size: sizeOf(clinic) }))
+    .filter(x => x.stats.pct !== null && x.stats.pct < TARGET_ALERT_PCT)
+    .filter(x => includeSmall || x.size === 'medium' || x.size === 'large')
+    .sort((a, b) => a.stats.pct - b.stats.pct);
+}
+
+/** צבע תגית לפי אחוז מהיעד: מתחת לסף = אדום, עד 100% = כתום, מעל = ירוק */
+function targetTone(pct) {
+  if (pct === null || pct === undefined) return 'na';
+  if (pct >= 100) return 'good';
+  if (pct >= TARGET_ALERT_PCT) return 'warn';
+  return 'bad';
+}
+
+/** צבע תגית לפי אחוז השלמה (צ'ק ליסט) */
+function completionTone(pct) {
+  return pct >= 85 ? 'good' : pct >= 60 ? 'warn' : 'bad';
+}
+
+__exports.isReported = isReported;
+__exports.clinicStats = clinicStats;
+__exports.aggregate = aggregate;
+__exports.capSeries = capSeries;
+__exports.lastReportedCap = lastReportedCap;
+__exports.reasonTotals = reasonTotals;
+__exports.openTasks = openTasks;
+__exports.lastVisitDate = lastVisitDate;
+__exports.isOverdue = isOverdue;
+__exports.sizeOf = sizeOf;
+__exports.belowTargetClinics = belowTargetClinics;
+__exports.targetTone = targetTone;
+__exports.completionTone = completionTone;
+__exports.SIZE_LABELS = SIZE_LABELS;
+};
+
+/* ===== js/domain/permissions.js ===== */
+__defs['js/domain/permissions.js'] = function (__exports) {
+/**
+ * domain/permissions.js - מי המשתמש הנוכחי ומה מותר לו.
+ *
+ * חשוב: אלה בדיקות לנוחות המסך בלבד (להסתיר כפתורים). האכיפה האמיתית נעשית
+ * בבסיס הנתונים (RLS), כך שגם עקיפה של הדף לא תחשוף נתונים.
+ *
+ * תפקידים: admin (מנהל), viewall (צפייה בכל המינהלות), coord (רכז/ת מינהלת), hosp (רכז/ת בתי חולים)
+ */
+const { store, ui } = __req('js/core/state.js');
+const { MG_NAMES } = __req('js/config.js');
+
+/** המשתמש המחובר (אובייקט ריק עם תפקיד "none" אם עדיין לא נטען) */
+function me() {
+  return store.users.find(u => u.id === ui.userId) || { id: null, name: '', title: '', role: 'none', units: [] };
+}
+
+function userName(id) {
+  const user = store.users.find(u => u.id === id);
+  return user ? user.name : '—';
+}
+
+/** משתמש ברמת ניהול: רואה את כל המינהלות */
+function isManagerView() {
+  const role = me().role;
+  return role === 'admin' || role === 'viewall';
+}
+
+/** רכז/ת שמתעדים ביקורים (מנהל ונופר לא מתעדים) */
+function canVisit() {
+  const role = me().role;
+  return role === 'coord' || role === 'hosp';
+}
+
+function canDeleteVisit() {
+  return isManagerView();
+}
+
+function canEditTargets() {
+  return me().role === 'admin';
+}
+
+/** האם מותר לערוך נתוני קפיטציה של מרפאה */
+function canEditClinic(clinic) {
+  const user = me();
+  return user.role === 'admin'
+    || (user.role === 'coord' && clinic.mg === user.mg)
+    || (user.role === 'hosp' && user.units.indexOf(clinic.id) >= 0);
+}
+
+/** המרפאות שהמשתמש רואה. השרת כבר מסנן, וכאן מוסיפים בדיקה כפולה למקרה של שינוי תפקיד בזמן ריצה */
+function visibleClinics() {
+  const user = me();
+  return store.clinics.filter(c =>
+    isManagerView()
+    || (user.role === 'coord' && c.mg === user.mg)
+    || (user.role === 'hosp' && user.units.indexOf(c.id) >= 0));
+}
+
+function getClinic(id) {
+  return visibleClinics().find(c => c.id === id) || null;
+}
+
+function clinicName(id) {
+  const clinic = store.clinics.find(c => c.id === id);
+  return clinic ? clinic.name : '—';
+}
+
+function visibleVisits() {
+  const ids = new Set(visibleClinics().map(c => c.id));
+  return store.visits.filter(v => ids.has(v.clinicId));
+}
+
+/** הרכז/ת האחראי/ת על מרפאה (לפי מינהלת, או בית חולים) */
+function coordinatorOf(clinic) {
+  return store.users.find(u =>
+    (u.role === 'coord' && u.mg === clinic.mg)
+    || (u.role === 'hosp' && u.units.indexOf(clinic.id) >= 0)) || null;
+}
+
+/** כל הרכזים (לתפריטי סינון) */
+function coordinators() {
+  return store.users.filter(u => u.role === 'coord' || u.role === 'hosp');
+}
+
+/** שם התחום שהמשתמש רואה, לכותרות */
+function scopeTitle() {
+  const user = me();
+  if (user.role === 'coord') return MG_NAMES[user.mg];
+  if (user.role === 'hosp') return 'בתי החולים שלך';
+  return 'כל המינהלות';
+}
+
+__exports.me = me;
+__exports.userName = userName;
+__exports.isManagerView = isManagerView;
+__exports.canVisit = canVisit;
+__exports.canDeleteVisit = canDeleteVisit;
+__exports.canEditTargets = canEditTargets;
+__exports.canEditClinic = canEditClinic;
+__exports.visibleClinics = visibleClinics;
+__exports.getClinic = getClinic;
+__exports.clinicName = clinicName;
+__exports.visibleVisits = visibleVisits;
+__exports.coordinatorOf = coordinatorOf;
+__exports.coordinators = coordinators;
+__exports.scopeTitle = scopeTitle;
+};
+
+/* ===== js/exports/leadsExcel.js ===== */
+__defs['js/exports/leadsExcel.js'] = function (__exports) {
+/**
+ * exports/leadsExcel.js - ייצוא טבלת מעקב הלידים לאקסל.
+ * הקובץ כולל ת.ז מלאה וטלפון (מידע אישי): יש לשמור אותו בזהירות ולמחוק כשאין בו צורך.
+ */
+const { toast } = __req('js/core/dom.js');
+const { fmtDateTime, todayIso } = __req('js/utils/format.js');
+const { userName } = __req('js/domain/permissions.js');
+const { downloadWorkbook, excelAvailable } = __req('js/exports/workbook.js');
+const { logChange } = __req('js/api/logApi.js');
+
+/** שורה לכל ליד. ת.ז וטלפון נשמרים כטקסט כדי שאפסים בהתחלה לא ייעלמו. */
+function leadRows(leads) {
+  return leads.map(l => ({
+    'תאריך פתיחה': fmtDateTime(l.createdAt),
+    'ת.ז': l.idNumber || '',
+    'שם פרטי': l.firstName,
+    'שם משפחה': l.lastName,
+    'טלפון': l.phone,
+    'עיר מגורים': l.city,
+    'מקור הליד': l.source,
+    'שם העובד הממליץ': l.referrerName || '',
+    'מיקום האירוע': l.eventLocation || '',
+    'סטטוס': l.status,
+    'מועד שיחה נוספת': l.followupAt ? fmtDateTime(l.followupAt) : '',
+    'רכז/ת': userName(l.ownerId),
+  }));
+}
+
+/** מייצא את הלידים שמוצגים כרגע בטבלה (אחרי סינון) */
+function exportLeads(leads) {
+  if (!excelAvailable()) return;
+  if (!leads.length) { toast('אין לידים לייצוא'); return; }
+  downloadWorkbook(`leads_${todayIso()}.xlsx`, [{
+    name: 'מעקב לידים',
+    rows: leadRows(leads),
+    widths: [18, 12, 14, 14, 13, 16, 16, 18, 18, 13, 18, 12],
+  }]);
+  logChange(`ייצוא לידים לאקסל (${leads.length} רשומות)`);
+  toast('הקובץ הורד');
+}
+
+__exports.exportLeads = exportLeads;
+};
+
+/* ===== js/exports/visitsExcel.js ===== */
+__defs['js/exports/visitsExcel.js'] = function (__exports) {
+/**
+ * exports/visitsExcel.js - ייצוא ביקורים לאקסל: לשונית "ביקורים" ולשונית "משימות".
+ */
+const { store } = __req('js/core/state.js');
+const { toast } = __req('js/core/dom.js');
+const { MG_NAMES } = __req('js/config.js');
+const { todayIso } = __req('js/utils/format.js');
+const { userName } = __req('js/domain/permissions.js');
+const { visitChecklist } = __req('js/domain/checklist.js');
+const { downloadWorkbook, excelAvailable } = __req('js/exports/workbook.js');
+const { logChange } = __req('js/api/logApi.js');
+
+const clinicOf = visit => store.clinics.find(c => c.id === visit.clinicId) || {};
+
+/** שורה לכל ביקור, עם עמודה לכל סעיף צ'ק ליסט (איחוד הסעיפים של כל הביקורים) */
+function visitRows(visits) {
+  const allItems = [];
+  visits.forEach(v => visitChecklist(v).forEach(t => { if (allItems.indexOf(t) < 0) allItems.push(t); }));
+  return visits.map(v => {
+    const clinic = clinicOf(v);
+    const items = visitChecklist(v);
+    const done = v.checks.filter(Boolean).length;
+    const row = {
+      'תאריך': v.date, 'שעה': v.time || '', 'מינהלת': MG_NAMES[clinic.mg] || '',
+      'מרפאה': clinic.name || '', 'ישוב': clinic.town || '', 'מתעד/ת': userName(v.coordId),
+      'מטרת הביקור': v.purpose || '', 'משתתפים': v.people || '',
+      'השלמת צ׳ק ליסט': items.length ? Math.round(done / items.length * 100) + '%' : '',
+    };
+    allItems.forEach(t => {
+      const k = items.indexOf(t);
+      row['✓ ' + t] = k < 0 ? '' : (v.checks[k] ? '✔' : '✘');
+    });
+    row['סיכום'] = v.summary || '';
+    row['משימות פתוחות'] = v.tasks.filter(t => !t.done).length;
+    row['נערך ב־'] = v.edited || '';
+    return row;
+  });
+}
+
+/** שורה לכל משימה בכל הביקורים */
+function taskRows(visits) {
+  const today = todayIso();
+  const rows = [];
+  visits.forEach(v => v.tasks.forEach(t => rows.push({
+    'תאריך ביקור': v.date, 'מרפאה': clinicOf(v).name || '', 'מתעד/ת': userName(v.coordId),
+    'משימה': t.text, 'אחראי': t.owner || '', 'תאריך יעד': t.due || '',
+    'בוצע': t.done ? 'כן' : 'לא', 'באיחור': (!t.done && t.due && t.due < today) ? 'כן' : '',
+  })));
+  return rows;
+}
+
+/** מייצא את רשימת הביקורים שמוצגת כרגע */
+function exportVisits(visits) {
+  if (!excelAvailable()) return;
+  if (!visits.length) { toast('אין ביקורים לייצוא'); return; }
+  const sorted = visits.slice().sort((a, b) => a.date.localeCompare(b.date) || String(a.time || '').localeCompare(String(b.time || '')));
+  const rows = visitRows(sorted);
+  const widths = Object.keys(rows[0]).map(k => (k === 'סיכום' ? 45 : Math.min(34, Math.max(11, k.length + 4))));
+  const sheets = [{ name: 'ביקורים', rows, widths }];
+  const tasks = taskRows(sorted);
+  if (tasks.length) sheets.push({ name: 'משימות', rows: tasks, widths: [13, 24, 12, 40, 12, 12, 8, 9] });
+  downloadWorkbook(`visits_${todayIso()}.xlsx`, sheets);
+  logChange(`ייצוא ביקורים לאקסל (${sorted.length} ביקורים)`);
+  toast('הקובץ הורד');
+}
+
+__exports.exportVisits = exportVisits;
+};
+
+/* ===== js/exports/workbook.js ===== */
+__defs['js/exports/workbook.js'] = function (__exports) {
+/**
+ * exports/workbook.js - יצירת קובץ אקסל להורדה.
+ * ספריית SheetJS נטענת כסקריפט רגיל ב-index.html ומוגדרת כ-XLSX.
+ */
+const { toast } = __req('js/core/dom.js');
+
+/** האם הספרייה נטענה (אם הרשת חסמה אותה, מציגים הודעה) */
+function excelAvailable() {
+  if (typeof XLSX === 'undefined') {
+    toast('רכיב הייצוא לא נטען. נסו לרענן את הדף');
+    return false;
+  }
+  return true;
+}
+
+/**
+ * מוריד קובץ אקסל בכיוון מימין לשמאל.
+ * @param {string} filename שם הקובץ
+ * @param {{name:string, rows:object[], widths?:number[]}[]} sheets לשונית לכל איבר; rows = מערך אובייקטים (כותרת = שם המפתח)
+ */
+function downloadWorkbook(filename, sheets) {
+  const wb = XLSX.utils.book_new();
+  sheets.forEach(sheet => {
+    const ws = XLSX.utils.json_to_sheet(sheet.rows);
+    if (sheet.widths) ws['!cols'] = sheet.widths.map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, ws, sheet.name);
+  });
+  wb.Workbook = { Views: [{ RTL: true }] };
+  XLSX.writeFile(wb, filename);
+}
+
+__exports.excelAvailable = excelAvailable;
+__exports.downloadWorkbook = downloadWorkbook;
+};
+
+/* ===== js/main.js ===== */
+__defs['js/main.js'] = function (__exports) {
+/**
+ * main.js - נקודת הכניסה: מחבר את כל החלקים ומפעיל את האפליקציה.
+ * אין כאן לוגיקה עסקית. רק חיווט: פעולות, נתב, אירועים וכניסה.
+ */
+const { initEvents, registerHandlers } = __req('js/core/events.js');
+const { startSession, endSession } = __req('js/core/session.js');
+const { currentUserId, onSignedOut } = __req('js/api/auth.js');
+const { initRouter, handlers: routerHandlers } = __req('js/ui/router.js');
+const { showLogin, handlers: loginHandlers } = __req('js/ui/screens/login.js');
+const { handlers: homeHandlers } = __req('js/ui/screens/home.js');
+const { handlers: clinicsHandlers } = __req('js/ui/screens/clinics.js');
+const { handlers: clinicDetailHandlers } = __req('js/ui/screens/clinicDetail.js');
+const { handlers: visitsHandlers } = __req('js/ui/screens/visits.js');
+const { handlers: visitDetailHandlers } = __req('js/ui/screens/visitDetail.js');
+const { handlers: visitFormHandlers } = __req('js/ui/screens/visitForm.js');
+const { handlers: leadsHandlers } = __req('js/ui/screens/leads.js');
+const { handlers: adminHandlers } = __req('js/ui/screens/admin.js');
+const { handlers: accountHandlers } = __req('js/ui/screens/account.js');
+
+/** רושם את הפעולות של כל המסכים. שם פעולה כפול בין מסכים יגרום לשגיאה מיד באתחול */
+function registerAllHandlers() {
+  [
+    routerHandlers, loginHandlers, homeHandlers, clinicsHandlers, clinicDetailHandlers,
+    visitsHandlers, visitDetailHandlers, visitFormHandlers, leadsHandlers, adminHandlers, accountHandlers,
+  ].forEach(registerHandlers);
+}
+
+/** אם כבר יש כניסה פעילה (אחרי רענון הדף), ממשיכים ממנה. אחרת מציגים מסך כניסה. */
+async function boot() {
+  const userId = await currentUserId();
+  if (!userId) { showLogin(); return; }
+  const result = await startSession(userId);
+  if (result.error) showLogin(result.error);
+}
+
+function startApp() {
+  initRouter();
+  registerAllHandlers();
+  initEvents();
+  onSignedOut(() => { endSession(); showLogin(); });
+  return boot();
+}
+
+startApp();
+
+__exports.startApp = startApp;
+};
+
+/* ===== js/ui/components/capTable.js ===== */
+__defs['js/ui/components/capTable.js'] = function (__exports) {
+/**
+ * ui/components/capTable.js - טבלת "מאזן לפי קפיטציה" (2026 בלבד):
+ * יעד מצטרפים, מצטרפים בפועל, עוזבים ומאזן. משמשת במסך הבית ובדף מרפאה.
+ */
+const { CAPS, CAPS_2026 } = __req('js/config.js');
+const { esc, sign, signClass } = __req('js/utils/format.js');
+
+const HEADER = `<thead><tr><th>קפיטציה</th><th>יעד מצטרפים</th><th>מצטרפים בפועל</th><th>עוזבים</th><th>מאזן</th></tr></thead>`;
+
+/** שורה בטבלה. values: { target, j, l } כאשר null/undefined = לא דווח */
+function row(label, target, j, l, boldTotal = false) {
+  const cell = boldTotal ? 'th' : 'td';
+  const reported = j !== null && l !== null && j !== undefined && l !== undefined;
+  const balance = reported ? j - l : null;
+  return `<tr>
+    <${cell}>${esc(label)}</${cell}>
+    <${cell}>${target ? esc(target) : '—'}</${cell}>
+    <${cell}>${reported ? j : '—'}</${cell}>
+    <${cell}>${reported ? l : '—'}</${cell}>
+    <${cell} class="${reported ? signClass(balance) : ''}">${reported ? sign(balance) : '—'}</${cell}>
+  </tr>`;
+}
+
+/**
+ * טבלה לקבוצת מרפאות.
+ * @param series  תוצאת capSeries
+ * @param futureTarget יעד כולל לקפיטציה שעוד לא דווחה (מוצג בשורה ריקה)
+ * @param total   { target, j, l } לשורת סיכום, או null
+ */
+function capTable(series, futureTarget, total) {
+  const rows = CAPS_2026.map(i => {
+    const s = series[i];
+    return row(CAPS[i], s ? s.tt : futureTarget, s ? s.j : null, s ? s.l : null);
+  }).join('');
+  const totalRow = total ? row('סה״כ 2026', Math.round(total.target), total.j, total.l, true) : '';
+  return `<div class="scroll"><table>${HEADER}<tbody>${rows}${totalRow}</tbody></table></div>
+    <div class="muted" style="margin-top:6px">היעד כולל רק יחידות שהוגדר להן יעד. שורת הסיכום כוללת קפיטציות שדווחו בלבד.</div>`;
+}
+
+/** טבלה למרפאה אחת: היעד הוא של המרפאה עצמה */
+function clinicCapTable(clinic, stats) {
+  const rows = CAPS_2026.map(i => {
+    const j = clinic.j[i];
+    const l = clinic.l[i];
+    return row(CAPS[i], clinic.target > 0 ? clinic.target : null, j, l);
+  }).join('');
+  const total = stats.n ? row('סה״כ 2026', stats.yt ? Math.round(stats.yt) : null, stats.j, stats.l, true) : '';
+  return `<div class="scroll"><table>${HEADER}<tbody>${rows}${total}</tbody></table></div>`;
+}
+
+__exports.capTable = capTable;
+__exports.clinicCapTable = clinicCapTable;
+};
+
+/* ===== js/ui/components/card.js ===== */
+__defs['js/ui/components/card.js'] = function (__exports) {
+/**
+ * ui/components/card.js - כרטיס עם כותרת (עטיפה בסיסית שחוזרת בכל המסכים).
+ */
+const { esc } = __req('js/utils/format.js');
+
+/** כרטיס: card('כותרת', '<p>תוכן</p>') */
+function card(title, bodyHtml, extraClass = '') {
+  const heading = title ? `<h3>${esc(title)}</h3>` : '';
+  return `<div class="card ${extraClass}">${heading}${bodyHtml}</div>`;
+}
+
+/** הודעת "אין נתונים" ממורכזת */
+function emptyNote(text) {
+  return `<div class="empty">${esc(text)}</div>`;
+}
+
+/** כפתור "חזרה" */
+function backButton(action, label) {
+  return `<button class="back" data-act="${action}">‹ ${esc(label)}</button>`;
+}
+
+__exports.card = card;
+__exports.emptyNote = emptyNote;
+__exports.backButton = backButton;
+};
+
+/* ===== js/ui/components/formFields.js ===== */
+__defs['js/ui/components/formFields.js'] = function (__exports) {
+/**
+ * ui/components/formFields.js - רכיבי טופס קטנים.
+ */
+const { esc } = __req('js/utils/format.js');
+
+/** אפשרויות ל-select. selected = הערך שנבחר, labelOf = המרת ערך לטקסט להצגה */
+function options(values, selected, labelOf = v => v) {
+  return values
+    .map(v => `<option value="${esc(v)}"${v === selected ? ' selected' : ''}>${esc(labelOf(v))}</option>`)
+    .join('');
+}
+
+/** select עם אפשרות ראשונה "הכול" (לסינונים) */
+function filterSelect({ id, label, chg, key, values, selected, labelOf }) {
+  return `<div><label for="${id}">${esc(label)}</label>
+    <select id="${id}" data-chg="${chg}" data-key="${key}">
+      <option value="">הכול</option>${options(values, selected, labelOf)}
+    </select></div>`;
+}
+
+/**
+ * עורך רשימת טקסטים (צ'ק ליסט, מקורות ליד): שדה לכל פריט, מחיקה, הוספה ושמירה.
+ * listId מזהה את הרשימה בפעולות: listAdd / listDel / listSave
+ */
+function editableList(listId, items, labelPrefix) {
+  const rows = items.map((text, i) => `
+    <div class="row" style="margin-bottom:8px">
+      <input class="list-input" data-list="${listId}" data-i="${i}" value="${esc(text)}" aria-label="${esc(labelPrefix)} ${i + 1}">
+      <button class="btn danger small" data-act="listDel" data-list="${listId}" data-i="${i}" aria-label="מחיקה">✕</button>
+    </div>`).join('');
+  return `${rows}
+    <div class="row">
+      <button class="btn ghost small" data-act="listAdd" data-list="${listId}">הוספת פריט</button>
+      <button class="btn small" data-act="listSave" data-list="${listId}">שמירה</button>
+    </div>`;
+}
+
+__exports.options = options;
+__exports.filterSelect = filterSelect;
+__exports.editableList = editableList;
+};
+
+/* ===== js/ui/components/listItem.js ===== */
+__defs['js/ui/components/listItem.js'] = function (__exports) {
+/**
+ * ui/components/listItem.js - שורה לחיצה ברשימה: שם, שורת משנה ותגית בצד.
+ */
+const { esc } = __req('js/utils/format.js');
+
+/**
+ * @param {{action:string, id:string, title:string, subtitle?:string, badgeHtml?:string}} o
+ */
+function listItem({ action, id, title, subtitle = '', badgeHtml = '' }) {
+  return `<div class="item" data-act="${action}" data-id="${esc(id)}" tabindex="0" role="button">
+    <div><div class="t">${esc(title)}</div><div class="muted">${esc(subtitle)}</div></div>
+    ${badgeHtml}
+  </div>`;
+}
+
+__exports.listItem = listItem;
+};
+
+/* ===== js/ui/components/pill.js ===== */
+__defs['js/ui/components/pill.js'] = function (__exports) {
+/**
+ * ui/components/pill.js - תגית צבעונית קטנה.
+ * tone: good (ירוק) | warn (כתום) | bad (אדום) | info (כחול-ירוק) | na (אפור)
+ */
+const { esc } = __req('js/utils/format.js');
+
+function pill(text, tone = 'na') {
+  return `<span class="pill ${tone}">${esc(text)}</span>`;
+}
+
+__exports.pill = pill;
+};
+
+/* ===== js/ui/components/statRows.js ===== */
+__defs['js/ui/components/statRows.js'] = function (__exports) {
+/**
+ * ui/components/statRows.js - שורות נתונים קטנות.
+ */
+const { esc } = __req('js/utils/format.js');
+
+/**
+ * שורה אחת של נתונים קצרים: "מצטרפים 12 · עוזבים 20 · מאזן -8".
+ * @param {{label:string, value:string|number, cls?:string}[]} items
+ */
+function inlineStats(items) {
+  const cells = items
+    .map(i => `<span>${esc(i.label)} <b class="${i.cls || ''}">${esc(i.value)}</b></span>`)
+    .join('');
+  return `<div class="s1">${cells}</div>`;
+}
+
+/** רשימה אנכית של שורות "שם  ערך" (בתוך כרטיס דשבורד) */
+function stackedStats(items) {
+  const rows = items
+    .map(i => `<span>${esc(i.label)} <b class="${i.cls || ''}">${esc(i.value)}</b></span>`)
+    .join('');
+  return `<div class="s2">${rows}</div>`;
+}
+
+/** מספר גדול עם צבע לפי סימן (למאזן) */
+function bigNumber(text, cls = '') {
+  return `<div class="big ${cls}">${esc(text)}</div>`;
+}
+
+/** פריט "תווית + ערך" לפרטי מרפאה (כרטיס נתוני מרפאה) */
+function keyValue(label, value) {
+  return `<div class="kv"><span>${esc(label)}</span><b>${esc(value)}</b></div>`;
+}
+
+
+__exports.inlineStats = inlineStats;
+__exports.stackedStats = stackedStats;
+__exports.bigNumber = bigNumber;
+__exports.keyValue = keyValue;
+};
+
+/* ===== js/ui/components/tabs.js ===== */
+__defs['js/ui/components/tabs.js'] = function (__exports) {
+/**
+ * ui/components/tabs.js - סרגל הניווט התחתון והכפתור בכותרת העליונה.
+ * כדי להוסיף מסך חדש לתפריט: מוסיפים שורה ל-TAB_DEFS ורושמים את המסך ב-ui/router.js.
+ */
+const { $ } = __req('js/core/dom.js');
+const { esc } = __req('js/utils/format.js');
+const { me } = __req('js/domain/permissions.js');
+
+/** adminOnly = מוצג למנהל בלבד */
+const TAB_DEFS = [
+  { id: 'home', icon: '🏠', label: 'בית' },
+  { id: 'clinics', icon: '🏥', label: 'יחידות' },
+  { id: 'visits', icon: '📝', label: 'ביקורים' },
+  { id: 'leads', icon: '📞', label: 'מעקב לידים' },
+  { id: 'admin', icon: '⚙️', label: 'ניהול', adminOnly: true },
+];
+
+function renderTabs(activeTab) {
+  const isAdmin = me().role === 'admin';
+  const html = TAB_DEFS
+    .filter(t => !t.adminOnly || isAdmin)
+    .map(t => `<button data-act="goTab" data-tab="${t.id}"${activeTab === t.id ? ' aria-current="page"' : ''}>
+      <span class="ic" aria-hidden="true">${t.icon}</span>${esc(t.label)}</button>`)
+    .join('');
+  $('#tabs').innerHTML = html;
+}
+
+/** הכותרת העליונה: תאריך היום, וכפתור עם שם המשתמש (פותח את מסך "החשבון שלי") */
+function renderWho() {
+  $('#hdate').textContent = new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
+  $('#who').innerHTML = `<button class="btn small" style="background:rgba(255,255,255,.15);color:#fff;min-height:36px" data-act="goTab" data-tab="account">${esc(me().name)} ▾</button>`;
+}
+
+function clearChrome() {
+  $('#tabs').innerHTML = '';
+  $('#who').innerHTML = '';
+}
+
+__exports.renderTabs = renderTabs;
+__exports.renderWho = renderWho;
+__exports.clearChrome = clearChrome;
+};
+
+/* ===== js/ui/components/visitItem.js ===== */
+__defs['js/ui/components/visitItem.js'] = function (__exports) {
+/**
+ * ui/components/visitItem.js - שורת ביקור ברשימות (דף מרפאה, מסך ביקורים).
+ */
+const { fmtDate } = __req('js/utils/format.js');
+const { clinicName, userName } = __req('js/domain/permissions.js');
+const { completionPct } = __req('js/domain/checklist.js');
+const { completionTone } = __req('js/domain/metrics.js');
+const { listItem } = __req('js/ui/components/listItem.js');
+const { pill } = __req('js/ui/components/pill.js');
+
+function visitItem(visit) {
+  const pct = completionPct(visit);
+  const open = visit.tasks.filter(t => !t.done).length;
+  const subtitle = `${userName(visit.coordId)} · ${visit.purpose || 'ללא מטרה'}${open ? ` · ${open} משימות פתוחות` : ''}`;
+  return listItem({
+    action: 'showVisit',
+    id: visit.id,
+    title: `${fmtDate(visit.date)} · ${clinicName(visit.clinicId)}`,
+    subtitle,
+    badgeHtml: pill(`${pct}%`, completionTone(pct)),
+  });
+}
+
+
+__exports.visitItem = visitItem;
+};
+
+/* ===== js/ui/router.js ===== */
+__defs['js/ui/router.js'] = function (__exports) {
+/**
+ * ui/router.js - הנתב: מחליט איזה מסך לצייר, ומטפל במעבר בין מסכים.
+ *
+ * כדי להוסיף מסך: ליצור קובץ ב-ui/screens שמייצא render() ו-handlers,
+ * להוסיף אותו ל-SCREENS כאן, ולהוסיף לשונית ב-ui/components/tabs.js.
+ */
+const { ui } = __req('js/core/state.js');
+const { $, scrollTop } = __req('js/core/dom.js');
+const { setRenderer, setNavigator } = __req('js/core/bus.js');
+const { loadVisits, loadLeads, loadLog } = __req('js/api/loaders.js');
+const { renderTabs, renderWho } = __req('js/ui/components/tabs.js');
+const { showLogin } = __req('js/ui/screens/login.js');
+const home = __req('js/ui/screens/home.js');
+const clinics = __req('js/ui/screens/clinics.js');
+const clinicDetail = __req('js/ui/screens/clinicDetail.js');
+const visits = __req('js/ui/screens/visits.js');
+const leads = __req('js/ui/screens/leads.js');
+const admin = __req('js/ui/screens/admin.js');
+const account = __req('js/ui/screens/account.js');
+
+/** מסך לכל לשונית. בלשונית "יחידות" הנתב בוחר בין הרשימה לדף המרפאה */
+const SCREENS = {
+  home,
+  clinics: { render: () => (ui.clinicId ? clinicDetail.render() || clinics.render() : clinics.render()) },
+  visits,
+  leads,
+  admin,
+  account,
+};
+
+/** מצייר את המסך הנוכחי (או את מסך הכניסה אם אין משתמש מחובר) */
+function render() {
+  if (!ui.userId) { showLogin(); return; }
+  renderTabs(ui.tab);
+  renderWho();
+  const screen = SCREENS[ui.tab] || home;
+  $('#app').innerHTML = screen.render();
+}
+
+/** מסכים שכדאי לרענן מהשרת בכל כניסה אליהם (כדי לראות מה שאחרים עדכנו) */
+const REFRESH_ON_ENTER = {
+  home: [loadVisits, loadLeads],
+  visits: [loadVisits],
+  leads: [loadLeads],
+  admin: [loadLog],
+};
+
+/** האם המשתמש באמצע מילוי טופס (כדי לא לצייר מחדש ולמחוק את מה שהקליד) */
+const isEditingForm = () => ui.visitClinic || ui.editVisit || ui.editClinic;
+
+/** עובר ללשונית. extra = מצב תצוגה נוסף, למשל { clinicId } */
+function navigate(tab, extra) {
+  ui.tab = tab;
+  ui.clinicId = null;
+  ui.editClinic = false;
+  ui.visitClinic = null;
+  ui.showVisit = null;
+  ui.editVisit = null;
+  ui.confirmDeleteVisit = null;
+  Object.assign(ui, extra || {});
+  render();
+  scrollTop();
+
+  // רענון ברקע אחרי הציור הראשון
+  (REFRESH_ON_ENTER[tab] || []).forEach(loader => {
+    loader().then(() => { if (ui.tab === tab && !isEditingForm()) render(); }).catch(() => {});
+  });
+}
+
+/** חיבור הנתב למתווך, כדי שמסכים יוכלו לבקש ציור וניווט בלי להכיר אותו */
+function initRouter() {
+  setRenderer(render);
+  setNavigator(navigate);
+}
+
+/** פעולת הלשוניות בסרגל התחתון */
+const handlers = {
+  goTab(el) { navigate(el.dataset.tab); },
+};
+
+__exports.render = render;
+__exports.navigate = navigate;
+__exports.initRouter = initRouter;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/account.js ===== */
+__defs['js/ui/screens/account.js'] = function (__exports) {
+/**
+ * ui/screens/account.js - "החשבון שלי": פרטי המשתמש, החלפת סיסמה ויציאה.
+ */
+const { $, toast, errorText } = __req('js/core/dom.js');
+const { esc } = __req('js/utils/format.js');
+const { MG_NAMES, ROLE_NAMES } = __req('js/config.js');
+const { me } = __req('js/domain/permissions.js');
+const { changePassword, signOut } = __req('js/api/auth.js');
+
+const MIN_PASSWORD_LENGTH = 8;
+
+function render() {
+  const user = me();
+  return `<h2 style="margin-top:4px">החשבון שלי</h2>
+    <div class="card">
+      <div style="font-weight:800">${esc(user.name)}</div>
+      <div class="muted">${esc(user.title)} · ${esc(ROLE_NAMES[user.role])}${user.mg ? ` (${esc(MG_NAMES[user.mg])})` : ''}</div>
+      <div class="muted">שם משתמש: ${esc(user.username)}</div>
+    </div>
+    <div class="card">
+      <h3>החלפת סיסמה</h3>
+      <label for="pw1">סיסמה חדשה (לפחות ${MIN_PASSWORD_LENGTH} תווים)</label>
+      <input id="pw1" type="password" autocomplete="new-password" dir="ltr">
+      <label for="pw2">אימות סיסמה</label>
+      <input id="pw2" type="password" autocomplete="new-password" dir="ltr">
+      <button class="btn" style="margin-top:12px" data-act="changePassword">שמירת סיסמה</button>
+    </div>
+    <div class="card"><button class="btn ghost" data-act="logout">יציאה מהמערכת</button></div>`;
+}
+
+async function doChangePassword() {
+  const first = $('#pw1').value || '';
+  const second = $('#pw2').value || '';
+  if (first.length < MIN_PASSWORD_LENGTH) { toast(`הסיסמה חייבת להכיל לפחות ${MIN_PASSWORD_LENGTH} תווים`); return; }
+  if (first !== second) { toast('הסיסמאות לא זהות'); return; }
+  const { error } = await changePassword(first);
+  if (error) { toast(errorText(error)); return; }
+  toast('הסיסמה הוחלפה');
+  $('#pw1').value = '';
+  $('#pw2').value = '';
+}
+
+const handlers = {
+  changePassword: doChangePassword,
+  logout() { signOut(); },
+};
+
+__exports.render = render;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/admin.js ===== */
+__defs['js/ui/screens/admin.js'] = function (__exports) {
+/**
+ * ui/screens/admin.js - ניהול מערכת (למנהל בלבד): ספי גודל מרפאה, צ'ק ליסט ביקור,
+ * מקורות ליד, רשימת משתמשים והרשאות, ויומן שינויים.
+ */
+const { store } = __req('js/core/state.js');
+const { requestRender } = __req('js/core/bus.js');
+const { $, toast, errorText } = __req('js/core/dom.js');
+const { esc, toInt } = __req('js/utils/format.js');
+const { MG_NAMES, ROLE_NAMES } = __req('js/config.js');
+const { me } = __req('js/domain/permissions.js');
+const { saveSetting } = __req('js/api/settingsApi.js');
+const { logChange } = __req('js/api/logApi.js');
+const { card, emptyNote } = __req('js/ui/components/card.js');
+const { editableList } = __req('js/ui/components/formFields.js');
+
+/** מפתח ב-store.settings לכל רשימה ניתנת לעריכה, ושם ההגדרה בבסיס הנתונים */
+const LISTS = {
+  checklist: { settingsKey: 'checklist', dbKey: 'checklist', label: 'סעיף', logText: 'עדכון צ׳ק ליסט הביקור' },
+  leadSources: { settingsKey: 'leadSources', dbKey: 'lead_sources', label: 'מקור', logText: 'עדכון מקורות ליד' },
+};
+
+function sizeThresholdsCard() {
+  const t = store.settings.sizeThresholds;
+  return card('גודל מרפאה (לפי מספר מבוטחים)', `
+    <div class="muted">משפיע על רשימת "מרפאות מתחת ליעד" במסך הבית, שמציגה מרפאות בינוניות וגדולות.</div>
+    <label for="sz_medium">בינונית: מ־ (מבוטחים)</label>
+    <input type="number" id="sz_medium" inputmode="numeric" value="${t.medium}">
+    <label for="sz_large">גדולה: מ־ (מבוטחים)</label>
+    <input type="number" id="sz_large" inputmode="numeric" value="${t.large}">
+    <button class="btn" style="margin-top:10px" data-act="saveSizes">שמירה</button>`);
+}
+
+function usersCard() {
+  const rows = store.users.map(u => `<tr><td>${esc(u.name)}</td><td>${esc(u.title)}</td>
+    <td>${esc(ROLE_NAMES[u.role])}${u.mg ? ` (${esc(MG_NAMES[u.mg])})` : ''}${u.units && u.units.length ? ' (בי״ח מאיר, בי״ח לוינשטיין)' : ''}</td></tr>`).join('');
+  return card('משתמשים והרשאות',
+    `<div class="scroll"><table><thead><tr><th>שם</th><th>תפקיד</th><th>גישה</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+}
+
+function logCard() {
+  const rows = store.log.map(l => `<div class="check"><div><div>${esc(l.what)}</div>
+    <div class="muted">${esc(l.user)} · ${esc(l.when)}</div></div></div>`).join('');
+  return card('יומן שינויים', rows || emptyNote('אין שינויים עדיין.'));
+}
+
+function render() {
+  if (me().role !== 'admin') return '<div class="card empty">מסך זה זמין למנהל בלבד.</div>';
+  return `<h2 style="margin-top:4px">ניהול מערכת</h2>
+    ${sizeThresholdsCard()}
+    ${card('צ׳ק ליסט הביקור', editableList('checklist', store.settings.checklist, LISTS.checklist.label))}
+    ${card('מקורות ליד', editableList('leadSources', store.settings.leadSources, LISTS.leadSources.label))}
+    ${usersCard()}${logCard()}`;
+}
+
+// ---------- פעולות ----------
+
+/** מעתיק את מה שהוקלד בשדות הרשימה אל ההגדרות (לפני הוספה, מחיקה או שמירה) */
+function syncListFromDom(listId) {
+  const list = store.settings[LISTS[listId].settingsKey];
+  document.querySelectorAll(`.list-input[data-list="${listId}"]`).forEach(input => {
+    list[Number(input.dataset.i)] = input.value;
+  });
+}
+
+async function saveList(el) {
+  const meta = LISTS[el.dataset.list];
+  if (!meta || me().role !== 'admin') return;
+  syncListFromDom(el.dataset.list);
+  const items = store.settings[meta.settingsKey].map(t => t.trim()).filter(Boolean);
+  store.settings[meta.settingsKey] = items;
+  const { error } = await saveSetting(meta.dbKey, items);
+  if (error) { toast(errorText(error)); return; }
+  logChange(meta.logText);
+  toast('נשמר');
+  requestRender();
+}
+
+async function saveSizes() {
+  if (me().role !== 'admin') return;
+  const medium = toInt($('#sz_medium').value);
+  const large = toInt($('#sz_large').value);
+  if (!medium || !large || medium >= large) { toast('הסף של גדולה חייב להיות גבוה מהסף של בינונית'); return; }
+  const value = { medium, large };
+  const { error } = await saveSetting('size_thresholds', value);
+  if (error) { toast(errorText(error)); return; }
+  store.settings.sizeThresholds = value;
+  logChange('עדכון ספי גודל מרפאה');
+  toast('נשמר');
+  requestRender();
+}
+
+const handlers = {
+  listAdd(el) {
+    syncListFromDom(el.dataset.list);
+    store.settings[LISTS[el.dataset.list].settingsKey].push('');
+    requestRender();
+  },
+  listDel(el) {
+    syncListFromDom(el.dataset.list);
+    store.settings[LISTS[el.dataset.list].settingsKey].splice(Number(el.dataset.i), 1);
+    requestRender();
+  },
+  listSave: saveList,
+  saveSizes,
+};
+
+
+__exports.render = render;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/clinicDetail.js ===== */
+__defs['js/ui/screens/clinicDetail.js'] = function (__exports) {
+/**
+ * ui/screens/clinicDetail.js - דף מרפאה: כותרת ופעולות, מאזן ונתוני מרפאה, מאזן לפי קפיטציה,
+ * סיבות עזיבה והיסטוריית ביקורים.
+ */
+const { ui, store } = __req('js/core/state.js');
+const { requestRender } = __req('js/core/bus.js');
+const { $, toast, errorText } = __req('js/core/dom.js');
+const { esc, fmtDate, sign, pctLabel, toInt } = __req('js/utils/format.js');
+const { CAPS_2026, MG_NAMES, CAPS_PER_YEAR, FIRST_CAP_2026, CAP_COUNT } = __req('js/config.js');
+const { getClinic, canEditClinic, canEditTargets, canVisit } = __req('js/domain/permissions.js');
+const { clinicStats, reasonTotals, targetTone, sizeOf, SIZE_LABELS } = __req('js/domain/metrics.js');
+const { saveClinicData } = __req('js/api/clinicsApi.js');
+const { pill } = __req('js/ui/components/pill.js');
+const { card, backButton, emptyNote } = __req('js/ui/components/card.js');
+const { stackedStats, bigNumber, keyValue } = __req('js/ui/components/statRows.js');
+const { clinicCapTable } = __req('js/ui/components/capTable.js');
+const { visitItem } = __req('js/ui/components/visitItem.js');
+const { editFormHtml } = __req('js/ui/screens/clinicEditForm.js');
+
+/** כרטיס כותרת: שם, תגית אחוז מהיעד, מקור הנתונים וכפתורי פעולה */
+function headerCard(clinic, stats, canEdit) {
+  const badge = stats.pct === null ? '' : pill(`${pctLabel(stats.pct)} מהיעד`, targetTone(stats.pct));
+  // מאגר מבוטחים אינו מרפאה פיזית, ולכן לא מתעדים בו ביקורים
+  const visitButton = canVisit() && !clinic.pool ? `<button class="btn" data-act="newVisit" data-id="${esc(clinic.id)}">דיווח ביקור חדש</button>` : '';
+  const editButton = canEdit ? `<button class="btn ghost" data-act="toggleClinicEdit">${ui.editClinic ? 'סגירת עדכון' : 'עדכון נתונים'}</button>` : '';
+  return `<div class="card">
+    <div class="row between">
+      <div style="min-width:0"><div style="font-size:1.2rem;font-weight:800">${esc(clinic.name)}</div>
+        <div class="muted">${esc([MG_NAMES[clinic.mg], clinic.kind].filter(Boolean).join(' · '))}</div></div>
+      ${badge}
+    </div>
+    <div class="muted" style="margin-top:8px">עודכן ${fmtDate(clinic.updated)} · מקור: ${esc(clinic.source)}</div>
+    <div class="row" style="margin-top:12px;flex-wrap:wrap">${visitButton}${editButton}</div>
+  </div>`;
+}
+
+/** כרטיס המאזן: מצטרפים, עוזבים, יעד, ביצוע ושארית ליעד השנתי */
+function balanceCard(clinic, s) {
+  if (!s.n) {
+    const text = clinic.hospital
+      ? 'אין נתונים בקובץ עבור היחידה הזו. ניתן להזין אותם ידנית.'
+      : 'אין נתוני קפיטציות ב־2026.';
+    return card('מאזן', `<div class="muted">${text}</div>`);
+  }
+  const items = [{ label: 'מצטרפים', value: s.j }, { label: 'עוזבים', value: s.l }];
+  if (s.yt) {
+    items.push(
+      { label: 'יעד לקפיטציה', value: s.tg },
+      { label: 'ביצוע מול יעד', value: pctLabel(s.pct) },
+      { label: 'יעד שנתי', value: s.ya },
+      { label: 'נותרו ליעד', value: Math.max(0, s.ya - s.j) });
+  } else {
+    items.push({ label: 'יעד', value: 'לא הוגדר' });
+  }
+  return card('מאזן',
+    `${bigNumber(sign(s.bal), s.bal >= 0 ? 'pos' : 'neg')}
+     <div class="muted">מאזן 2026 (${s.n} מתוך ${CAPS_PER_YEAR} קפיטציות)</div>${stackedStats(items)}`);
+}
+
+/** כרטיס נתוני המרפאה (ישוב, כתובת, מנהלים, מבוטחים...) */
+function infoCard(clinic) {
+  const size = sizeOf(clinic);
+  const fields = [
+    ['ישוב', clinic.town], ['כתובת', clinic.addr], ['מגזר', clinic.sector], ['סוג יחידה', clinic.kind],
+    ['גודל מרפאה', size ? SIZE_LABELS[size] : null],
+    ['מנהל רפואי', clinic.dr], ['מנהל אדמיניסטרטיבי', clinic.adm], ['מנהל סיעוד', clinic.nur],
+    ['מספר מבוטחים', clinic.ins != null ? clinic.ins.toLocaleString('he-IL') : null],
+    ['קוד מרפאה', clinic.code],
+  ].filter(([, value]) => value !== null && value !== undefined && value !== '');
+  return card('נתוני מרפאה', fields.map(([label, value]) => keyValue(label, value)).join(''));
+}
+
+/** סיבות עזיבה ב-2026 (ינואר עד ספטמבר) */
+function reasonsCard(clinic) {
+  const totals = reasonTotals([clinic], CAPS_2026.slice(0, 5));
+  const keys = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
+  if (!keys.length) return '';
+  const sum = keys.reduce((s, k) => s + totals[k], 0);
+  const rows = keys.map(k => `<tr><td>${esc(store.reasons[k])}</td>
+    <td><b>${totals[k]}</b> <span class="muted">(${Math.round(totals[k] / sum * 100)}%)</span></td></tr>`).join('');
+  return card('סיבות עזיבה',
+    `<div class="scroll"><table><thead><tr><th>סיבה</th><th>ינו׳–ספט׳ 2026</th></tr></thead><tbody>${rows}</tbody></table></div>
+     <div class="muted" style="margin-top:6px">סיבות העזיבה מדווחות בקובץ בנפרד, וסכומן לא תמיד זהה למספר העוזבים בגיליון המאזן.</div>`);
+}
+
+function historyCard(clinic) {
+  const visits = store.visits.filter(v => v.clinicId === clinic.id).sort((a, b) => b.date.localeCompare(a.date));
+  return card('היסטוריית ביקורים',
+    visits.length ? `<div class="list">${visits.map(visitItem).join('')}</div>` : emptyNote('עדיין לא תועדו ביקורים ביחידה זו.'));
+}
+
+function render() {
+  const clinic = getClinic(ui.clinicId);
+  if (!clinic) { ui.clinicId = null; return ''; }
+  const stats = clinicStats(clinic);
+  const canEdit = canEditClinic(clinic);
+  return `${backButton('backToClinics', 'חזרה לרשימה')}
+    ${headerCard(clinic, stats, canEdit)}
+    ${ui.editClinic && canEdit ? editFormHtml(clinic) : ''}
+    <div class="grid2 dash">${balanceCard(clinic, stats)}${infoCard(clinic)}</div>
+    ${card('מאזן לפי קפיטציה', clinicCapTable(clinic, stats))}
+    ${reasonsCard(clinic)}
+    ${historyCard(clinic)}`;
+}
+
+// ---------- שמירת עדכון נתונים ----------
+
+/** קורא את הערכים מהטופס. שדה נעול (disabled) נשאר כמו שהוא */
+function readFormValues(clinic) {
+  const joiners = clinic.j.slice();
+  const leavers = clinic.l.slice();
+  for (let i = FIRST_CAP_2026; i < CAP_COUNT; i++) {
+    const jField = $('#cj' + i);
+    const lField = $('#cl' + i);
+    if (jField && !jField.disabled) { const v = toInt(jField.value); joiners[i] = v !== null && v < 0 ? null : v; }
+    if (lField && !lField.disabled) { const v = toInt(lField.value); leavers[i] = v !== null && v < 0 ? null : v; }
+  }
+  let target = clinic.target;
+  if (canEditTargets() && $('#e_t')) {
+    const t = toInt($('#e_t').value);
+    target = t && t > 0 ? t : null;
+  }
+  return { joiners, leavers, target };
+}
+
+async function saveEdit(el) {
+  const clinic = getClinic(el.dataset.id);
+  if (!clinic || !canEditClinic(clinic) || ui.busy) return;
+  const { joiners, leavers, target } = readFormValues(clinic);
+  ui.busy = true;
+  const result = await saveClinicData(clinic.id, joiners, leavers, target);
+  ui.busy = false;
+  if (result.error) { toast(errorText(result.error)); return; }
+  if (result.clinic) Object.assign(clinic, result.clinic);
+  ui.editClinic = false;
+  toast('הנתונים נשמרו');
+  requestRender();
+}
+
+const handlers = {
+  backToClinics() { ui.clinicId = null; ui.editClinic = false; requestRender(); },
+  toggleClinicEdit() { ui.editClinic = !ui.editClinic; requestRender(); },
+  saveClinicEdit: saveEdit,
+};
+
+
+__exports.render = render;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/clinicEditForm.js ===== */
+__defs['js/ui/screens/clinicEditForm.js'] = function (__exports) {
+/**
+ * ui/screens/clinicEditForm.js - טופס עדכון נתוני קפיטציה של מרפאה (2026 בלבד).
+ * ערך שכבר קיים (נטען מהקובץ) נעול לרכזים, ורק מנהל יכול לשנות אותו.
+ * שדה ריק נשמר כ"לא דווח" ולא כאפס.
+ */
+const { CAPS, CAPS_2026 } = __req('js/config.js');
+const { esc } = __req('js/utils/format.js');
+const { me, canEditTargets } = __req('js/domain/permissions.js');
+
+/** שדה מספר אחד בטבלה; locked = נעול לעריכה */
+function numberCell(id, value, locked) {
+  return `<td><input type="number" inputmode="numeric" id="${id}" value="${value === null ? '' : value}"${locked ? ' disabled' : ''}></td>`;
+}
+
+function editFormHtml(clinic) {
+  const isAdmin = me().role === 'admin';
+  const rows = CAPS_2026.map(i => `<tr>
+    <td>${esc(CAPS[i])}</td>
+    ${numberCell('cj' + i, clinic.j[i], !isAdmin && clinic.j0[i] !== null)}
+    ${numberCell('cl' + i, clinic.l[i], !isAdmin && clinic.l0[i] !== null)}
+  </tr>`).join('');
+  const targetField = canEditTargets() && !clinic.pool
+    ? `<label for="e_t">יעד מצטרפים לקפיטציה</label>
+       <input type="number" inputmode="numeric" id="e_t" value="${clinic.target > 0 ? clinic.target : ''}">` : '';
+  return `<div class="card" id="editBox">
+    <h3>עדכון נתונים</h3>
+    <div class="muted">נתונים שיובאו מהקובץ ננעלים לעריכה, וניתן לתקן אותם רק על ידי מנהל. שדה ריק נשמר כ״לא דווח״ ולא כאפס. כל שינוי נרשם ביומן.</div>
+    <div class="scroll"><table><thead><tr><th>קפיטציה</th><th>מצטרפים</th><th>עוזבים</th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${targetField}
+    <div class="row" style="margin-top:14px">
+      <button class="btn" data-act="saveClinicEdit" data-id="${esc(clinic.id)}">שמירת שינויים</button>
+      <button class="btn ghost" data-act="toggleClinicEdit">ביטול</button>
+    </div></div>`;
+}
+
+__exports.editFormHtml = editFormHtml;
+};
+
+/* ===== js/ui/screens/clinics.js ===== */
+__defs['js/ui/screens/clinics.js'] = function (__exports) {
+/**
+ * ui/screens/clinics.js - רשימת היחידות: חיפוש, סינון, מיון, וכרטיס לכל מרפאה.
+ */
+const { ui } = __req('js/core/state.js');
+const { requestRender, navigate } = __req('js/core/bus.js');
+const { rerenderKeepingFocus } = __req('js/core/dom.js');
+const { esc, sign, signClass, pctLabel, localeSort } = __req('js/utils/format.js');
+const { LIST_PAGE_SIZE, MG_NAMES } = __req('js/config.js');
+const { visibleClinics, isManagerView, me } = __req('js/domain/permissions.js');
+const { clinicStats, targetTone, sizeOf, SIZE_LABELS } = __req('js/domain/metrics.js');
+const { filterSelect } = __req('js/ui/components/formFields.js');
+const { pill } = __req('js/ui/components/pill.js');
+const { inlineStats } = __req('js/ui/components/statRows.js');
+const { emptyNote } = __req('js/ui/components/card.js');
+
+const UNDEFINED_LABEL = 'לא מוגדר';
+
+/** מפתחות מיון: פונקציה שמחזירה מספר, מהנמוך לגבוה */
+const SORT_KEYS = {
+  pct: c => { const p = clinicStats(c).pct; return p === null ? 9999 : p; },
+  bal: c => clinicStats(c).bal,
+  ins: c => -(c.ins || 0),
+};
+const SORT_OPTIONS = [
+  ['bal', 'מאזן (נמוך קודם)'],
+  ['pct', 'ביצוע מול יעד (נמוך קודם)'],
+  ['ins', 'מספר מבוטחים'],
+  ['name', 'שם'],
+];
+
+/** מסנן ומיין את היחידות לפי מצב התצוגה */
+function filteredClinics(all) {
+  const f = ui.filters;
+  const q = ui.search.trim();
+  const list = all.filter(c =>
+    (!q || c.name.indexOf(q) >= 0 || (c.town || '').indexOf(q) >= 0)
+    && (!f.mg || c.mg === f.mg)
+    && (!f.sector || (c.sector || UNDEFINED_LABEL) === f.sector)
+    && (!f.kind || (c.kind || UNDEFINED_LABEL) === f.kind));
+  return list.sort((a, b) => f.sort === 'name'
+    ? localeSort(a.name, b.name)
+    : SORT_KEYS[f.sort](a) - SORT_KEYS[f.sort](b));
+}
+
+/** כרטיס מרפאה אחד ברשימה */
+function clinicCard(c) {
+  const s = clinicStats(c);
+  const size = sizeOf(c);
+  const subtitle = [c.town, c.kind, size ? `${SIZE_LABELS[size]}` : null, isManagerView() ? MG_NAMES[c.mg] : null]
+    .filter(Boolean).join(' · ');
+  const badge = s.pct === null ? pill('אין יעד', 'na') : pill(pctLabel(s.pct), targetTone(s.pct));
+  const body = s.n
+    ? `${inlineStats([
+        { label: 'מצטרפים', value: s.j },
+        { label: 'עוזבים', value: s.l },
+        { label: 'מאזן', value: sign(s.bal), cls: signClass(s.bal) },
+      ])}
+      <div class="muted">${s.pct === null ? 'אין יעד מוגדר' : `ביצוע מול יעד: ${Math.round(s.pct)}% (${s.j} מתוך ${Math.round(s.yt)})`}</div>`
+    : '<div class="muted" style="margin-top:8px">אין נתוני קפיטציות ב־2026</div>';
+  return `<div class="card" data-act="openClinic" data-id="${esc(c.id)}" tabindex="0" role="button" style="cursor:pointer">
+    <div class="row between">
+      <div style="min-width:0"><div style="font-weight:800">${esc(c.name)}</div><div class="muted">${esc(subtitle)}</div></div>
+      ${badge}
+    </div>${body}</div>`;
+}
+
+/** שורת הסינונים: מיון, מינהלת, מגזר וסוג יחידה (מוצגים רק כשיש מה לסנן) */
+function filtersHtml(all) {
+  const f = ui.filters;
+  const uniq = pick => [...new Set(all.map(pick))];
+  const sortSelect = `<div><label for="f_sort">מיון</label>
+    <select id="f_sort" data-chg="clinicFilter" data-key="sort">
+      ${SORT_OPTIONS.map(([v, t]) => `<option value="${v}"${f.sort === v ? ' selected' : ''}>${t}</option>`).join('')}
+    </select></div>`;
+  const mgs = uniq(c => c.mg);
+  const sectors = uniq(c => c.sector || UNDEFINED_LABEL);
+  const kinds = uniq(c => c.kind || UNDEFINED_LABEL);
+  return `<div class="grid2" style="margin-top:6px">${sortSelect}
+    ${mgs.length > 1 ? filterSelect({ id: 'f_mg', label: 'מינהלת', chg: 'clinicFilter', key: 'mg', values: mgs, selected: f.mg, labelOf: x => MG_NAMES[x] || x }) : ''}
+    ${sectors.length > 1 ? filterSelect({ id: 'f_sec', label: 'מגזר', chg: 'clinicFilter', key: 'sector', values: sectors, selected: f.sector }) : ''}
+    ${kinds.length > 1 ? filterSelect({ id: 'f_kind', label: 'סוג יחידה', chg: 'clinicFilter', key: 'kind', values: kinds, selected: f.kind }) : ''}
+  </div>`;
+}
+
+function render() {
+  const all = visibleClinics();
+  const list = filteredClinics(all);
+  const shown = list.slice(0, ui.limit);
+  const personal = me().role === 'coord' || me().role === 'hosp';
+  const more = list.length > ui.limit
+    ? `<button class="btn ghost" style="width:100%" data-act="moreClinics">הצגת עוד (${list.length - ui.limit} נוספות)</button>` : '';
+  return `<h2 style="margin-top:4px">${personal ? 'היחידות שלי' : 'כל היחידות'} <span class="muted">(${list.length})</span></h2>
+    <input type="search" id="q" placeholder="חיפוש לפי שם מרפאה או ישוב" value="${esc(ui.search)}" aria-label="חיפוש" data-inp="clinicSearch">
+    ${filtersHtml(all)}
+    <div style="height:10px"></div>
+    ${shown.length ? shown.map(clinicCard).join('') : emptyNote('לא נמצאו יחידות שמתאימות לחיפוש.')}
+    ${more}`;
+}
+
+const handlers = {
+  /** פתיחת דף מרפאה (משמש גם מסכים אחרים) */
+  openClinic(el) { navigate('clinics', { clinicId: el.dataset.id }); },
+  moreClinics() { ui.limit += LIST_PAGE_SIZE; requestRender(); },
+  clinicFilter(el) {
+    ui.filters[el.dataset.key] = el.value;
+    ui.limit = LIST_PAGE_SIZE;
+    requestRender();
+  },
+  clinicSearch(el) {
+    ui.search = el.value;
+    ui.limit = LIST_PAGE_SIZE;
+    rerenderKeepingFocus('q', requestRender);
+  },
+};
+
+__exports.render = render;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/home.js ===== */
+__defs['js/ui/screens/home.js'] = function (__exports) {
+/**
+ * ui/screens/home.js - מסך הבית.
+ *
+ * מבנה: homeModel() מחשב את כל המספרים, ופונקציות ה-view הקטנות מציירות כל חלק.
+ *  1. כרטיסי דשבורד: מאזן (ימין) וביקורים במרפאות (שמאל)
+ *  2. מאזן לפי קפיטציה
+ *  3. "מה דורש תשומת לב": מרפאות מתחת ליעד, מאזן שלילי, ביקורים, משימות באיחור, חוסר דיווח
+ */
+const { ui, store } = __req('js/core/state.js');
+const { requestRender } = __req('js/core/bus.js');
+const { esc, addDays, todayIso, fmtDate, pctLabel, sign, signClass } = __req('js/utils/format.js');
+const { BELOW_PREVIEW_COUNT, CAPS, TARGET_ALERT_PCT, VISIT_STALE_DAYS, MG_NAMES } = __req('js/config.js');
+const { me, visibleClinics, coordinators, coordinatorOf, canVisit, clinicName, isManagerView, scopeTitle } = __req('js/domain/permissions.js');
+const { aggregate, capSeries, lastReportedCap, clinicStats, isReported, openTasks, lastVisitDate, belowTargetClinics, targetTone, SIZE_LABELS, isOverdue } = __req('js/domain/metrics.js');
+const { pill } = __req('js/ui/components/pill.js');
+const { stackedStats, bigNumber } = __req('js/ui/components/statRows.js');
+const { capTable } = __req('js/ui/components/capTable.js');
+const { listItem } = __req('js/ui/components/listItem.js');
+const { options } = __req('js/ui/components/formFields.js');
+const { card, emptyNote } = __req('js/ui/components/card.js');
+const { leadTableHtml } = __req('js/ui/screens/leadTable.js');
+
+// ---------- חישוב ----------
+
+/** כל הנתונים שהמסך צריך, מחושבים פעם אחת */
+function homeModel() {
+  const clinics = visibleClinics();
+  const real = clinics.filter(c => !c.pool);
+  const today = todayIso();
+  const staleLimit = addDays(-VISIT_STALE_DAYS);
+  const withoutRecentVisit = list => list.filter(c => {
+    const last = lastVisitDate(c.id);
+    return !last || last < staleLimit;
+  });
+
+  // כרטיס הביקורים: למנהל ולנופר אפשר לסנן לפי רכז
+  const coordFilter = !canVisit() && ui.homeCoord;
+  const visitScope = coordFilter
+    ? real.filter(c => { const owner = coordinatorOf(c); return owner && owner.id === ui.homeCoord; })
+    : real;
+  const scopeIds = new Set(visitScope.map(c => c.id));
+  const monthPrefix = today.slice(0, 7);
+  const tasksInScope = openTasks(visitScope);
+
+  const series = capSeries(clinics);
+  const lastIdx = lastReportedCap(series);
+  return {
+    clinics, real, today,
+    agg: aggregate(clinics),
+    series, lastIdx, last: lastIdx >= 0 ? series[lastIdx] : null,
+    visits: {
+      scope: visitScope,
+      visited: visitScope.length - withoutRecentVisit(visitScope).length,
+      none: withoutRecentVisit(visitScope).length,
+      month: store.visits.filter(v => scopeIds.has(v.clinicId) && v.date.indexOf(monthPrefix) === 0).length,
+      tasks: tasksInScope.length,
+      late: tasksInScope.filter(x => isOverdue(x.task, today)).length,
+    },
+    noVisitAll: withoutRecentVisit(real).length,
+    below: belowTargetClinics(clinics, ui.belowIncludeSmall),
+    negative: clinics.filter(c => clinicStats(c).bal < 0).sort((a, b) => clinicStats(a).bal - clinicStats(b).bal),
+    lateTasks: openTasks(clinics).filter(x => isOverdue(x.task, today)),
+    missing: lastIdx >= 0 ? clinics.filter(c => !isReported(c, lastIdx)) : [],
+  };
+}
+
+// ---------- חלקי התצוגה ----------
+
+function greetingHtml(model) {
+  const user = me();
+  const hour = new Date().getHours();
+  const hello = hour < 12 ? 'בוקר טוב' : hour < 18 ? 'צהריים טובים' : 'ערב טוב';
+  return `<h2 style="margin-top:4px">${hello}, ${esc(user.name)}</h2>
+    <div class="muted" style="margin-bottom:10px">${esc(user.title)} · ${esc(scopeTitle())} · ${model.clinics.length} יחידות</div>`;
+}
+
+/** כרטיס מאזן (ימין): מאזן 2026, מצטרפים, עוזבים, והקפיטציה האחרונה */
+function balanceCard(model) {
+  if (!model.agg.reporting) {
+    return card('מאזן', '<div class="muted">עדיין לא הוזנו נתוני קפיטציות. אפשר להזין אותם במסך היחידה.</div>');
+  }
+  const a = model.agg;
+  const items = [
+    { label: 'מצטרפים', value: a.J },
+    { label: 'עוזבים', value: a.L },
+  ];
+  if (model.last) {
+    items.push({ label: CAPS[model.lastIdx], value: sign(model.last.bal), cls: signClass(model.last.bal) });
+  }
+  if (a.targetPct !== null) items.push({ label: 'ביצוע מול יעד', value: pctLabel(a.targetPct) });
+  return card('מאזן',
+    `${bigNumber(sign(a.bal), a.bal >= 0 ? 'pos' : 'neg')}
+     <div class="muted">מאזן 2026 (${a.nmax} מתוך 6 קפיטציות)</div>${stackedStats(items)}`);
+}
+
+/** כרטיס ביקורים (שמאל), עם סינון לפי רכז למנהל ולנופר */
+function visitsCard(model) {
+  const v = model.visits;
+  const filter = canVisit() ? '' : `
+    <select data-chg="homeCoord" aria-label="סינון לפי רכז" style="min-height:36px;padding:4px 8px;font-size:.85rem;margin-bottom:4px">
+      <option value="">כל הרכזים</option>
+      ${options(coordinators().map(u => u.id), ui.homeCoord, id => coordinators().find(u => u.id === id).name)}
+    </select>`;
+  const items = [
+    { label: 'ביקורים החודש', value: v.month },
+    { label: 'ללא ביקור', value: v.none, cls: v.none ? 'neg' : 'pos' },
+    { label: 'משימות פתוחות', value: v.tasks },
+  ];
+  if (v.late) items.push({ label: 'באיחור', value: v.late, cls: 'neg' });
+  return card('ביקורים במרפאות',
+    `${filter}${bigNumber(`${v.visited} / ${v.scope.length}`)}
+     <div class="muted">יחידות שבוקרו ב־${VISIT_STALE_DAYS} הימים האחרונים</div>${stackedStats(items)}`);
+}
+
+/** כותרת משנה לשורת מרפאה: גודל, מבוטחים, ישוב ומינהלת */
+function clinicSubtitle(clinic, size) {
+  const parts = [];
+  if (size) parts.push(SIZE_LABELS[size]);
+  if (clinic.ins) parts.push(`${clinic.ins.toLocaleString('he-IL')} מבוטחים`);
+  if (clinic.town) parts.push(clinic.town);
+  if (isManagerView()) parts.push(MG_NAMES[clinic.mg]);
+  return parts.join(' · ');
+}
+
+/** מרפאות מתחת ליעד: מציג את הנמוכות ביותר, וכפתור שפותח את כל הרשימה */
+function belowTargetCard(model) {
+  const all = model.below;
+  const rows = (ui.showAllBelow ? all : all.slice(0, BELOW_PREVIEW_COUNT)).map(x => listItem({
+    action: 'openClinic',
+    id: x.clinic.id,
+    title: x.clinic.name,
+    subtitle: clinicSubtitle(x.clinic, x.size),
+    badgeHtml: pill(pctLabel(x.stats.pct), targetTone(x.stats.pct)),
+  })).join('');
+
+  const scopeNote = ui.belowIncludeSmall ? '' : 'בינוניות וגדולות ';
+  const title = `מרפאות ${scopeNote}מתחת ל־${TARGET_ALERT_PCT}% מהיעד (${all.length})`;
+
+  const sizeChips = ui.showAllBelow ? `
+    <div class="chips" role="group" aria-label="גודל מרפאה">
+      <button class="chip" data-act="belowSmall" data-value="0" aria-pressed="${!ui.belowIncludeSmall}">בינוניות וגדולות</button>
+      <button class="chip" data-act="belowSmall" data-value="1" aria-pressed="${ui.belowIncludeSmall}">כולל קטנות</button>
+    </div>` : '';
+
+  const toggle = (all.length > BELOW_PREVIEW_COUNT || ui.showAllBelow)
+    ? `<button class="btn ghost small" style="margin-top:10px" data-act="toggleBelowAll">${ui.showAllBelow ? 'הצגת פחות' : `הצגת כל הרשימה (${all.length})`}</button>`
+    : '';
+
+  const body = all.length
+    ? `${sizeChips}<div class="list">${rows}</div>${toggle}`
+    : `${sizeChips}${emptyNote(`אין מרפאות מתחת ל־${TARGET_ALERT_PCT}% מהיעד.`)}${toggle}`;
+  return card(title, body);
+}
+
+function negativeBalanceCard(model) {
+  const list = model.negative;
+  const rows = list.slice(0, 6).map(c => listItem({
+    action: 'openClinic', id: c.id, title: c.name,
+    subtitle: clinicSubtitle(c, null),
+    badgeHtml: pill(sign(clinicStats(c).bal), 'bad'),
+  })).join('');
+  return card(`מאזן שלילי מתחילת השנה (${list.length})`,
+    list.length ? `<div class="list">${rows}</div>` : emptyNote('אין מרפאות עם מאזן שלילי.'));
+}
+
+function visitsSummaryCard(model) {
+  const text = model.real.length
+    ? `${model.noVisitAll} מתוך ${model.real.length} יחידות ללא ביקור מתועד ב־${VISIT_STALE_DAYS} הימים האחרונים.`
+    : 'אין יחידות.';
+  const button = model.real.length
+    ? '<button class="btn small" style="margin-top:10px" data-act="goTab" data-tab="visits">למסך הביקורים</button>' : '';
+  return card('ביקורים', `<div>${text}</div>${button}`);
+}
+
+function lateTasksCard(model) {
+  if (!model.lateTasks.length) return '';
+  const rows = model.lateTasks.slice(0, 6).map(x => `
+    <div class="item"><div><div class="t">${esc(x.task.text)}</div>
+      <div class="muted">${esc(clinicName(x.visit.clinicId))} · יעד ${fmtDate(x.task.due)}</div></div>
+      ${pill('באיחור', 'bad')}</div>`).join('');
+  return card(`משימות באיחור (${model.lateTasks.length})`, `<div class="list">${rows}</div>`);
+}
+
+function missingDataCard(model) {
+  if (!model.missing.length) return '';
+  const chips = model.missing.slice(0, 12)
+    .map(c => `<span class="chip" data-act="openClinic" data-id="${esc(c.id)}" role="button" tabindex="0">${esc(c.name)}</span>`).join('');
+  const more = model.missing.length > 12 ? `<span class="muted">ועוד ${model.missing.length - 12}</span>` : '';
+  return card('חסר דיווח בקפיטציה האחרונה',
+    `<div class="muted">ביחידות הבאות אין נתוני ${esc(CAPS[model.lastIdx])}:</div><div class="chips">${chips}${more}</div>`);
+}
+
+// ---------- הרכבת המסך ----------
+
+function render() {
+  const model = homeModel();
+  const hasData = model.agg.reporting > 0;
+  const capCard = hasData
+    ? card('מאזן לפי קפיטציה', capTable(model.series, futureTarget(model), { target: model.agg.tt, j: model.agg.J, l: model.agg.L }))
+    : '';
+  const attention = hasData ? belowTargetCard(model) + negativeBalanceCard(model) : '';
+  return `${greetingHtml(model)}
+    <div class="grid2 dash">${balanceCard(model)}${visitsCard(model)}</div>
+    ${capCard}
+    ${leadsSection()}
+    <h2>מה דורש תשומת לב?</h2>
+    ${attention}${visitsSummaryCard(model)}${lateTasksCard(model)}${missingDataCard(model)}`;
+}
+
+/** טבלת מעקב הלידים (אותה טבלה כמו בלשונית "מעקב לידים") וכפתור להוספת ליד */
+function leadsSection() {
+  return `<div class="row between" style="margin:16px 0 6px">
+      <h2 style="margin:0">מעקב לידים</h2>
+      <button class="btn small" data-act="goTab" data-tab="leads">הוספת ליד</button>
+    </div>${leadTableHtml()}`;
+}
+
+/** יעד כולל לקפיטציה שעוד לא דווחה: סכום היעדים של כל המרפאות */
+function futureTarget(model) {
+  return model.clinics.reduce((sum, c) => sum + (c.target > 0 ? c.target : 0), 0);
+}
+
+// ---------- פעולות ----------
+
+const handlers = {
+  homeCoord(el) { ui.homeCoord = el.value; requestRender(); },
+  toggleBelowAll() {
+    ui.showAllBelow = !ui.showAllBelow;
+    if (!ui.showAllBelow) ui.belowIncludeSmall = false;
+    requestRender();
+  },
+  belowSmall(el) { ui.belowIncludeSmall = el.dataset.value === '1'; requestRender(); },
+};
+
+__exports.render = render;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/leadForm.js ===== */
+__defs['js/ui/screens/leadForm.js'] = function (__exports) {
+/**
+ * ui/screens/leadForm.js - טופס הוספת ליד: תצוגה וולידציה.
+ *
+ * הטופס שומר "טיוטה" ב-ui.leads.draft בכל הקלדה, כדי שציור מחדש של המסך
+ * (למשל בעת סינון הטבלה) לא ימחק מה שהוקלד.
+ * שדות מותנים (מוצגים או מוסתרים לפי בחירה):
+ *  - "מועד לשיחה נוספת": כשהסטטוס הוא "המשך טיפול"
+ *  - "שם העובד הממליץ": כשהמקור הוא "תרומת עובדים"
+ *  - "מיקום האירוע": כשהמקור הוא "פעילות שטח" או "מרתון גיוס"
+ * ת.ז אינה חובה, אבל אם הוזנה היא נבדקת.
+ */
+const { ui, store } = __req('js/core/state.js');
+const { esc } = __req('js/utils/format.js');
+const { normalizeIsraeliId, normalizePhone } = __req('js/utils/validate.js');
+const { LEAD_STATUSES, LEAD_STATUS_FOLLOWUP, LEAD_SOURCE_EMPLOYEE, LEAD_SOURCES_EVENT } = __req('js/config.js');
+const { options } = __req('js/ui/components/formFields.js');
+
+/** שדה טקסט בטופס שמעדכן את הטיוטה בכל הקלדה */
+function textField({ key, label, attrs = '' }) {
+  const value = ui.leads.draft[key];
+  return `<div><label for="ld_${key}">${esc(label)}</label>
+    <input id="ld_${key}" data-inp="leadDraft" data-key="${key}" value="${esc(value)}" ${attrs}></div>`;
+}
+
+/** האם המקור שנבחר דורש שם עובד ממליץ / מיקום אירוע */
+const needsReferrer = source => source === LEAD_SOURCE_EMPLOYEE;
+const needsEventLocation = source => LEAD_SOURCES_EVENT.indexOf(source) >= 0;
+
+function leadFormHtml() {
+  const d = ui.leads.draft;
+  const showFollowup = d.status === LEAD_STATUS_FOLLOWUP;
+  return `<div class="card">
+    <h3>טופס הוספת ליד</h3>
+    ${textField({ key: 'idNumber', label: 'ת.ז (לא חובה)', attrs: 'inputmode="numeric" maxlength="9" autocomplete="off" dir="ltr"' })}
+    <div class="grid2">
+      ${textField({ key: 'firstName', label: 'שם פרטי' })}
+      ${textField({ key: 'lastName', label: 'שם משפחה' })}
+    </div>
+    ${textField({ key: 'phone', label: 'טלפון', attrs: 'type="tel" inputmode="tel" dir="ltr"' })}
+    ${textField({ key: 'city', label: 'עיר מגורים' })}
+    <label for="ld_source">מקור הליד</label>
+    <select id="ld_source" data-chg="leadDraftSource">
+      <option value="">בחרו מקור</option>${options(store.settings.leadSources, d.source)}
+    </select>
+    <div id="ld_referrer_wrap"${needsReferrer(d.source) ? '' : ' hidden'}>
+      ${textField({ key: 'referrer', label: 'שם העובד הממליץ' })}
+    </div>
+    <div id="ld_event_wrap"${needsEventLocation(d.source) ? '' : ' hidden'}>
+      ${textField({ key: 'eventLocation', label: 'מיקום האירוע' })}
+    </div>
+    <label for="ld_status">סטטוס הליד</label>
+    <select id="ld_status" data-chg="leadDraftStatus" data-key="status">${options(LEAD_STATUSES, d.status)}</select>
+    <div class="lead-fu" id="ld_followup_wrap"${showFollowup ? '' : ' hidden'}>
+      <label for="ld_followup">מועד לשיחה נוספת (תאריך ושעה)</label>
+      <input type="datetime-local" id="ld_followup" data-inp="leadDraft" data-chg="leadDraft" data-key="followup" value="${esc(d.followup)}">
+    </div>
+    <div class="field-err" id="ld_error" role="alert"${ui.leads.error ? '' : ' hidden'}>${esc(ui.leads.error)}</div>
+    <button class="btn" style="width:100%;margin-top:14px" data-act="saveLead">שמירת ליד</button>
+  </div>`;
+}
+
+/**
+ * בודק את הטיוטה ומחזיר ליד מוכן לשמירה, או הודעת שגיאה.
+ * @returns {{lead?:object, error?:string}}
+ */
+function validateDraft(draft) {
+  // ת.ז אינה חובה. אם הוזנה, היא חייבת להיות תקינה
+  const rawId = draft.idNumber.trim();
+  const idNumber = rawId ? normalizeIsraeliId(rawId) : null;
+  if (rawId && !idNumber) return { error: 'מספר תעודת הזהות אינו תקין.' };
+  if (!draft.firstName.trim() || !draft.lastName.trim()) return { error: 'יש להזין שם פרטי ושם משפחה.' };
+  const phone = normalizePhone(draft.phone);
+  if (!phone) return { error: 'מספר הטלפון אינו תקין (למשל 0501234567).' };
+  if (!draft.city.trim()) return { error: 'יש להזין עיר מגורים.' };
+  if (!draft.source) return { error: 'יש לבחור מקור ליד.' };
+  if (needsReferrer(draft.source) && !draft.referrer.trim()) return { error: 'יש להזין את שם העובד הממליץ.' };
+  if (needsEventLocation(draft.source) && !draft.eventLocation.trim()) return { error: 'יש להזין את מיקום האירוע.' };
+  let followupAt = null;
+  if (draft.status === LEAD_STATUS_FOLLOWUP) {
+    if (!draft.followup) return { error: 'בסטטוס "המשך טיפול" יש לבחור תאריך ושעה לשיחה נוספת.' };
+    followupAt = new Date(draft.followup).toISOString();
+  }
+  return {
+    lead: {
+      idNumber, firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), phone,
+      city: draft.city.trim(), source: draft.source,
+      referrerName: needsReferrer(draft.source) ? draft.referrer.trim() : null,
+      eventLocation: needsEventLocation(draft.source) ? draft.eventLocation.trim() : null,
+      status: draft.status, followupAt,
+    },
+  };
+}
+
+__exports.leadFormHtml = leadFormHtml;
+__exports.validateDraft = validateDraft;
+__exports.needsReferrer = needsReferrer;
+__exports.needsEventLocation = needsEventLocation;
+};
+
+/* ===== js/ui/screens/leadTable.js ===== */
+__defs['js/ui/screens/leadTable.js'] = function (__exports) {
+/**
+ * ui/screens/leadTable.js - טבלת מעקב הלידים: סינון לפי סטטוס וחיפוש, ופאנל עדכון סטטוס.
+ */
+const { ui, store } = __req('js/core/state.js');
+const { esc, fmtDateTime, maskId, isoDate, todayIso } = __req('js/utils/format.js');
+const { LEAD_STATUSES, LEAD_STATUS_FOLLOWUP } = __req('js/config.js');
+const { isManagerView, coordinators, userName, me } = __req('js/domain/permissions.js');
+const { options } = __req('js/ui/components/formFields.js');
+const { pill } = __req('js/ui/components/pill.js');
+const { emptyNote } = __req('js/ui/components/card.js');
+
+/** צבע תגית לכל סטטוס */
+const STATUS_TONE = {
+  'חדש': 'info', 'אין מענה': 'na', 'המשך טיפול': 'warn', 'לא מעוניין': 'bad', 'בוצע מעבר': 'good',
+};
+
+/** הלידים לפי הסינונים. מסודרים: שיחות מעקב קרובות קודם, ואז החדשים ביותר */
+function filteredLeads() {
+  const s = ui.leads;
+  const q = s.search.trim();
+  const list = store.leads.filter(l =>
+    (!s.statusFilter || l.status === s.statusFilter)
+    && (!s.coordFilter || l.ownerId === s.coordFilter)
+    && (!q || [l.firstName, l.lastName, l.phone, l.idNumber, l.city, l.referrerName, l.eventLocation].some(x => String(x == null ? '' : x).indexOf(q) >= 0)));
+  const followupKey = l => (l.status === LEAD_STATUS_FOLLOWUP && l.followupAt ? l.followupAt : '9999');
+  return list.sort((a, b) => followupKey(a).localeCompare(followupKey(b)) || b.createdAt.localeCompare(a.createdAt));
+}
+
+/** צ'יפים עם ספירה לכל סטטוס */
+function statusChips() {
+  const counts = {};
+  store.leads.forEach(l => { counts[l.status] = (counts[l.status] || 0) + 1; });
+  const chip = (value, label, count) =>
+    `<button class="chip" data-act="leadStatusFilter" data-value="${esc(value)}" aria-pressed="${ui.leads.statusFilter === value}">${esc(label)} (${count})</button>`;
+  return `<div class="chips" role="group" aria-label="סינון לפי סטטוס">
+    ${chip('', 'הכול', store.leads.length)}${LEAD_STATUSES.map(s => chip(s, s, counts[s] || 0)).join('')}</div>`;
+}
+
+/** שורת סיכום: שיחות מעקב להיום ובאיחור */
+function followupBanner() {
+  const now = new Date();
+  const todayLocal = todayIso();
+  const due = store.leads.filter(l => l.status === LEAD_STATUS_FOLLOWUP && l.followupAt);
+  const overdue = due.filter(l => new Date(l.followupAt) < now).length;
+  const today = due.filter(l => isoDate(new Date(l.followupAt)) === todayLocal && new Date(l.followupAt) >= now).length;
+  if (!overdue && !today) return '';
+  return `<div class="muted" style="margin:6px 0">שיחות מעקב: ${today ? `<b>${today}</b> להיום` : ''}${today && overdue ? ' · ' : ''}${overdue ? `<b class="neg">${overdue}</b> באיחור` : ''}</div>`;
+}
+
+function followupCell(lead) {
+  if (lead.status !== LEAD_STATUS_FOLLOWUP || !lead.followupAt) return '—';
+  const late = new Date(lead.followupAt) < new Date();
+  return `<span class="${late ? 'neg' : ''}">${fmtDateTime(lead.followupAt)}</span>`;
+}
+
+/** מקור הליד, ומתחתיו הפרט הנוסף (שם העובד הממליץ או מיקום האירוע) */
+function sourceCell(lead) {
+  const detail = lead.referrerName || lead.eventLocation;
+  return `${esc(lead.source)}${detail ? `<div class="muted">${esc(detail)}</div>` : ''}`;
+}
+
+function rowHtml(lead, showOwner) {
+  return `<tr>
+    <td>${fmtDateTime(lead.createdAt).slice(0, 10)}</td>
+    <td>${esc(lead.firstName)} ${esc(lead.lastName)}</td>
+    <td dir="ltr">${maskId(lead.idNumber)}</td>
+    <td dir="ltr"><a href="tel:${esc(lead.phone)}">${esc(lead.phone)}</a></td>
+    <td>${esc(lead.city)}</td>
+    <td>${sourceCell(lead)}</td>
+    <td>${pill(lead.status, STATUS_TONE[lead.status] || 'na')}</td>
+    <td>${followupCell(lead)}</td>
+    ${showOwner ? `<td>${esc(userName(lead.ownerId))}</td>` : ''}
+    <td><button class="btn ghost small" data-act="editLead" data-id="${esc(lead.id)}">עדכון</button></td>
+  </tr>`;
+}
+
+/** פאנל עדכון סטטוס לליד שנבחר */
+function editPanel() {
+  const s = ui.leads;
+  const lead = store.leads.find(l => l.id === s.editId);
+  if (!lead) return '';
+  const showFollowup = s.editDraft.status === LEAD_STATUS_FOLLOWUP;
+  const deleteArea = me().role === 'admin' ? (s.confirmDelete === lead.id
+    ? `<div class="row3"><button class="btn danger" data-act="deleteLeadYes" data-id="${esc(lead.id)}">כן, למחוק</button>
+         <button class="btn ghost" data-act="deleteLeadNo">ביטול</button></div>`
+    : `<button class="btn danger small" style="margin-top:10px" data-act="deleteLead" data-id="${esc(lead.id)}">מחיקת ליד</button>`) : '';
+  return `<div class="card" id="lead_edit_panel" style="border-color:var(--primary)">
+    <h3>עדכון ליד: ${esc(lead.firstName)} ${esc(lead.lastName)}</h3>
+    <label for="le_status">סטטוס</label>
+    <select id="le_status" data-chg="leadEditStatus">${options(LEAD_STATUSES, s.editDraft.status)}</select>
+    <div class="lead-fu" id="le_followup_wrap"${showFollowup ? '' : ' hidden'}>
+      <label for="le_followup">מועד לשיחה נוספת (תאריך ושעה)</label>
+      <input type="datetime-local" id="le_followup" data-inp="leadEditFollowup" data-chg="leadEditFollowup" value="${esc(s.editDraft.followup)}">
+    </div>
+    <div class="field-err" role="alert"${s.editError ? '' : ' hidden'}>${esc(s.editError)}</div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" data-act="saveLeadEdit" data-id="${esc(lead.id)}">שמירה</button>
+      <button class="btn ghost" data-act="cancelLeadEdit">ביטול</button>
+    </div>${deleteArea}</div>`;
+}
+
+function leadTableHtml() {
+  const s = ui.leads;
+  const leads = filteredLeads();
+  s.shown = leads;   // לייצוא לאקסל
+  const managers = isManagerView();
+  const coordFilter = managers ? `<div><label for="ld_coord">רכז/ת</label>
+    <select id="ld_coord" data-chg="leadCoordFilter"><option value="">כל הרכזים</option>
+      ${options(coordinators().map(u => u.id), s.coordFilter, userName)}</select></div>` : '';
+  const head = `<tr><th>נפתח</th><th>שם</th><th>ת.ז</th><th>טלפון</th><th>עיר</th><th>מקור</th><th>סטטוס</th><th>שיחה נוספת</th>${managers ? '<th>רכז/ת</th>' : ''}<th></th></tr>`;
+  const body = leads.length
+    ? `<div class="scroll"><table class="lead-table"><thead>${head}</thead><tbody>${leads.map(l => rowHtml(l, managers)).join('')}</tbody></table></div>`
+    : emptyNote(store.leads.length ? 'אין לידים שמתאימים לסינון.' : 'עדיין לא נוספו לידים.');
+  return `${editPanel()}
+    <div class="card">
+      <div class="row between"><h3 style="margin:0">טבלת מעקב לידים (${leads.length})</h3>
+        <button class="btn small" data-act="exportLeads">ייצוא לאקסל</button></div>
+      ${followupBanner()}${statusChips()}
+      <div class="grid2">
+        <div><label for="ld_search">חיפוש (שם, טלפון, ת.ז, עיר)</label>
+          <input id="ld_search" type="search" data-inp="leadSearch" value="${esc(s.search)}"></div>
+        ${coordFilter}
+      </div>
+      ${body}
+    </div>`;
+}
+
+__exports.leadTableHtml = leadTableHtml;
+};
+
+/* ===== js/ui/screens/leads.js ===== */
+__defs['js/ui/screens/leads.js'] = function (__exports) {
+/**
+ * ui/screens/leads.js - מסך "מעקב לידים": טופס הוספה (leadForm.js) וטבלת מעקב (leadTable.js).
+ * כאן נמצאות הפעולות שמחברות בין שני החלקים לבין השרת.
+ *
+ * מידע אישי: ת.ז וטלפון. הגישה מוגבלת בשרת (כל משתמש רואה את הלידים שפתח, מנהל ונופר רואים הכול).
+ */
+const { ui, store, emptyLeadsUi } = __req('js/core/state.js');
+const { requestRender } = __req('js/core/bus.js');
+const { toast, rerenderKeepingFocus } = __req('js/core/dom.js');
+const { toLocalInput } = __req('js/utils/format.js');
+const { LEAD_STATUS_FOLLOWUP } = __req('js/config.js');
+const { me } = __req('js/domain/permissions.js');
+const { insertLead, updateLeadStatus, deleteLead, leadErrorText } = __req('js/api/leadsApi.js');
+const { logChange } = __req('js/api/logApi.js');
+const { exportLeads } = __req('js/exports/leadsExcel.js');
+const { leadFormHtml, validateDraft, needsReferrer, needsEventLocation } = __req('js/ui/screens/leadForm.js');
+const { leadTableHtml } = __req('js/ui/screens/leadTable.js');
+
+function render() {
+  return `<h2 style="margin-top:4px">מעקב לידים</h2>${leadFormHtml()}${leadTableHtml()}`;
+}
+
+/** מראה או מסתיר אזור בטופס, בלי לצייר את המסך מחדש (כדי לא למחוק מה שהוקלד) */
+function setVisible(wrapId, visible) {
+  const wrap = document.getElementById(wrapId);
+  if (wrap) wrap.hidden = !visible;
+}
+
+/** מראה או מסתיר את אזור "מועד לשיחה נוספת" לפי הסטטוס */
+function toggleFollowupField(wrapId, status) {
+  const wrap = document.getElementById(wrapId);
+  if (wrap) wrap.hidden = status !== LEAD_STATUS_FOLLOWUP;
+}
+
+// ---------- הוספת ליד ----------
+
+async function saveLead() {
+  if (ui.busy) return;
+  const state = ui.leads;
+  const { lead, error } = validateDraft(state.draft);
+  if (error) { state.error = error; requestRender(); return; }
+  ui.busy = true;
+  const result = await insertLead(lead);
+  ui.busy = false;
+  if (result.error || !result.lead) {
+    state.error = leadErrorText(result.error);
+    requestRender();
+    return;
+  }
+  store.leads.unshift(result.lead);
+  logChange('הוספת ליד');            // בכוונה בלי פרטים אישיים
+  state.draft = emptyLeadsUi().draft;
+  state.error = '';
+  toast('הליד נשמר');
+  requestRender();
+}
+
+// ---------- עדכון ליד קיים ----------
+
+async function saveLeadEdit(el) {
+  if (ui.busy) return;
+  const state = ui.leads;
+  const lead = store.leads.find(l => l.id === el.dataset.id);
+  if (!lead) return;
+  const { status, followup } = state.editDraft;
+  if (status === LEAD_STATUS_FOLLOWUP && !followup) {
+    state.editError = 'בסטטוס "המשך טיפול" יש לבחור תאריך ושעה לשיחה נוספת.';
+    requestRender();
+    return;
+  }
+  const followupAt = status === LEAD_STATUS_FOLLOWUP ? new Date(followup).toISOString() : null;
+  ui.busy = true;
+  const result = await updateLeadStatus(lead.id, status, followupAt);
+  ui.busy = false;
+  if (result.error || !result.lead) { state.editError = leadErrorText(result.error) || 'אין הרשאה לעדכן'; requestRender(); return; }
+  Object.assign(lead, result.lead);
+  logChange('עדכון סטטוס ליד');
+  state.editId = null; state.editError = '';
+  toast('הליד עודכן');
+  requestRender();
+}
+
+async function deleteLeadYes(el) {
+  if (ui.busy || me().role !== 'admin') return;
+  ui.busy = true;
+  const { ok, error } = await deleteLead(el.dataset.id);
+  ui.busy = false;
+  if (!ok) { toast(leadErrorText(error) || 'אין הרשאה למחוק'); return; }
+  store.leads = store.leads.filter(l => l.id !== el.dataset.id);
+  logChange('מחיקת ליד');
+  ui.leads.editId = null; ui.leads.confirmDelete = null;
+  toast('הליד נמחק');
+  requestRender();
+}
+
+// ---------- פעולות ----------
+
+const handlers = {
+  /** עדכון טיוטת הטופס בכל הקלדה או בחירה */
+  leadDraft(el) { ui.leads.draft[el.dataset.key] = el.value; },
+  /** שינוי סטטוס בטופס: מעדכן את הטיוטה ומציג/מסתיר את שדה מועד השיחה */
+  leadDraftStatus(el) {
+    ui.leads.draft.status = el.value;
+    toggleFollowupField('ld_followup_wrap', el.value);
+  },
+  /** בחירת מקור: פותח שדה "שם העובד הממליץ" או "מיקום האירוע" לפי המקור */
+  leadDraftSource(el) {
+    ui.leads.draft.source = el.value;
+    setVisible('ld_referrer_wrap', needsReferrer(el.value));
+    setVisible('ld_event_wrap', needsEventLocation(el.value));
+  },
+  saveLead,
+  // טבלה
+  leadStatusFilter(el) { ui.leads.statusFilter = el.dataset.value; requestRender(); },
+  leadCoordFilter(el) { ui.leads.coordFilter = el.value; requestRender(); },
+  leadSearch(el) { ui.leads.search = el.value; rerenderKeepingFocus('ld_search', requestRender); },
+  exportLeads() { exportLeads(ui.leads.shown); },
+  // פאנל עדכון
+  editLead(el) {
+    const lead = store.leads.find(l => l.id === el.dataset.id);
+    if (!lead) return;
+    ui.leads.editId = lead.id;
+    ui.leads.editDraft = { status: lead.status, followup: toLocalInput(lead.followupAt) };
+    ui.leads.editError = '';
+    ui.leads.confirmDelete = null;
+    requestRender();
+    // הפאנל מופיע בתוך מסך הלידים או בתוך מסך הבית: גוללים אליו
+    const panel = document.getElementById('lead_edit_panel');
+    if (panel && panel.scrollIntoView) panel.scrollIntoView({ block: 'center' });
+  },
+  leadEditStatus(el) {
+    ui.leads.editDraft.status = el.value;
+    toggleFollowupField('le_followup_wrap', el.value);
+  },
+  leadEditFollowup(el) { ui.leads.editDraft.followup = el.value; },
+  saveLeadEdit,
+  cancelLeadEdit() { ui.leads.editId = null; ui.leads.editError = ''; requestRender(); },
+  deleteLead(el) { ui.leads.confirmDelete = el.dataset.id; requestRender(); },
+  deleteLeadNo() { ui.leads.confirmDelete = null; requestRender(); },
+  deleteLeadYes,
+};
+
+
+__exports.render = render;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/login.js ===== */
+__defs['js/ui/screens/login.js'] = function (__exports) {
+/**
+ * ui/screens/login.js - מסך כניסה.
+ */
+const { $ } = __req('js/core/dom.js');
+const { ui } = __req('js/core/state.js');
+const { esc } = __req('js/utils/format.js');
+const { signIn } = __req('js/api/auth.js');
+const { startSession } = __req('js/core/session.js');
+const { clearChrome } = __req('js/ui/components/tabs.js');
+
+/** מצייר את מסך הכניסה (message = הודעת שגיאה אופציונלית) */
+function showLogin(message = '') {
+  clearChrome();
+  $('#app').innerHTML = `
+    <div class="card" style="max-width:380px;margin:30px auto">
+      <h2 style="margin-top:0">כניסה למערכת</h2>
+      <label for="lg_u">שם משתמש</label>
+      <input id="lg_u" autocomplete="username" autocapitalize="none" dir="ltr">
+      <label for="lg_p">סיסמה</label>
+      <input id="lg_p" type="password" autocomplete="current-password" dir="ltr" data-enter="login">
+      ${message ? `<div class="field-err" role="alert">${esc(message)}</div>` : ''}
+      <button class="btn" style="width:100%;margin-top:14px" data-act="login">כניסה</button>
+    </div>`;
+}
+
+async function login() {
+  if (ui.busy) return;
+  const username = ($('#lg_u').value || '').trim();
+  const password = $('#lg_p').value || '';
+  if (!username || !password) { showLogin('יש להזין שם משתמש וסיסמה'); return; }
+  ui.busy = true;
+  const result = await signIn(username, password);
+  ui.busy = false;
+  if (result.error) { showLogin('שם המשתמש או הסיסמה שגויים'); return; }
+  const started = await startSession(result.userId);
+  if (started.error) showLogin(started.error);
+}
+
+const handlers = { login };
+
+__exports.showLogin = showLogin;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/visitDetail.js ===== */
+__defs['js/ui/screens/visitDetail.js'] = function (__exports) {
+/**
+ * ui/screens/visitDetail.js - צפייה בביקור: פרטים, צ'ק ליסט, סיכום, משימות, והפעולות
+ * עריכה, העתקת סיכום ומחיקה (מחיקה למנהל ולנופר בלבד, עם אישור בתוך הדף).
+ */
+const { ui, store } = __req('js/core/state.js');
+const { requestRender } = __req('js/core/bus.js');
+const { toast, errorText, scrollTop } = __req('js/core/dom.js');
+const { esc, fmtDate, todayIso } = __req('js/utils/format.js');
+const { clinicName, userName, getClinic, canVisit, canDeleteVisit } = __req('js/domain/permissions.js');
+const { isOverdue } = __req('js/domain/metrics.js');
+const { visitChecklist } = __req('js/domain/checklist.js');
+const { updateVisitTasks, deleteVisit } = __req('js/api/visitsApi.js');
+const { logChange } = __req('js/api/logApi.js');
+const { backButton } = __req('js/ui/components/card.js');
+const { copyText } = __req('js/utils/clipboard.js');
+
+const findVisit = id => store.visits.find(v => v.id === id);
+
+function checklistHtml(visit) {
+  return visitChecklist(visit)
+    .map((text, i) => `<div class="check"><span aria-hidden="true">${visit.checks[i] ? '✅' : '⬜'}</span><span>${esc(text)}</span></div>`)
+    .join('');
+}
+
+function tasksHtml(visit) {
+  if (!visit.tasks.length) return '<div class="muted">אין משימות.</div>';
+  const today = todayIso();
+  return visit.tasks.map((task, i) => `
+    <div class="check">
+      <input type="checkbox" data-chg="toggleTask" data-v="${esc(visit.id)}" data-i="${i}"${task.done ? ' checked' : ''}
+        aria-label="בוצע"${canVisit() ? '' : ' disabled'}>
+      <div><div>${esc(task.text)}</div>
+        <div class="muted">${esc(task.owner || 'ללא אחראי')} · יעד ${fmtDate(task.due)}${isOverdue(task, today) ? ' · <b class="neg">באיחור</b>' : ''}</div></div>
+    </div>`).join('');
+}
+
+/** כרטיס האישור שמופיע אחרי לחיצה על "מחיקת ביקור" */
+function deleteConfirmHtml(visit) {
+  if (ui.confirmDeleteVisit !== visit.id || !canDeleteVisit()) return '';
+  return `<div class="card" style="margin:12px 0 0;border-color:var(--bad)" role="alert">
+    <div><b>למחוק את הביקור?</b> הפעולה לא ניתנת לביטול.</div>
+    <div class="row3">
+      <button class="btn danger" data-act="deleteVisitYes" data-v="${esc(visit.id)}">כן, למחוק</button>
+      <button class="btn ghost" data-act="deleteVisitNo">ביטול</button>
+    </div></div>`;
+}
+
+function render() {
+  const visit = findVisit(ui.showVisit);
+  if (!visit || !getClinic(visit.clinicId)) { ui.showVisit = null; return ''; }
+  const deleteButton = canDeleteVisit()
+    ? `<button class="btn danger" data-act="deleteVisit" data-v="${esc(visit.id)}">מחיקת ביקור</button>` : '';
+  return `${backButton('backVisits', 'חזרה')}
+    <div class="card">
+      <h3>${esc(clinicName(visit.clinicId))} · ${fmtDate(visit.date)} ${esc(visit.time || '')}</h3>
+      <div class="muted">${esc(userName(visit.coordId))}${visit.people ? ` · משתתפים: ${esc(visit.people)}` : ''}</div>
+      <div class="muted">מטרה: ${esc(visit.purpose || '—')}</div>
+      ${visit.edited ? `<div class="muted">נערך ב־${fmtDate(visit.edited)}</div>` : ''}
+      <h3 style="margin-top:12px">צ׳ק ליסט</h3>${checklistHtml(visit)}
+      <h3 style="margin-top:12px">סיכום</h3><div>${esc(visit.summary || '—').replace(/\n/g, '<br>')}</div>
+      <h3 style="margin-top:12px">משימות להמשך</h3>${tasksHtml(visit)}
+      <div class="row3">
+        <button class="btn" data-act="editVisit" data-v="${esc(visit.id)}">עריכת ביקור</button>
+        <button class="btn ghost" data-act="copyVisit" data-v="${esc(visit.id)}">העתקת סיכום</button>
+        ${deleteButton}
+      </div>
+      ${deleteConfirmHtml(visit)}
+    </div>`;
+}
+
+/** טקסט להעתקה (וואטסאפ, מייל) */
+function visitAsText(visit) {
+  const lines = [
+    `סיכום ביקור – ${clinicName(visit.clinicId)} – ${fmtDate(visit.date)}`,
+    `מתעד/ת: ${userName(visit.coordId)}`,
+    `מטרה: ${visit.purpose || '—'}`, '', 'צ׳ק ליסט:',
+  ];
+  visitChecklist(visit).forEach((text, i) => lines.push(`${visit.checks[i] ? '✔' : '✘'} ${text}`));
+  lines.push('', `סיכום: ${visit.summary || '—'}`, '', 'משימות:');
+  if (visit.tasks.length) visit.tasks.forEach(t => lines.push(`- ${t.text} (${t.owner || ''}, עד ${fmtDate(t.due)})`));
+  else lines.push('אין');
+  return lines.join('\n');
+}
+
+// ---------- פעולות ----------
+
+async function toggleTask(el) {
+  const visit = findVisit(el.dataset.v);
+  if (!visit || !getClinic(visit.clinicId) || !canVisit()) { requestRender(); return; }
+  const index = Number(el.dataset.i);
+  const tasks = visit.tasks.map((t, i) => (i === index ? { ...t, done: el.checked } : t));
+  const { ok, error } = await updateVisitTasks(visit.id, tasks);
+  if (!ok) { toast(error ? errorText(error) : 'אין הרשאה'); requestRender(); return; }
+  logChange(`${el.checked ? 'סגירת' : 'פתיחת'} משימה: ${tasks[index].text}`);
+  visit.tasks = tasks;
+  requestRender();
+}
+
+async function deleteYes(el) {
+  const visit = findVisit(el.dataset.v);
+  if (!visit || !canDeleteVisit() || ui.busy) return;
+  ui.busy = true;
+  const { ok, error } = await deleteVisit(visit.id);
+  ui.busy = false;
+  if (!ok) { toast(error ? errorText(error) : 'אין הרשאה למחוק'); return; }
+  store.visits = store.visits.filter(v => v.id !== visit.id);
+  logChange(`מחיקת ביקור ב${clinicName(visit.clinicId)} מתאריך ${fmtDate(visit.date)}`);
+  ui.showVisit = null;
+  ui.confirmDeleteVisit = null;
+  toast('הביקור נמחק');
+  requestRender();
+  scrollTop();
+}
+
+const handlers = {
+  /** חזרה: מעריכה לצפייה, ומצפייה לרשימה */
+  backVisits() {
+    if (ui.editVisit) { ui.showVisit = ui.editVisit; ui.editVisit = null; ui.visitClinic = null; }
+    else { ui.visitClinic = null; ui.showVisit = null; }
+    requestRender();
+  },
+  editVisit(el) {
+    const visit = findVisit(el.dataset.v);
+    if (!visit || !getClinic(visit.clinicId)) return;
+    ui.editVisit = visit.id;
+    ui.visitClinic = visit.clinicId;
+    ui.showVisit = null;
+    requestRender();
+    scrollTop();
+  },
+  copyVisit(el) { const v = findVisit(el.dataset.v); if (v) copyText(visitAsText(v)); },
+  deleteVisit(el) { if (canDeleteVisit()) { ui.confirmDeleteVisit = el.dataset.v; requestRender(); } },
+  deleteVisitNo() { ui.confirmDeleteVisit = null; requestRender(); },
+  deleteVisitYes: deleteYes,
+  toggleTask,
+};
+
+__exports.render = render;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/visitForm.js ===== */
+__defs['js/ui/screens/visitForm.js'] = function (__exports) {
+/**
+ * ui/screens/visitForm.js - טופס דיווח ביקור חדש ועריכת ביקור קיים.
+ *
+ * הטופס נשמר עם עותק של סעיפי הצ'ק ליסט של אותו רגע, כדי ששינוי עתידי ברשימה לא יעוות ביקורים ישנים.
+ * משימות נקראות מה-DOM בעת שמירה (שורות שאפשר להוסיף ולהסיר בלי לצייר מחדש).
+ */
+const { ui, store } = __req('js/core/state.js');
+const { requestRender } = __req('js/core/bus.js');
+const { $, toast, errorText, scrollTop } = __req('js/core/dom.js');
+const { esc, addDays, todayIso, sign, pctLabel } = __req('js/utils/format.js');
+const { MG_NAMES } = __req('js/config.js');
+const { me, getClinic, canVisit } = __req('js/domain/permissions.js');
+const { clinicStats } = __req('js/domain/metrics.js');
+const { visitChecklist } = __req('js/domain/checklist.js');
+const { insertVisit, updateVisit } = __req('js/api/visitsApi.js');
+const { logChange } = __req('js/api/logApi.js');
+const { backButton } = __req('js/ui/components/card.js');
+
+const pad2 = n => String(n).padStart(2, '0');
+
+/** שורת משימה בטופס. task = ערכים קיימים (בעריכה), או ריק (משימה חדשה) */
+function taskRowHtml(task = {}) {
+  return `<div class="card" data-done="${task.done ? 1 : 0}" style="background:var(--bg)">
+    <label style="margin-top:0">משימה</label>
+    <input class="t_text" value="${esc(task.text || '')}">
+    <div class="grid2">
+      <div><label>אחראי</label><input class="t_owner" value="${esc(task.owner != null ? task.owner : me().name)}"></div>
+      <div><label>תאריך יעד</label><input type="date" class="t_due" value="${esc(task.due || addDays(7))}"></div>
+    </div>
+    <button class="btn danger small" data-act="removeTaskRow" style="margin-top:10px">הסרת משימה</button>
+  </div>`;
+}
+
+/** שורת נתוני פתיחה של המרפאה, מעל הטופס */
+function openingStats(clinic) {
+  const s = clinicStats(clinic);
+  if (!s.n) return '';
+  const target = s.pct !== null ? `, ${pctLabel(s.pct)} מהיעד` : '';
+  return `<div class="muted" style="margin-top:6px">נתוני פתיחה: מצטרפים ${s.j}, עוזבים ${s.l}, מאזן ${sign(s.bal)}${target}</div>`;
+}
+
+function render() {
+  const clinic = getClinic(ui.visitClinic);
+  if (!clinic) { ui.visitClinic = null; ui.editVisit = null; return ''; }
+  const editing = ui.editVisit ? store.visits.find(v => v.id === ui.editVisit) : null;
+  const checklist = editing ? visitChecklist(editing) : store.settings.checklist;
+  const now = new Date();
+  const checkboxes = checklist.map((text, i) => `
+    <label class="check" style="margin:0;color:var(--ink);font-size:1rem">
+      <input type="checkbox" class="vchk" data-i="${i}" data-chg="visitCheckCount"${editing && editing.checks[i] ? ' checked' : ''}>
+      <span>${esc(text)}</span></label>`).join('');
+  const tasks = editing ? editing.tasks.map(taskRowHtml).join('') : '';
+  const checkedCount = editing ? editing.checks.filter(Boolean).length : 0;
+  return `${backButton('backVisits', 'ביטול')}
+    <div class="card">
+      <h3>${editing ? 'עריכת ביקור' : 'דיווח ביקור'} – ${esc(clinic.name)}</h3>
+      <div class="muted">${esc([clinic.town, MG_NAMES[clinic.mg]].filter(Boolean).join(' · '))}</div>
+      ${openingStats(clinic)}
+      <div class="grid2">
+        <div><label for="v_date">תאריך</label><input type="date" id="v_date" value="${esc(editing ? editing.date : todayIso())}"></div>
+        <div><label for="v_time">שעה</label><input type="time" id="v_time" value="${esc(editing ? editing.time || '' : `${pad2(now.getHours())}:${pad2(now.getMinutes())}`)}"></div>
+      </div>
+      <label for="v_people">אנשי קשר / משתתפים</label><input id="v_people" placeholder="לא חובה" value="${esc(editing ? editing.people : '')}">
+      <label for="v_purpose">מטרת הביקור</label><input id="v_purpose" placeholder="למשל: מעקב יעדים" value="${esc(editing ? editing.purpose : '')}">
+      <h3 style="margin-top:14px">צ׳ק ליסט <span class="muted" id="chkCount">${checkedCount} מתוך ${checklist.length}</span></h3>
+      ${checkboxes}
+      <label for="v_sum">סיכום חופשי</label><textarea id="v_sum">${esc(editing ? editing.summary : '')}</textarea>
+      <h3 style="margin-top:14px">משימות להמשך</h3>
+      <div id="taskRows">${tasks}</div>
+      <button class="btn ghost small" data-act="addTaskRow" style="margin-top:8px">הוספת משימה</button>
+      <div class="row" style="margin-top:16px">
+        <button class="btn" data-act="saveVisit" data-id="${esc(clinic.id)}">${editing ? 'שמירת שינויים' : 'שמירת ביקור'}</button>
+      </div>
+    </div>`;
+}
+
+/** קורא את כל ערכי הטופס מה-DOM */
+function readForm(checklist) {
+  const checks = checklist.map((_, i) => {
+    const box = document.querySelector(`.vchk[data-i="${i}"]`);
+    return box && box.checked ? 1 : 0;
+  });
+  const tasks = [...document.querySelectorAll('#taskRows > .card')].map(row => ({
+    text: row.querySelector('.t_text').value.trim(),
+    owner: row.querySelector('.t_owner').value.trim(),
+    due: row.querySelector('.t_due').value,
+    done: row.dataset.done === '1',
+  })).filter(t => t.text);
+  return {
+    date: $('#v_date').value || todayIso(), time: $('#v_time').value,
+    purpose: $('#v_purpose').value.trim(), people: $('#v_people').value.trim(),
+    summary: $('#v_sum').value.trim(), checks, checklist: checklist.slice(), tasks,
+  };
+}
+
+async function saveVisit(el) {
+  const clinic = getClinic(el.dataset.id);
+  if (!clinic || ui.busy) return;
+  const editing = ui.editVisit ? store.visits.find(v => v.id === ui.editVisit) : null;
+  if (!editing && !canVisit()) return;
+  const form = readForm(editing ? visitChecklist(editing) : store.settings.checklist);
+
+  ui.busy = true;
+  if (editing) {
+    const { ok, error } = await updateVisit(editing.id, form, todayIso());
+    ui.busy = false;
+    if (!ok) { toast(error ? errorText(error) : 'אין הרשאה לעדכן את הביקור'); return; }
+    Object.assign(editing, form, { edited: todayIso() });
+    logChange(`עריכת ביקור ב${clinic.name}`);
+    ui.editVisit = null; ui.visitClinic = null; ui.showVisit = editing.id;
+    toast('הביקור עודכן');
+  } else {
+    const { visit, error } = await insertVisit(clinic.id, me().id, form);
+    ui.busy = false;
+    if (error || !visit) { toast(error ? errorText(error) : 'השמירה נכשלה'); return; }
+    store.visits.unshift(visit);
+    logChange(`תיעוד ביקור ב${clinic.name}`);
+    ui.visitClinic = null; ui.showVisit = visit.id;
+    toast('הביקור נשמר');
+  }
+  requestRender();
+  scrollTop();
+}
+
+const handlers = {
+  addTaskRow() {
+    const holder = document.createElement('div');
+    holder.innerHTML = taskRowHtml({});
+    $('#taskRows').appendChild(holder.firstElementChild);
+  },
+  removeTaskRow(el) { const row = el.closest('#taskRows > .card'); if (row) row.remove(); },
+  /** מעדכן את מונה הסעיפים שסומנו, בלי לצייר מחדש */
+  visitCheckCount() {
+    const total = document.querySelectorAll('.vchk').length;
+    $('#chkCount').textContent = `${document.querySelectorAll('.vchk:checked').length} מתוך ${total}`;
+  },
+  saveVisit,
+};
+
+__exports.render = render;
+__exports.handlers = handlers;
+};
+
+/* ===== js/ui/screens/visits.js ===== */
+__defs['js/ui/screens/visits.js'] = function (__exports) {
+/**
+ * ui/screens/visits.js - מסך הביקורים.
+ *  רכז/ת: פתיחת ביקור חדש, ללא ביקור מעל 20 יום, והיסטוריה.
+ *  מנהל ונופר: דשבורד לפי רכז, סינון לפי רכז, והיסטוריה עם ייצוא לאקסל.
+ * המסך משמש גם כמארח לטופס ביקור ולצפייה בביקור (לפי ui.visitClinic / ui.showVisit).
+ */
+const { ui } = __req('js/core/state.js');
+const { store } = __req('js/core/state.js');
+const { requestRender, navigate } = __req('js/core/bus.js');
+const { $, toast } = __req('js/core/dom.js');
+const { esc, addDays, todayIso, localeSort } = __req('js/utils/format.js');
+const { VISIT_STALE_DAYS } = __req('js/config.js');
+const { visibleClinics, visibleVisits, getClinic, coordinators, coordinatorOf, canVisit, isManagerView, userName } = __req('js/domain/permissions.js');
+const { lastVisitDate, openTasks, clinicStats, isOverdue } = __req('js/domain/metrics.js');
+const { card, emptyNote } = __req('js/ui/components/card.js');
+const { visitItem } = __req('js/ui/components/visitItem.js');
+const { options } = __req('js/ui/components/formFields.js');
+const { exportVisits } = __req('js/exports/visitsExcel.js');
+const visitForm = __req('js/ui/screens/visitForm.js');
+const visitDetail = __req('js/ui/screens/visitDetail.js');
+
+/** מרפאות שמוצגות לפי סינון הרכז (מנהל ונופר בלבד) */
+function clinicsInScope() {
+  const real = visibleClinics().filter(c => !c.pool);
+  if (canVisit() || !ui.visitFilters.rc) return real;
+  return real.filter(c => { const owner = coordinatorOf(c); return owner && owner.id === ui.visitFilters.rc; });
+}
+
+/** מסנן את רשימת הביקורים לפי הסינונים שנבחרו */
+function filteredVisits(clinics) {
+  const f = ui.visitFilters;
+  const ids = new Set(clinics.map(c => c.id));
+  let list = visibleVisits().filter(v => ids.has(v.clinicId)).sort((a, b) => b.date.localeCompare(a.date));
+  if (f.clinic) list = list.filter(v => v.clinicId === f.clinic);
+  if (f.coord) list = list.filter(v => v.coordId === f.coord);
+  if (f.status === 'open') list = list.filter(v => v.tasks.some(t => !t.done));
+  if (f.period) { const from = addDays(-Number(f.period)); list = list.filter(v => v.date >= from); }
+  return list;
+}
+
+/** מרפאות ללא ביקור מעל מספר הימים שהוגדר, מהמרפאה עם הביצוע הנמוך ביותר */
+function staleClinics(clinics) {
+  const limit = addDays(-VISIT_STALE_DAYS);
+  const pctOf = c => { const p = clinicStats(c).pct; return p === null ? 999 : p; };
+  return clinics
+    .filter(c => { const last = lastVisitDate(c.id); return !last || last < limit; })
+    .sort((a, b) => pctOf(a) - pctOf(b));
+}
+
+// ---------- חלקי התצוגה ----------
+
+/** רכז/ת: בחירת מרפאה ופתיחת טופס ביקור */
+function newVisitCard(clinics) {
+  const sorted = clinics.slice().sort((a, b) => localeSort(a.name, b.name));
+  return card('דיווח ביקור חדש', `
+    <label for="v_pick">בחירת יחידה</label>
+    <select id="v_pick"><option value="">בחרו מרפאה</option>
+      ${sorted.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}
+    </select>
+    <button class="btn" data-act="newVisitPick" style="width:100%;margin-top:10px">פתיחת טופס ביקור</button>`);
+}
+
+/** מנהל ונופר: טבלת סיכום לכל רכז + סינון */
+function managerDashboard(allReal) {
+  const limit = addDays(-VISIT_STALE_DAYS);
+  const month = todayIso().slice(0, 7);
+  const today = todayIso();
+  const rows = coordinators().map(user => {
+    const mine = allReal.filter(c => { const owner = coordinatorOf(c); return owner && owner.id === user.id; });
+    const ids = new Set(mine.map(c => c.id));
+    const visited = mine.filter(c => { const last = lastVisitDate(c.id); return last && last >= limit; }).length;
+    const tasks = openTasks(mine);
+    return {
+      user, units: mine.length, visited,
+      monthVisits: store.visits.filter(v => ids.has(v.clinicId) && v.date.indexOf(month) === 0).length,
+      tasks: tasks.length, late: tasks.filter(x => isOverdue(x.task, today)).length,
+    };
+  });
+  const tableRows = rows.map(r => `<tr>
+    <td><b>${esc(r.user.name)}</b></td><td>${r.units}</td><td>${r.visited}</td>
+    <td class="${r.units - r.visited ? 'neg' : 'pos'}">${r.units - r.visited}</td><td>${r.monthVisits}</td>
+    <td>${r.tasks}${r.late ? ` <span class="neg">(${r.late} באיחור)</span>` : ''}</td></tr>`).join('');
+  const filterOptions = options(rows.map(r => r.user.id), ui.visitFilters.rc, id => {
+    const u = rows.find(r => r.user.id === id).user;
+    return `${u.name} – ${u.title}`;
+  });
+  return card('דשבורד ביקורים לפי רכז/ת', `<div class="scroll"><table>
+      <thead><tr><th>רכז/ת</th><th>יחידות</th><th>בוקרו ב־${VISIT_STALE_DAYS} יום</th><th>ללא ביקור</th><th>ביקורים החודש</th><th>משימות פתוחות</th></tr></thead>
+      <tbody>${tableRows}</tbody></table></div>`)
+    + card('', `<label for="f_rc" style="margin-top:0">סינון לפי רכז/ת</label>
+      <select id="f_rc" data-chg="visitFilter" data-key="rc"><option value="">כל הרכזים</option>${filterOptions}</select>
+      <div class="muted" style="margin-top:6px">הסינון חל על רשימת היחידות ללא ביקור ועל היסטוריית הביקורים.</div>`);
+}
+
+function staleCard(stale) {
+  if (!stale.length) return '';
+  const chips = stale.slice(0, 10)
+    .map(c => `<span class="chip" data-act="openClinic" data-id="${esc(c.id)}" role="button" tabindex="0">${esc(c.name)}</span>`).join('');
+  const more = stale.length > 10 ? `<span class="muted">ועוד ${stale.length - 10}</span>` : '';
+  return card(`ללא ביקור מעל ${VISIT_STALE_DAYS} יום (${stale.length})`,
+    `<div class="muted">ממוינות לפי ביצוע נמוך מול היעד:</div><div class="chips">${chips}${more}</div>`);
+}
+
+/** היסטוריית ביקורים עם סינונים וייצוא (ייצוא למנהל ולנופר בלבד) */
+function historyCard(clinics, visits) {
+  const f = ui.visitFilters;
+  const sorted = clinics.slice().sort((a, b) => localeSort(a.name, b.name));
+  const who = [...new Set(visibleVisits().map(v => v.coordId))];
+  const exportButton = isManagerView()
+    ? `<button class="btn small" data-act="exportVisits">ייצוא לאקסל (${visits.length})</button>` : '';
+  const coordFilter = canVisit() && who.length > 1
+    ? `<div><label for="f_coord">מתעד/ת</label><select id="f_coord" data-chg="visitFilter" data-key="coord">
+         <option value="">הכול</option>${options(who, f.coord, userName)}</select></div>` : '';
+  const periods = [['', 'כל הזמן'], ['7', 'שבוע אחרון'], ['30', '30 ימים'], ['90', '90 ימים']];
+  return card('', `
+    <div class="row between"><h3 style="margin:0">היסטוריית ביקורים</h3>${exportButton}</div>
+    <div class="grid2">
+      <div><label for="f_clinic">מרפאה</label><select id="f_clinic" data-chg="visitFilter" data-key="clinic">
+        <option value="">הכול</option>${options(sorted.map(c => c.id), f.clinic, id => sorted.find(c => c.id === id).name)}</select></div>
+      ${coordFilter}
+      <div><label for="f_period">תקופה</label><select id="f_period" data-chg="visitFilter" data-key="period">
+        ${periods.map(([v, t]) => `<option value="${v}"${f.period === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+      <div><label for="f_status">סטטוס משימות</label><select id="f_status" data-chg="visitFilter" data-key="status">
+        <option value="">הכול</option><option value="open"${f.status === 'open' ? ' selected' : ''}>עם משימות פתוחות</option></select></div>
+    </div>
+    ${visits.length
+      ? `<div class="list" style="margin-top:8px">${visits.map(visitItem).join('')}</div>`
+      : emptyNote(store.visits.length ? 'אין ביקורים שמתאימים לסינון.' : 'עדיין לא תועדו ביקורים.')}`);
+}
+
+function render() {
+  // טופס ביקור או צפייה בביקור (כל אחד מחזיר טקסט ריק אם הנתונים כבר לא זמינים)
+  if (ui.visitClinic) { const html = visitForm.render(); if (html) return html; }
+  if (ui.showVisit) { const html = visitDetail.render(); if (html) return html; }
+  const clinics = clinicsInScope();
+  const visits = filteredVisits(clinics);
+  ui.visitsShown = visits;   // לייצוא לאקסל
+  const top = canVisit() ? newVisitCard(clinics) : managerDashboard(visibleClinics().filter(c => !c.pool));
+  return `<h2 style="margin-top:4px">ביקורים</h2>${top}${staleCard(staleClinics(clinics))}${historyCard(clinics, visits)}`;
+}
+
+const handlers = {
+  visitFilter(el) { ui.visitFilters[el.dataset.key] = el.value; requestRender(); },
+  /** פתיחת טופס ביקור ממרפאה מסוימת (מדף מרפאה) */
+  newVisit(el) {
+    const clinic = getClinic(el.dataset.id);
+    if (canVisit() && clinic && !clinic.pool) navigate('visits', { visitClinic: clinic.id });
+  },
+  /** פתיחת טופס ביקור מהמרפאה שנבחרה ברשימה */
+  newVisitPick() {
+    if (!canVisit()) return;
+    const id = $('#v_pick').value;
+    if (!id) { toast('בחרו יחידה'); return; }
+    navigate('visits', { visitClinic: id });
+  },
+  showVisit(el) { navigate('visits', { showVisit: el.dataset.id }); },
+  exportVisits() { if (isManagerView()) exportVisits(ui.visitsShown); },
+};
+
+
+__exports.render = render;
+__exports.handlers = handlers;
+};
+
+/* ===== js/utils/clipboard.js ===== */
+__defs['js/utils/clipboard.js'] = function (__exports) {
+/**
+ * utils/clipboard.js - העתקת טקסט ללוח.
+ */
+const { toast } = __req('js/core/dom.js');
+
+/** העתקה בדרך המודרנית, ואם הדפדפן לא תומך, בדרך הישנה דרך שדה זמני */
+function copyText(text) {
+  const done = () => toast('הועתק');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, () => legacyCopy(text, done));
+  } else {
+    legacyCopy(text, done);
+  }
+}
+
+function legacyCopy(text, done) {
+  const field = document.createElement('textarea');
+  field.value = text;
+  document.body.appendChild(field);
+  field.select();
+  try { document.execCommand('copy'); done(); } catch (e) { toast('ההעתקה לא נתמכת בדפדפן'); }
+  field.remove();
+}
+
+__exports.copyText = copyText;
+};
+
+/* ===== js/utils/format.js ===== */
+__defs['js/utils/format.js'] = function (__exports) {
+/**
+ * utils/format.js - פונקציות עזר טהורות לעיצוב טקסט ותאריכים.
+ * אין כאן תלות במצב האפליקציה או ב-DOM.
+ */
+
+/** מנקה טקסט לפני הכנסה ל-HTML (הגנה מפני הזרקת קוד). חובה לכל טקסט שמגיע ממשתמש או מבסיס הנתונים. */
+function esc(value) {
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(value == null ? '' : value).replace(/[&<>"']/g, ch => map[ch]);
+}
+
+const pad2 = n => String(n).padStart(2, '0');
+
+/** תאריך כ-YYYY-MM-DD לפי השעון המקומי */
+function isoDate(d) {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+/** התאריך של היום (מחושב בכל קריאה, כדי שלא יתיישן אם הדף נשאר פתוח עד למחרת) */
+function todayIso() {
+  return isoDate(new Date());
+}
+
+/** תאריך יחסי להיום: addDays(-20) הוא לפני 20 יום */
+function addDays(n) {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return isoDate(d);
+}
+
+/** YYYY-MM-DD ל-DD/MM/YYYY */
+function fmtDate(s) {
+  if (!s) return '—';
+  const [y, m, d] = s.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+/** תאריך ושעה מלאים (ISO) להצגה: 20/10/2026 14:30 */
+function fmtDateTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+/** ערך לשדה datetime-local (YYYY-MM-DDTHH:MM) מתוך תאריך ISO */
+function toLocalInput(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${isoDate(d)}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+/** מספר עם סימן: 5 -> "+5", -3 -> "-3", 0 -> "0" */
+function sign(n) {
+  return (n > 0 ? '+' : '') + n;
+}
+
+/** CSS class לפי סימן המספר: ירוק לחיובי, אדום לשלילי */
+function signClass(n) {
+  return n > 0 ? 'pos' : n < 0 ? 'neg' : '';
+}
+
+/** ממיר ערך משדה טופס למספר שלם, או null אם ריק או לא תקין */
+function toInt(value) {
+  if (value === null || value === undefined || value === '' || isNaN(Number(value))) return null;
+  return Math.round(Number(value));
+}
+
+/** אחוז להצגה: 71.4 -> "71%". עבור null מחזיר את הטקסט החלופי */
+function pctLabel(p, fallback = 'לא דווח') {
+  return p === null || p === undefined ? fallback : `${Math.round(p)}%`;
+}
+
+/** מסתיר את רוב ספרות ת.ז: 123456782 -> "•••••6782" */
+function maskId(id) {
+  return id ? `•••••${String(id).slice(-4)}` : '—';
+}
+
+/** פונקציית מיון לפי סדר האלף-בית העברי: list.sort(localeSort) */
+function localeSort(a, b) {
+  return a.localeCompare(b, 'he');
+}
+
+__exports.esc = esc;
+__exports.isoDate = isoDate;
+__exports.todayIso = todayIso;
+__exports.addDays = addDays;
+__exports.fmtDate = fmtDate;
+__exports.fmtDateTime = fmtDateTime;
+__exports.toLocalInput = toLocalInput;
+__exports.sign = sign;
+__exports.signClass = signClass;
+__exports.toInt = toInt;
+__exports.pctLabel = pctLabel;
+__exports.maskId = maskId;
+__exports.localeSort = localeSort;
+};
+
+/* ===== js/utils/validate.js ===== */
+__defs['js/utils/validate.js'] = function (__exports) {
+/**
+ * utils/validate.js - בדיקות תקינות לשדות בטפסים.
+ * כל הפונקציות טהורות ומחזירות ערך חזרה, בלי לגעת במסך.
+ */
+
+/**
+ * בודק תעודת זהות ישראלית: עד 9 ספרות (משלים אפסים משמאל) ובדיקת ספרת ביקורת.
+ * @returns {string|null} ת.ז בת 9 ספרות אם תקינה, אחרת null
+ */
+function normalizeIsraeliId(input) {
+  const digits = String(input || '').replace(/\D/g, '');
+  if (digits.length < 5 || digits.length > 9) return null;
+  const id = digits.padStart(9, '0');
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    let step = Number(id[i]) * (i % 2 === 0 ? 1 : 2);
+    if (step > 9) step -= 9;
+    sum += step;
+  }
+  return sum % 10 === 0 ? id : null;
+}
+
+/**
+ * מנרמל מספר טלפון ישראלי לצורה 0501234567 (ללא מקפים ורווחים, וקידומת 972+ מומרת ל-0).
+ * @returns {string|null} המספר התקני, או null אם אינו תקין
+ */
+function normalizePhone(input) {
+  let digits = String(input || '').replace(/[^\d+]/g, '');
+  if (digits.startsWith('+972')) digits = '0' + digits.slice(4);
+  else if (digits.startsWith('972')) digits = '0' + digits.slice(3);
+  return /^0\d{8,9}$/.test(digits) ? digits : null;
+}
+
+__exports.normalizeIsraeliId = normalizeIsraeliId;
+__exports.normalizePhone = normalizePhone;
+};
+
+__req('js/main.js');
+})();
+</script>
 </body>
 </html>
