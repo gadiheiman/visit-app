@@ -1,0 +1,15 @@
+/* משתני עיצוב: צבעים, ערכת צבעים כהה וגלישת אזורי מסך בטוחים */
+:root{
+  --bg:#edf2f3; --surface:#ffffff; --ink:#12303a; --ink2:#4d6670; --line:#d5e0e3;
+  --primary:#17766f; --primary-ink:#ffffff; --soft:#dff0ee;
+  --warn:#b97a00; --warn-bg:#fdf1d4; --bad:#b83a30; --bad-bg:#fbe3e0; --good:#1d7a45; --good-bg:#dff3e6;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1a1f; --surface:#15272e; --ink:#e6f0f2; --ink2:#9db5bc; --line:#274047;
+    --primary:#3bb5ab; --primary-ink:#06201d; --soft:#16393a;
+    --warn:#f0b84a; --warn-bg:#3a2e12; --bad:#ff8a7e; --bad-bg:#40201c; --good:#6fd39a; --good-bg:#16372a;
+  }
+}

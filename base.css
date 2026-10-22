@@ -1,0 +1,30 @@
+/* בסיס: איפוס, טיפוגרפיה, כפתורים, שדות טופס, כותרת עליונה וסרגל ניווט תחתון */
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.45}
+body{min-height:100vh;padding-bottom:84px}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+header.top{background:var(--ink);color:#fff;padding:14px 0 16px}
+:root[data-theme="dark"] header.top{background:#0a1418}
+header.top .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between}
+header.top h1{margin:0;font-size:1.1rem;font-weight:800}
+header.top .sub{font-size:.8rem;opacity:.8}
+main{padding-top:16px}
+h2{font-size:1.15rem;margin:22px 0 10px;font-weight:800}
+h3{font-size:1rem;margin:0 0 8px;font-weight:700}
+.btn{background:var(--primary);color:var(--primary-ink);border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;min-height:44px}
+.btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--primary)}
+.btn.small{padding:6px 12px;min-height:36px;font-size:.88rem}
+.btn.danger{background:var(--bad);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+input,select,textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:44px}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-size:.85rem;color:var(--ink2);margin:10px 0 4px}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:20}
+nav.tabs .in{max-width:760px;margin:0 auto;display:flex;gap:2px}
+nav.tabs button{flex:1;background:none;border:0;padding:8px 2px;border-radius:10px;font-size:.74rem;color:var(--ink2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button .ic{font-size:1.25rem;line-height:1}
+nav.tabs button[aria-current="page"]{color:var(--primary);background:var(--soft);font-weight:700}
+.back{background:none;border:0;color:var(--primary);font-weight:700;padding:6px 0;cursor:pointer}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;z-index:30;font-size:.9rem}

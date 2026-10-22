@@ -1,0 +1,24 @@
+/* קומפוננטות משותפות: כרטיסים, תגיות, טבלאות, רשימות, צ'יפים, שורות סטטיסטיקה */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:10px;align-items:center}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.muted{color:var(--ink2);font-size:.85rem}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:700}
+.pill.good{background:var(--good-bg);color:var(--good)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.na{background:var(--line);color:var(--ink2)}
+.list .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.list .item:last-child{border-bottom:0}
+.list .item .t{font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--ink2);font-size:.8rem}
+.scroll{overflow-x:auto}
+.check{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.check input{width:22px;height:22px;min-height:0;margin-top:2px;flex:none}
+.empty{text-align:center;color:var(--ink2);padding:18px 6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:.85rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+.s1{display:flex;justify-content:space-between;gap:8px;margin-top:10px;white-space:nowrap;font-size:.9rem;color:var(--ink2)}.s1 b{font-size:1.05rem;color:var(--ink);font-weight:800}.s1 b.pos{color:var(--good)}.s1 b.neg{color:var(--bad)}
+.row3{display:flex;gap:6px;margin-top:14px}.row3 .btn{flex:1;min-width:0;padding:10px 4px;font-size:.82rem;white-space:nowrap}

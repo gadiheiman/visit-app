@@ -1,0 +1,7 @@
+{
+  "name": "visit-app",
+  "private": true,
+  "type": "module",
+  "description": "מערכת רכזים – מעקב מרפאות, ביקורים ולידים (אתר סטטי, ללא build)",
+  "scripts": { "test": "node tests/run.mjs" }
+}
