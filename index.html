@@ -4,90 +4,140 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>מערכת רכזים – מרפאות וביצועים</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* משתני עיצוב: צבעים, ערכת צבעים כהה וגלישת אזורי מסך בטוחים */
+/* משתני עיצוב: עיצוב "בנטו מדבקות" (בהיר, מסגרות עבות, צללים מלאים). שינוי צבע כאן משנה את כל האפליקציה */
 :root{
-  --bg:#edf2f3; --surface:#ffffff; --ink:#12303a; --ink2:#4d6670; --line:#d5e0e3;
-  --primary:#17766f; --primary-ink:#ffffff; --soft:#dff0ee;
-  --warn:#b97a00; --warn-bg:#fdf1d4; --bad:#b83a30; --bad-bg:#fbe3e0; --good:#1d7a45; --good-bg:#dff3e6;
+  --bg:#eef1f8; --surface:#ffffff; --ink:#151515; --ink2:#454b63; --line:#cbd0e4;
+  /* צבעי המדבקות */
+  --yellow:#ffd84d; --pink:#ff9ec4; --sky:#8cd3ff; --mint:#8ef0c0; --orange:#ffa45b; --grey:#e4e7f2;
+  /* תפקידים: משמשים בכל הקומפוננטות */
+  --primary:#151515; --primary-ink:#ffffff; --soft:#fff3b8;
+  --good:#0b6b3a; --good-bg:#8ef0c0; --warn:#7a4a00; --warn-bg:#ffd84d; --bad:#b3162b; --bad-bg:#ff9ec4;
+  --focus:#1d4ed8;
+  color-scheme:light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#0d1a1f; --surface:#15272e; --ink:#e6f0f2; --ink2:#9db5bc; --line:#274047;
-    --primary:#3bb5ab; --primary-ink:#06201d; --soft:#16393a;
-    --warn:#f0b84a; --warn-bg:#3a2e12; --bad:#ff8a7e; --bad-bg:#40201c; --good:#6fd39a; --good-bg:#16372a;
-  }
-}
-/* בסיס: איפוס, טיפוגרפיה, כפתורים, שדות טופס, כותרת עליונה וסרגל ניווט תחתון */
+/* בסיס: איפוס, טיפוגרפיה, כפתורים, שדות טופס, כותרת עליונה וסרגל ניווט תחתון צף */
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.45}
-body{min-height:100vh;padding-bottom:84px}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Rubik','Heebo',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.45}
+body{min-height:100vh;padding-bottom:120px}
 button,input,select,textarea{font:inherit;color:inherit}
-.wrap{max-width:760px;margin:0 auto;padding:0 14px}
-header.top{background:var(--ink);color:#fff;padding:14px 0 16px}
-:root[data-theme="dark"] header.top{background:#0a1418}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+main{padding-top:14px}
+h2,h3{font-family:'Secular One','Rubik',sans-serif;font-weight:400}
+h2{font-size:1.5rem;margin:18px 0 10px;line-height:1.15}
+h3{font-size:1.15rem;margin:0 0 8px}
+
+/* כותרת עליונה */
+header.top{padding:20px 0 4px}
 header.top .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between}
-header.top h1{margin:0;font-size:1.1rem;font-weight:800}
-header.top .sub{font-size:.8rem;opacity:.8}
-main{padding-top:16px}
-h2{font-size:1.15rem;margin:22px 0 10px;font-weight:800}
-h3{font-size:1rem;margin:0 0 8px;font-weight:700}
-.btn{background:var(--primary);color:var(--primary-ink);border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;min-height:44px}
-.btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--primary)}
-.btn.small{padding:6px 12px;min-height:36px;font-size:.88rem}
-.btn.danger{background:var(--bad);color:#fff}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
-input,select,textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:44px}
+header.top h1{margin:0;font-family:'Secular One','Rubik',sans-serif;font-weight:400;font-size:1.9rem;line-height:1.05}
+header.top .sub{display:inline-block;margin-top:6px;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:1px 10px;font-size:.78rem;font-weight:600;transform:rotate(-2deg)}
+
+/* כפתורים */
+.btn{background:var(--yellow);color:var(--ink);border:2.5px solid var(--ink);border-radius:14px;padding:10px 16px;font-weight:700;cursor:pointer;min-height:44px;box-shadow:3px 3px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.ghost{background:#fff}
+.btn.small{padding:5px 12px;min-height:38px;font-size:.88rem;box-shadow:2px 2px 0 var(--ink)}
+.btn.danger{background:var(--pink)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* שדות טופס */
+input,select,textarea{width:100%;background:#fff;border:2.5px solid var(--ink);border-radius:14px;padding:10px 12px;min-height:48px}
 textarea{min-height:90px;resize:vertical}
-label{display:block;font-size:.85rem;color:var(--ink2);margin:10px 0 4px}
-nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:20}
-nav.tabs .in{max-width:760px;margin:0 auto;display:flex;gap:2px}
-nav.tabs button{flex:1;background:none;border:0;padding:8px 2px;border-radius:10px;font-size:.74rem;color:var(--ink2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
-nav.tabs button .ic{font-size:1.25rem;line-height:1}
-nav.tabs button[aria-current="page"]{color:var(--primary);background:var(--soft);font-weight:700}
-.back{background:none;border:0;color:var(--primary);font-weight:700;padding:6px 0;cursor:pointer}
-.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;z-index:30;font-size:.9rem}
-/* קומפוננטות משותפות: כרטיסים, תגיות, טבלאות, רשימות, צ'יפים, שורות סטטיסטיקה */
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:.85rem;font-weight:600;color:var(--ink2);margin:10px 0 4px}
+
+/* סרגל ניווט תחתון צף */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;padding:0 14px calc(14px + env(safe-area-inset-bottom,0px));z-index:20;pointer-events:none}
+nav.tabs .in{pointer-events:auto;max-width:980px;margin:0 auto;display:flex;gap:4px;background:#fff;border:2.5px solid var(--ink);border-radius:22px;box-shadow:5px 5px 0 var(--ink);padding:7px}
+nav.tabs button{flex:1;background:none;border:2px solid transparent;padding:6px 2px;border-radius:14px;font-size:.74rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;min-height:52px}
+nav.tabs button[aria-current="page"]{background:var(--yellow);border-color:var(--ink)}
+
+.back{background:none;border:0;color:var(--ink);font-weight:700;padding:6px 0;min-height:44px;cursor:pointer;text-decoration:underline}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:14px;z-index:30;font-size:.9rem}
+/* קומפוננטות משותפות: כרטיסים ומדבקות כותרת, תגיות, טבלאות, רשימות, צ'יפים, שורות סטטיסטיקה */
+.card{position:relative;background:var(--surface);border:2.5px solid var(--ink);border-radius:22px;padding:16px;margin-bottom:18px;box-shadow:4px 4px 0 var(--ink)}
+/* צבעי כרטיס */
+.tone-pink{background:var(--pink)} .tone-sky{background:var(--sky)} .tone-mint{background:var(--mint)}
+.tone-orange{background:var(--orange)} .tone-yellow{background:var(--yellow)}
+.tone-orange .muted{color:#2b2b2b}
+/* כותרת "מדבקה" שמודבקת על שפת הכרטיס */
+.has-sticker{margin-top:30px;padding-top:24px}
+.sticker-title{position:absolute;top:-17px;right:16px;background:var(--yellow);border:2.5px solid var(--ink);border-radius:12px;padding:3px 14px;font-family:'Secular One','Rubik',sans-serif;font-size:1.05rem;transform:rotate(-2deg)}
+.tone-mint .sticker-title,.tone-orange .sticker-title{background:#fff;transform:rotate(2deg)}
+.card-subtitle{font-weight:700;line-height:1.35;margin-bottom:8px}
 .row{display:flex;gap:10px;align-items:center}
 .between{justify-content:space-between}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .muted{color:var(--ink2);font-size:.85rem}
 .pos{color:var(--good)} .neg{color:var(--bad)}
-.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:700}
-.pill.good{background:var(--good-bg);color:var(--good)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.na{background:var(--line);color:var(--ink2)}
-.list .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
-.list .item:last-child{border-bottom:0}
+/* על רקעים צבעוניים הטקסט תמיד כהה, כדי לשמור על ניגודיות */
+.tone-pink .pos,.tone-pink .neg,.tone-mint .pos,.tone-mint .neg,.tone-sky .pos,.tone-sky .neg,.tone-orange .pos,.tone-orange .neg{color:var(--ink)}
+/* תגיות */
+.pill{display:inline-block;border:2px solid var(--ink);border-radius:99px;padding:2px 10px;font-size:.78rem;font-weight:700;color:var(--ink);background:var(--grey)}
+.pill.good{background:var(--mint)} .pill.warn{background:var(--yellow)} .pill.bad{background:var(--pink)} .pill.info{background:var(--sky)} .pill.na{background:var(--grey)}
+/* רשימות: כל שורה היא כרטיסון עם מסגרת */
+.list .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin-bottom:8px;background:#fff;border:2px solid var(--ink);border-radius:16px;cursor:pointer}
+.list .item:last-child{margin-bottom:0}
 .list .item .t{font-weight:700}
-table{width:100%;border-collapse:collapse;font-size:.9rem}
-th,td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line)}
-th{font-weight:600;color:var(--ink2);font-size:.8rem}
+/* טבלאות */
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th,td{padding:9px 4px;text-align:right;border-top:1.5px solid var(--ink)}
+thead th{border-top:0;font-weight:600;color:var(--ink2);font-size:.8rem}
 .scroll{overflow-x:auto}
+.bal-chip{display:inline-block;min-width:44px;text-align:center;direction:ltr;unicode-bidi:isolate;border:2px solid var(--ink);border-radius:99px;padding:1px 6px;font-size:.82rem;font-weight:700;color:var(--ink);background:#fff}
+.bal-chip.pos{background:var(--mint)} .bal-chip.neg{background:var(--pink)}
 .check{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
-.check input{width:22px;height:22px;min-height:0;margin-top:2px;flex:none}
+.check input{width:24px;height:24px;min-height:0;margin-top:2px;flex:none}
 .empty{text-align:center;color:var(--ink2);padding:18px 6px}
+/* צ'יפים */
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:.85rem;cursor:pointer}
-.chip[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+.chip{border:2.5px solid var(--ink);background:#fff;border-radius:99px;padding:6px 14px;font-size:.85rem;font-weight:600;cursor:pointer;min-height:40px}
+.chip[aria-pressed="true"]{background:var(--yellow);box-shadow:2px 2px 0 var(--ink)}
+/* שורות נתונים קצרות */
 .s1{display:flex;justify-content:space-between;gap:8px;margin-top:10px;white-space:nowrap;font-size:.9rem;color:var(--ink2)}.s1 b{font-size:1.05rem;color:var(--ink);font-weight:800}.s1 b.pos{color:var(--good)}.s1 b.neg{color:var(--bad)}
-.row3{display:flex;gap:6px;margin-top:14px}.row3 .btn{flex:1;min-width:0;padding:10px 4px;font-size:.82rem;white-space:nowrap}
-/* סגנונות ייעודיים למסכים: דשבורד הבית, נתוני מרפאה, מעקב לידים */
-.dash .card{margin-bottom:12px;padding:12px}.dash h3{font-size:.95rem}.big{font-size:2.1rem;font-weight:800;line-height:1.1;margin:4px 0}.big.pos{color:var(--good)}.big.neg{color:var(--bad)}.s2{display:flex;flex-direction:column;gap:5px;margin-top:10px;font-size:.85rem;color:var(--ink2)}.s2 span{display:flex;justify-content:space-between;gap:6px}.s2 b{color:var(--ink);font-weight:800}.s2 b.pos{color:var(--good)}.s2 b.neg{color:var(--bad)}
+.row3{display:flex;gap:8px;margin-top:14px}.row3 .btn{flex:1;min-width:0;padding:10px 4px;font-size:.82rem;white-space:nowrap}
+/* מספרים ואחוזים מוצגים משמאל לימין, כדי שסימן מינוס ומפרידים יופיעו בצד הנכון בתוך טקסט עברי */
+.num{direction:ltr;unicode-bidi:isolate}
+.big.num,.s1 b.num,.s2 b.num{display:inline-block}
+.s2 span b.num{text-align:left}
+td:first-child{white-space:nowrap}
+/* סגנונות ייעודיים למסכים: דשבורד הבית ודף מרפאה, תגית גודל, מעקב לידים */
+.dash{gap:14px}
+.dash .card{margin-bottom:14px;padding:14px}
+.dash h3{font-size:1rem}
+.big{font-family:'Secular One','Rubik',sans-serif;font-size:2.6rem;font-weight:400;line-height:1.05;margin:4px 0}
+.big.pos{color:var(--good)} .big.neg{color:var(--bad)}
+.tone-pink .big,.tone-mint .big,.tone-sky .big{color:var(--ink)}
+.s2{display:flex;flex-direction:column;gap:6px;margin-top:10px;font-size:.85rem;color:var(--ink)}
+.s2 span{display:flex;justify-content:space-between;gap:6px}
+.s2 b{font-weight:800}.s2 b.pos{color:var(--good)}.s2 b.neg{color:var(--bad)}
+.tone-pink .s2 b.pos,.tone-pink .s2 b.neg,.tone-mint .s2 b.pos,.tone-mint .s2 b.neg,.tone-sky .s2 b.pos,.tone-sky .s2 b.neg{color:var(--ink)}
 .kv{display:flex;flex-direction:column;margin-bottom:8px;font-size:.88rem}.kv span{color:var(--ink2);font-size:.75rem}.kv b{font-weight:700;overflow-wrap:anywhere}
+.tone-sky .kv span{color:#1f2a44}
 /* תגית גודל מרפאה */
-.size{display:inline-block;border-radius:6px;padding:1px 8px;font-size:.72rem;font-weight:700;background:var(--soft);color:var(--primary)}
+.size{display:inline-block;border:2px solid var(--ink);border-radius:8px;padding:0 8px;font-size:.72rem;font-weight:700;background:var(--yellow);color:var(--ink)}
 /* מעקב לידים */
-.pill.info{background:var(--soft);color:var(--primary)}
-.pill.na{background:var(--line);color:var(--ink2)}
-.lead-fu{margin-top:10px;padding:10px;border-radius:12px;background:var(--warn-bg)}
-.lead-fu label{color:var(--warn);margin-top:0}
+.lead-fu{margin-top:12px;padding:12px;border:2.5px solid var(--ink);border-radius:18px;background:var(--yellow)}
+.lead-fu label{color:var(--ink);margin-top:0}
+.cond-box{margin-top:12px;padding:12px;border:2.5px solid var(--ink);border-radius:18px}
+.cond-box label{color:var(--ink);font-weight:700;margin-top:0}
+.cond-mint{background:var(--mint)} .cond-sky{background:var(--sky)}
 .lead-table td,.lead-table th{white-space:nowrap}
 .field-err{color:var(--bad);font-weight:700;margin-top:10px}
 [hidden]{display:none!important}
+/* ליד ככרטיס בנייד, ובטבלה במסך רחב */
+.lead-cards{display:none;flex-direction:column;gap:10px;margin-top:10px}
+.lead-card{background:#fff;border:2.5px solid var(--ink);border-radius:18px;padding:12px 14px}
+.lead-name{font-weight:700;font-size:1.05rem}
+@media (max-width:760px){
+  .lead-cards{display:flex}
+  .lead-table-wrap{display:none}
+}
+.lead-table{font-size:.8rem}
 </style>
 </head>
 <body>
@@ -380,6 +430,7 @@ function mapLead(r) {
     id: r.id, ownerId: r.owner_id, idNumber: r.id_number, firstName: r.first_name, lastName: r.last_name,
     phone: r.phone, city: r.city, source: r.source, referrerName: r.referrer_name, eventLocation: r.event_location,
     status: r.status, followupAt: r.followup_at, createdAt: r.created_at,
+    updatedAt: r.updated_at || r.created_at,
   };
 }
 
@@ -547,20 +598,27 @@ __defs['js/core/bus.js'] = function (__exports) {
  */
 let renderer = () => {};
 let navigator = () => {};
+let backNavigator = () => {};
 
 const setRenderer = fn => { renderer = fn; };
 const setNavigator = fn => { navigator = fn; };
+const setBackNavigator = fn => { backNavigator = fn; };
 
 /** מצייר מחדש את המסך הנוכחי */
 const requestRender = () => renderer();
 
-/** עובר למסך אחר: navigate('clinics', { clinicId: 'חפר-5182' }) */
+/** עובר למסך אחר ושומר את המסך הנוכחי להיסטוריה: navigate('clinics', { clinicId: 'חפר-5182' }) */
 const navigate = (tab, extraUiState) => navigator(tab, extraUiState);
+
+/** חוזר למסך הקודם. אם אין היסטוריה (למשל אחרי רענון), עובר ללשונית fallbackTab */
+const goBack = fallbackTab => backNavigator(fallbackTab);
 
 __exports.setRenderer = setRenderer;
 __exports.setNavigator = setNavigator;
+__exports.setBackNavigator = setBackNavigator;
 __exports.requestRender = requestRender;
 __exports.navigate = navigate;
+__exports.goBack = goBack;
 };
 
 /* ===== js/core/dom.js ===== */
@@ -776,6 +834,7 @@ const ui = {
   userId: null,             // מזהה המשתמש המחובר
   tab: 'home',              // המסך הפעיל
   busy: false,              // true בזמן שמירה, למניעת לחיצה כפולה
+  history: [],              // מסכים קודמים, לכפתור "חזרה" (נשמרים רק במעבר עומק, לא בלחיצה על לשונית)
   // מרפאות
   clinicId: null,           // מרפאה פתוחה (דף מרפאה)
   editClinic: false,        // טופס עריכת נתוני מרפאה פתוח
@@ -800,7 +859,7 @@ const ui = {
 /** מאפס את מצב התצוגה (בכניסה ובצאת מהמערכת) */
 function resetUi() {
   const fresh = {
-    tab: 'home', busy: false, clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
+    tab: 'home', busy: false, history: [], clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
     filters: { mg: '', sector: '', kind: '', sort: 'bal' },
     visitClinic: null, showVisit: null, editVisit: null, confirmDeleteVisit: null,
     visitFilters: { clinic: '', coord: '', rc: '', status: '', period: '' }, visitsShown: [],
@@ -1149,7 +1208,7 @@ __defs['js/exports/leadsExcel.js'] = function (__exports) {
  * הקובץ כולל ת.ז מלאה וטלפון (מידע אישי): יש לשמור אותו בזהירות ולמחוק כשאין בו צורך.
  */
 const { toast } = __req('js/core/dom.js');
-const { fmtDateTime, todayIso } = __req('js/utils/format.js');
+const { fmtDateTime, todayIso, daysSince } = __req('js/utils/format.js');
 const { userName } = __req('js/domain/permissions.js');
 const { downloadWorkbook, excelAvailable } = __req('js/exports/workbook.js');
 const { logChange } = __req('js/api/logApi.js');
@@ -1158,6 +1217,8 @@ const { logChange } = __req('js/api/logApi.js');
 function leadRows(leads) {
   return leads.map(l => ({
     'תאריך פתיחה': fmtDateTime(l.createdAt),
+    'תאריך עדכון': fmtDateTime(l.updatedAt),
+    'ימים מפתיחה': daysSince(l.createdAt),
     'ת.ז': l.idNumber || '',
     'שם פרטי': l.firstName,
     'שם משפחה': l.lastName,
@@ -1179,7 +1240,7 @@ function exportLeads(leads) {
   downloadWorkbook(`leads_${todayIso()}.xlsx`, [{
     name: 'מעקב לידים',
     rows: leadRows(leads),
-    widths: [18, 12, 14, 14, 13, 16, 16, 18, 18, 13, 18, 12],
+    widths: [18, 18, 11, 12, 14, 14, 13, 16, 16, 18, 18, 13, 18, 12],
   }]);
   logChange(`ייצוא לידים לאקסל (${leads.length} רשומות)`);
   toast('הקובץ הורד');
@@ -1353,7 +1414,7 @@ __defs['js/ui/components/capTable.js'] = function (__exports) {
  * יעד מצטרפים, מצטרפים בפועל, עוזבים ומאזן. משמשת במסך הבית ובדף מרפאה.
  */
 const { CAPS, CAPS_2026 } = __req('js/config.js');
-const { esc, sign, signClass } = __req('js/utils/format.js');
+const { esc, sign, signClass, fmtInt } = __req('js/utils/format.js');
 
 const HEADER = `<thead><tr><th>קפיטציה</th><th>יעד מצטרפים</th><th>מצטרפים בפועל</th><th>עוזבים</th><th>מאזן</th></tr></thead>`;
 
@@ -1364,10 +1425,10 @@ function row(label, target, j, l, boldTotal = false) {
   const balance = reported ? j - l : null;
   return `<tr>
     <${cell}>${esc(label)}</${cell}>
-    <${cell}>${target ? esc(target) : '—'}</${cell}>
-    <${cell}>${reported ? j : '—'}</${cell}>
-    <${cell}>${reported ? l : '—'}</${cell}>
-    <${cell} class="${reported ? signClass(balance) : ''}">${reported ? sign(balance) : '—'}</${cell}>
+    <${cell}>${target ? fmtInt(target) : '—'}</${cell}>
+    <${cell}>${reported ? fmtInt(j) : '—'}</${cell}>
+    <${cell}>${reported ? fmtInt(l) : '—'}</${cell}>
+    <${cell}>${reported ? `<span class="bal-chip ${signClass(balance)}">${sign(balance)}</span>` : '—'}</${cell}>
   </tr>`;
 }
 
@@ -1409,10 +1470,17 @@ __defs['js/ui/components/card.js'] = function (__exports) {
  */
 const { esc } = __req('js/utils/format.js');
 
-/** כרטיס: card('כותרת', '<p>תוכן</p>') */
+/**
+ * כרטיס: card('כותרת', '<p>תוכן</p>', 'tone-pink sticker')
+ * extraClass: tone-pink / tone-sky / tone-mint / tone-orange / tone-yellow לצבע הכרטיס,
+ * ו-sticker כדי שהכותרת תופיע כמדבקה על שפת הכרטיס (במקום כותרת רגילה בתוכו).
+ */
 function card(title, bodyHtml, extraClass = '') {
-  const heading = title ? `<h3>${esc(title)}</h3>` : '';
-  return `<div class="card ${extraClass}">${heading}${bodyHtml}</div>`;
+  const sticker = extraClass.split(' ').indexOf('sticker') >= 0;
+  const classes = extraClass.replace('sticker', sticker ? 'has-sticker' : '').trim();
+  let heading = '';
+  if (title) heading = sticker ? `<div class="sticker-title">${esc(title)}</div>` : `<h3>${esc(title)}</h3>`;
+  return `<div class="card ${classes}">${heading}${bodyHtml}</div>`;
 }
 
 /** הודעת "אין נתונים" ממורכזת */
@@ -1420,9 +1488,12 @@ function emptyNote(text) {
   return `<div class="empty">${esc(text)}</div>`;
 }
 
-/** כפתור "חזרה" */
-function backButton(action, label) {
-  return `<button class="back" data-act="${action}">‹ ${esc(label)}</button>`;
+/**
+ * כפתור "חזרה". action = שם הפעולה (בדרך כלל goBack).
+ * fallback = הלשונית שאליה חוזרים אם אין היסטוריה (למשל אחרי רענון הדף).
+ */
+function backButton(action, label, fallback = '') {
+  return `<button class="back" data-act="${action}" data-fallback="${esc(fallback)}">‹ ${esc(label)}</button>`;
 }
 
 __exports.card = card;
@@ -1500,10 +1571,11 @@ __defs['js/ui/components/pill.js'] = function (__exports) {
  * ui/components/pill.js - תגית צבעונית קטנה.
  * tone: good (ירוק) | warn (כתום) | bad (אדום) | info (כחול-ירוק) | na (אפור)
  */
-const { esc } = __req('js/utils/format.js');
+const { esc, isNumeric } = __req('js/utils/format.js');
 
+/** תגית. טקסט מספרי (כמו "-153" או "22%") מוצג משמאל לימין כדי שהסימן יופיע בצד הנכון */
 function pill(text, tone = 'na') {
-  return `<span class="pill ${tone}">${esc(text)}</span>`;
+  return `<span class="pill ${tone}${isNumeric(text) ? ' num' : ''}">${esc(text)}</span>`;
 }
 
 __exports.pill = pill;
@@ -1514,7 +1586,11 @@ __defs['js/ui/components/statRows.js'] = function (__exports) {
 /**
  * ui/components/statRows.js - שורות נתונים קטנות.
  */
-const { esc } = __req('js/utils/format.js');
+const { esc, fmtValue, isNumeric } = __req('js/utils/format.js');
+
+/** תוכן של ערך: מעוצב, ומסומן כמספר (משמאל לימין) כשצריך */
+const valueHtml = (value, cls = '') =>
+  `<b class="${cls}${isNumeric(value) ? ' num' : ''}">${esc(fmtValue(value))}</b>`;
 
 /**
  * שורה אחת של נתונים קצרים: "מצטרפים 12 · עוזבים 20 · מאזן -8".
@@ -1522,7 +1598,7 @@ const { esc } = __req('js/utils/format.js');
  */
 function inlineStats(items) {
   const cells = items
-    .map(i => `<span>${esc(i.label)} <b class="${i.cls || ''}">${esc(i.value)}</b></span>`)
+    .map(i => `<span>${esc(i.label)} ${valueHtml(i.value, i.cls)}</span>`)
     .join('');
   return `<div class="s1">${cells}</div>`;
 }
@@ -1530,14 +1606,14 @@ function inlineStats(items) {
 /** רשימה אנכית של שורות "שם  ערך" (בתוך כרטיס דשבורד) */
 function stackedStats(items) {
   const rows = items
-    .map(i => `<span>${esc(i.label)} <b class="${i.cls || ''}">${esc(i.value)}</b></span>`)
+    .map(i => `<span>${esc(i.label)} ${valueHtml(i.value, i.cls)}</span>`)
     .join('');
   return `<div class="s2">${rows}</div>`;
 }
 
 /** מספר גדול עם צבע לפי סימן (למאזן) */
 function bigNumber(text, cls = '') {
-  return `<div class="big ${cls}">${esc(text)}</div>`;
+  return `<div class="big ${cls}${isNumeric(text) ? ' num' : ''}">${esc(fmtValue(text))}</div>`;
 }
 
 /** פריט "תווית + ערך" לפרטי מרפאה (כרטיס נתוני מרפאה) */
@@ -1564,11 +1640,11 @@ const { me } = __req('js/domain/permissions.js');
 
 /** adminOnly = מוצג למנהל בלבד */
 const TAB_DEFS = [
-  { id: 'home', icon: '🏠', label: 'בית' },
-  { id: 'clinics', icon: '🏥', label: 'יחידות' },
-  { id: 'visits', icon: '📝', label: 'ביקורים' },
-  { id: 'leads', icon: '📞', label: 'מעקב לידים' },
-  { id: 'admin', icon: '⚙️', label: 'ניהול', adminOnly: true },
+  { id: 'home', label: 'בית', icon: 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z' },
+  { id: 'clinics', label: 'יחידות', icon: 'M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 9h5a1 1 0 0 1 1 1v11M8 8h2M8 12h2M8 16h2M17 13h1M17 17h1' },
+  { id: 'visits', label: 'ביקורים', icon: 'M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1zM8 6H6a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2M9 14l2 2 4-4' },
+  { id: 'leads', label: 'לידים', icon: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A15 15 0 0 1 4 5a1 1 0 0 1 1-1z' },
+  { id: 'admin', label: 'ניהול', adminOnly: true, icon: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M16 4v4M10 10v4M18 16v4' },
 ];
 
 function renderTabs(activeTab) {
@@ -1576,7 +1652,7 @@ function renderTabs(activeTab) {
   const html = TAB_DEFS
     .filter(t => !t.adminOnly || isAdmin)
     .map(t => `<button data-act="goTab" data-tab="${t.id}"${activeTab === t.id ? ' aria-current="page"' : ''}>
-      <span class="ic" aria-hidden="true">${t.icon}</span>${esc(t.label)}</button>`)
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${t.icon}"/></svg>${esc(t.label)}</button>`)
     .join('');
   $('#tabs').innerHTML = html;
 }
@@ -1584,7 +1660,7 @@ function renderTabs(activeTab) {
 /** הכותרת העליונה: תאריך היום, וכפתור עם שם המשתמש (פותח את מסך "החשבון שלי") */
 function renderWho() {
   $('#hdate').textContent = new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
-  $('#who').innerHTML = `<button class="btn small" style="background:rgba(255,255,255,.15);color:#fff;min-height:36px" data-act="goTab" data-tab="account">${esc(me().name)} ▾</button>`;
+  $('#who').innerHTML = `<button class="btn small" data-act="openTab" data-tab="account">${esc(me().name)} ▾</button>`;
 }
 
 function clearChrome() {
@@ -1636,7 +1712,7 @@ __defs['js/ui/router.js'] = function (__exports) {
  */
 const { ui } = __req('js/core/state.js');
 const { $, scrollTop } = __req('js/core/dom.js');
-const { setRenderer, setNavigator } = __req('js/core/bus.js');
+const { setRenderer, setNavigator, setBackNavigator } = __req('js/core/bus.js');
 const { loadVisits, loadLeads, loadLog } = __req('js/api/loaders.js');
 const { renderTabs, renderWho } = __req('js/ui/components/tabs.js');
 const { showLogin } = __req('js/ui/screens/login.js');
@@ -1678,8 +1754,38 @@ const REFRESH_ON_ENTER = {
 /** האם המשתמש באמצע מילוי טופס (כדי לא לצייר מחדש ולמחוק את מה שהקליד) */
 const isEditingForm = () => ui.visitClinic || ui.editVisit || ui.editClinic;
 
-/** עובר ללשונית. extra = מצב תצוגה נוסף, למשל { clinicId } */
+const HISTORY_LIMIT = 20;
+
+/** תמונת מצב של המסך הנוכחי, כדי שאפשר יהיה לחזור אליו */
+function snapshot() {
+  return {
+    tab: ui.tab, clinicId: ui.clinicId, showVisit: ui.showVisit,
+    visitClinic: ui.visitClinic, editVisit: ui.editVisit, editClinic: ui.editClinic,
+  };
+}
+
+/** מעבר "לעומק" (למשל מרשימה לדף מרפאה): המסך הנוכחי נשמר, וכפתור "חזרה" יחזיר אליו */
 function navigate(tab, extra) {
+  ui.history.push(snapshot());
+  if (ui.history.length > HISTORY_LIMIT) ui.history.shift();
+  goTo(tab, extra);
+}
+
+/** מעבר ללשונית ראשית (סרגל הניווט): מאפס את ההיסטוריה */
+function goTop(tab) {
+  ui.history.length = 0;
+  goTo(tab);
+}
+
+/** חזרה למסך הקודם, או ללשונית ברירת מחדל אם אין היסטוריה */
+function goBack(fallbackTab = 'home') {
+  const previous = ui.history.pop();
+  if (previous) goTo(previous.tab, previous);
+  else goTo(fallbackTab);
+}
+
+/** עובר ללשונית. extra = מצב תצוגה נוסף, למשל { clinicId } */
+function goTo(tab, extra) {
   ui.tab = tab;
   ui.clinicId = null;
   ui.editClinic = false;
@@ -1701,15 +1807,21 @@ function navigate(tab, extra) {
 function initRouter() {
   setRenderer(render);
   setNavigator(navigate);
+  setBackNavigator(goBack);
 }
 
-/** פעולת הלשוניות בסרגל התחתון */
 const handlers = {
-  goTab(el) { navigate(el.dataset.tab); },
+  /** לשונית בסרגל התחתון: מסך ראשי, בלי היסטוריה */
+  goTab(el) { goTop(el.dataset.tab); },
+  /** מעבר למסך אחר מתוך מסך (למשל "הוספת ליד" מהבית), עם אפשרות חזרה */
+  openTab(el) { navigate(el.dataset.tab); },
+  /** כפתור "חזרה" */
+  goBack(el) { goBack(el.dataset.fallback || 'home'); },
 };
 
 __exports.render = render;
 __exports.navigate = navigate;
+__exports.goBack = goBack;
 __exports.initRouter = initRouter;
 __exports.handlers = handlers;
 };
@@ -1724,12 +1836,14 @@ const { esc } = __req('js/utils/format.js');
 const { MG_NAMES, ROLE_NAMES } = __req('js/config.js');
 const { me } = __req('js/domain/permissions.js');
 const { changePassword, signOut } = __req('js/api/auth.js');
+const { backButton } = __req('js/ui/components/card.js');
 
 const MIN_PASSWORD_LENGTH = 8;
 
 function render() {
   const user = me();
-  return `<h2 style="margin-top:4px">החשבון שלי</h2>
+  return `${backButton('goBack', 'חזרה', 'home')}
+    <h2 style="margin-top:4px">החשבון שלי</h2>
     <div class="card">
       <div style="font-weight:800">${esc(user.name)}</div>
       <div class="muted">${esc(user.title)} · ${esc(ROLE_NAMES[user.role])}${user.mg ? ` (${esc(MG_NAMES[user.mg])})` : ''}</div>
@@ -1924,7 +2038,7 @@ function balanceCard(clinic, s) {
     const text = clinic.hospital
       ? 'אין נתונים בקובץ עבור היחידה הזו. ניתן להזין אותם ידנית.'
       : 'אין נתוני קפיטציות ב־2026.';
-    return card('מאזן', `<div class="muted">${text}</div>`);
+    return card('מאזן', `<div class="muted">${text}</div>`, 'tone-yellow');
   }
   const items = [{ label: 'מצטרפים', value: s.j }, { label: 'עוזבים', value: s.l }];
   if (s.yt) {
@@ -1938,7 +2052,8 @@ function balanceCard(clinic, s) {
   }
   return card('מאזן',
     `${bigNumber(sign(s.bal), s.bal >= 0 ? 'pos' : 'neg')}
-     <div class="muted">מאזן 2026 (${s.n} מתוך ${CAPS_PER_YEAR} קפיטציות)</div>${stackedStats(items)}`);
+     <div class="muted">מאזן 2026 (${s.n} מתוך ${CAPS_PER_YEAR} קפיטציות)</div>${stackedStats(items)}`,
+    s.bal >= 0 ? 'tone-mint' : 'tone-pink');
 }
 
 /** כרטיס נתוני המרפאה (ישוב, כתובת, מנהלים, מבוטחים...) */
@@ -1951,7 +2066,7 @@ function infoCard(clinic) {
     ['מספר מבוטחים', clinic.ins != null ? clinic.ins.toLocaleString('he-IL') : null],
     ['קוד מרפאה', clinic.code],
   ].filter(([, value]) => value !== null && value !== undefined && value !== '');
-  return card('נתוני מרפאה', fields.map(([label, value]) => keyValue(label, value)).join(''));
+  return card('נתוני מרפאה', fields.map(([label, value]) => keyValue(label, value)).join(''), 'tone-sky');
 }
 
 /** סיבות עזיבה ב-2026 (ינואר עד ספטמבר) */
@@ -1978,11 +2093,11 @@ function render() {
   if (!clinic) { ui.clinicId = null; return ''; }
   const stats = clinicStats(clinic);
   const canEdit = canEditClinic(clinic);
-  return `${backButton('backToClinics', 'חזרה לרשימה')}
+  return `${backButton('goBack', 'חזרה', 'clinics')}
     ${headerCard(clinic, stats, canEdit)}
     ${ui.editClinic && canEdit ? editFormHtml(clinic) : ''}
     <div class="grid2 dash">${balanceCard(clinic, stats)}${infoCard(clinic)}</div>
-    ${card('מאזן לפי קפיטציה', clinicCapTable(clinic, stats))}
+    ${card('מאזן לפי קפיטציה', clinicCapTable(clinic, stats), 'sticker')}
     ${reasonsCard(clinic)}
     ${historyCard(clinic)}`;
 }
@@ -2022,7 +2137,6 @@ async function saveEdit(el) {
 }
 
 const handlers = {
-  backToClinics() { ui.clinicId = null; ui.editClinic = false; requestRender(); },
   toggleClinicEdit() { ui.editClinic = !ui.editClinic; requestRender(); },
   saveClinicEdit: saveEdit,
 };
@@ -2274,7 +2388,7 @@ function greetingHtml(model) {
 /** כרטיס מאזן (ימין): מאזן 2026, מצטרפים, עוזבים, והקפיטציה האחרונה */
 function balanceCard(model) {
   if (!model.agg.reporting) {
-    return card('מאזן', '<div class="muted">עדיין לא הוזנו נתוני קפיטציות. אפשר להזין אותם במסך היחידה.</div>');
+    return card('מאזן', '<div class="muted">עדיין לא הוזנו נתוני קפיטציות. אפשר להזין אותם במסך היחידה.</div>', 'tone-yellow');
   }
   const a = model.agg;
   const items = [
@@ -2287,7 +2401,8 @@ function balanceCard(model) {
   if (a.targetPct !== null) items.push({ label: 'ביצוע מול יעד', value: pctLabel(a.targetPct) });
   return card('מאזן',
     `${bigNumber(sign(a.bal), a.bal >= 0 ? 'pos' : 'neg')}
-     <div class="muted">מאזן 2026 (${a.nmax} מתוך 6 קפיטציות)</div>${stackedStats(items)}`);
+     <div class="muted">מאזן 2026 (${a.nmax} מתוך 6 קפיטציות)</div>${stackedStats(items)}`,
+    a.bal >= 0 ? 'tone-mint' : 'tone-pink');
 }
 
 /** כרטיס ביקורים (שמאל), עם סינון לפי רכז למנהל ולנופר */
@@ -2306,7 +2421,8 @@ function visitsCard(model) {
   if (v.late) items.push({ label: 'באיחור', value: v.late, cls: 'neg' });
   return card('ביקורים במרפאות',
     `${filter}${bigNumber(`${v.visited} / ${v.scope.length}`)}
-     <div class="muted">יחידות שבוקרו ב־${VISIT_STALE_DAYS} הימים האחרונים</div>${stackedStats(items)}`);
+     <div class="muted">יחידות שבוקרו ב־${VISIT_STALE_DAYS} הימים האחרונים</div>${stackedStats(items)}`,
+    'tone-sky');
 }
 
 /** כותרת משנה לשורת מרפאה: גודל, מבוטחים, ישוב ומינהלת */
@@ -2346,7 +2462,7 @@ function belowTargetCard(model) {
   const body = all.length
     ? `${sizeChips}<div class="list">${rows}</div>${toggle}`
     : `${sizeChips}${emptyNote(`אין מרפאות מתחת ל־${TARGET_ALERT_PCT}% מהיעד.`)}${toggle}`;
-  return card(title, body);
+  return card('מה דורש תשומת לב?', `<div class="card-subtitle">${esc(title)}</div>${body}`, 'tone-orange sticker');
 }
 
 function negativeBalanceCard(model) {
@@ -2393,23 +2509,14 @@ function render() {
   const model = homeModel();
   const hasData = model.agg.reporting > 0;
   const capCard = hasData
-    ? card('מאזן לפי קפיטציה', capTable(model.series, futureTarget(model), { target: model.agg.tt, j: model.agg.J, l: model.agg.L }))
+    ? card('מאזן לפי קפיטציה', capTable(model.series, futureTarget(model), { target: model.agg.tt, j: model.agg.J, l: model.agg.L }), 'sticker')
     : '';
   const attention = hasData ? belowTargetCard(model) + negativeBalanceCard(model) : '';
   return `${greetingHtml(model)}
     <div class="grid2 dash">${balanceCard(model)}${visitsCard(model)}</div>
     ${capCard}
-    ${leadsSection()}
-    <h2>מה דורש תשומת לב?</h2>
+    ${leadTableHtml({ showAdd: true })}
     ${attention}${visitsSummaryCard(model)}${lateTasksCard(model)}${missingDataCard(model)}`;
-}
-
-/** טבלת מעקב הלידים (אותה טבלה כמו בלשונית "מעקב לידים") וכפתור להוספת ליד */
-function leadsSection() {
-  return `<div class="row between" style="margin:16px 0 6px">
-      <h2 style="margin:0">מעקב לידים</h2>
-      <button class="btn small" data-act="goTab" data-tab="leads">הוספת ליד</button>
-    </div>${leadTableHtml()}`;
 }
 
 /** יעד כולל לקפיטציה שעוד לא דווחה: סכום היעדים של כל המרפאות */
@@ -2466,8 +2573,8 @@ const needsEventLocation = source => LEAD_SOURCES_EVENT.indexOf(source) >= 0;
 function leadFormHtml() {
   const d = ui.leads.draft;
   const showFollowup = d.status === LEAD_STATUS_FOLLOWUP;
-  return `<div class="card">
-    <h3>טופס הוספת ליד</h3>
+  return `<div class="card has-sticker">
+    <div class="sticker-title">טופס הוספת ליד</div>
     ${textField({ key: 'idNumber', label: 'ת.ז (לא חובה)', attrs: 'inputmode="numeric" maxlength="9" autocomplete="off" dir="ltr"' })}
     <div class="grid2">
       ${textField({ key: 'firstName', label: 'שם פרטי' })}
@@ -2479,10 +2586,10 @@ function leadFormHtml() {
     <select id="ld_source" data-chg="leadDraftSource">
       <option value="">בחרו מקור</option>${options(store.settings.leadSources, d.source)}
     </select>
-    <div id="ld_referrer_wrap"${needsReferrer(d.source) ? '' : ' hidden'}>
+    <div class="cond-box cond-mint" id="ld_referrer_wrap"${needsReferrer(d.source) ? '' : ' hidden'}>
       ${textField({ key: 'referrer', label: 'שם העובד הממליץ' })}
     </div>
-    <div id="ld_event_wrap"${needsEventLocation(d.source) ? '' : ' hidden'}>
+    <div class="cond-box cond-sky" id="ld_event_wrap"${needsEventLocation(d.source) ? '' : ' hidden'}>
       ${textField({ key: 'eventLocation', label: 'מיקום האירוע' })}
     </div>
     <label for="ld_status">סטטוס הליד</label>
@@ -2540,7 +2647,7 @@ __defs['js/ui/screens/leadTable.js'] = function (__exports) {
  * ui/screens/leadTable.js - טבלת מעקב הלידים: סינון לפי סטטוס וחיפוש, ופאנל עדכון סטטוס.
  */
 const { ui, store } = __req('js/core/state.js');
-const { esc, fmtDateTime, maskId, isoDate, todayIso } = __req('js/utils/format.js');
+const { esc, fmtDateTime, maskId, isoDate, todayIso, daysSince } = __req('js/utils/format.js');
 const { LEAD_STATUSES, LEAD_STATUS_FOLLOWUP } = __req('js/config.js');
 const { isManagerView, coordinators, userName, me } = __req('js/domain/permissions.js');
 const { options } = __req('js/ui/components/formFields.js');
@@ -2585,10 +2692,16 @@ function followupBanner() {
   return `<div class="muted" style="margin:6px 0">שיחות מעקב: ${today ? `<b>${today}</b> להיום` : ''}${today && overdue ? ' · ' : ''}${overdue ? `<b class="neg">${overdue}</b> באיחור` : ''}</div>`;
 }
 
+/** תאריך בלי שעה: 20/10/2026 */
+const shortDate = iso => fmtDateTime(iso).slice(0, 10);
+
+/** תאריך ושעה מוצגים משמאל לימין, כדי שהשעה לא תתהפך מול התאריך בתוך טקסט עברי */
+const dateTimeHtml = iso => `<span class="num">${fmtDateTime(iso)}</span>`;
+
 function followupCell(lead) {
   if (lead.status !== LEAD_STATUS_FOLLOWUP || !lead.followupAt) return '—';
   const late = new Date(lead.followupAt) < new Date();
-  return `<span class="${late ? 'neg' : ''}">${fmtDateTime(lead.followupAt)}</span>`;
+  return `<span class="num ${late ? 'neg' : ''}">${fmtDateTime(lead.followupAt)}</span>`;
 }
 
 /** מקור הליד, ומתחתיו הפרט הנוסף (שם העובד הממליץ או מיקום האירוע) */
@@ -2599,7 +2712,9 @@ function sourceCell(lead) {
 
 function rowHtml(lead, showOwner) {
   return `<tr>
-    <td>${fmtDateTime(lead.createdAt).slice(0, 10)}</td>
+    <td>${shortDate(lead.createdAt)}</td>
+    <td>${shortDate(lead.updatedAt)}</td>
+    <td class="num"><b>${daysSince(lead.createdAt)}</b></td>
     <td>${esc(lead.firstName)} ${esc(lead.lastName)}</td>
     <td dir="ltr">${maskId(lead.idNumber)}</td>
     <td dir="ltr"><a href="tel:${esc(lead.phone)}">${esc(lead.phone)}</a></td>
@@ -2612,6 +2727,27 @@ function rowHtml(lead, showOwner) {
   </tr>`;
 }
 
+/** ליד ככרטיס: התצוגה בנייד (בטלפון טבלה רחבה קשה לקריאה). בטבלה ובכרטיסים אותו מידע */
+function cardHtml(lead, showOwner) {
+  const detail = lead.referrerName || lead.eventLocation;
+  const late = lead.status === LEAD_STATUS_FOLLOWUP && lead.followupAt && new Date(lead.followupAt) < new Date();
+  const followup = lead.status === LEAD_STATUS_FOLLOWUP && lead.followupAt
+    ? `<div style="margin-top:4px;font-weight:600">שיחה נוספת: <span class="num ${late ? 'neg' : ''}">${fmtDateTime(lead.followupAt)}</span></div>` : '';
+  const dates = `נפתח ${shortDate(lead.createdAt)} · עודכן ${shortDate(lead.updatedAt)}`;
+  const who = [lead.idNumber ? `ת.ז ${maskId(lead.idNumber)}` : null, showOwner ? userName(lead.ownerId) : null]
+    .filter(Boolean).join(' · ');
+  return `<div class="lead-card">
+    <div class="row between"><div class="lead-name">${esc(lead.firstName)} ${esc(lead.lastName)}</div>${pill(lead.status, STATUS_TONE[lead.status] || 'na')}</div>
+    <div class="muted"><b>${daysSince(lead.createdAt)}</b> ימים מפתיחת הליד</div>
+    <div class="muted">${esc(lead.source)}${detail ? ` · ${esc(detail)}` : ''}</div>
+    <div style="margin-top:4px"><a class="num" href="tel:${esc(lead.phone)}">${esc(lead.phone)}</a> · ${esc(lead.city)}</div>
+    ${followup}
+    <div class="muted" style="margin-top:6px">${esc(dates)}</div>
+    ${who ? `<div class="muted">${esc(who)}</div>` : ''}
+    <div style="margin-top:8px"><button class="btn ghost small" data-act="editLead" data-id="${esc(lead.id)}">עדכון</button></div>
+  </div>`;
+}
+
 /** פאנל עדכון סטטוס לליד שנבחר */
 function editPanel() {
   const s = ui.leads;
@@ -2622,8 +2758,9 @@ function editPanel() {
     ? `<div class="row3"><button class="btn danger" data-act="deleteLeadYes" data-id="${esc(lead.id)}">כן, למחוק</button>
          <button class="btn ghost" data-act="deleteLeadNo">ביטול</button></div>`
     : `<button class="btn danger small" style="margin-top:10px" data-act="deleteLead" data-id="${esc(lead.id)}">מחיקת ליד</button>`) : '';
-  return `<div class="card" id="lead_edit_panel" style="border-color:var(--primary)">
+  return `<div class="card tone-yellow" id="lead_edit_panel">
     <h3>עדכון ליד: ${esc(lead.firstName)} ${esc(lead.lastName)}</h3>
+    <div class="muted">נפתח ${shortDate(lead.createdAt)} · עודכן לאחרונה ${shortDate(lead.updatedAt)} · <b>${daysSince(lead.createdAt)}</b> ימים מפתיחת הליד</div>
     <label for="le_status">סטטוס</label>
     <select id="le_status" data-chg="leadEditStatus">${options(LEAD_STATUSES, s.editDraft.status)}</select>
     <div class="lead-fu" id="le_followup_wrap"${showFollowup ? '' : ' hidden'}>
@@ -2637,7 +2774,10 @@ function editPanel() {
     </div>${deleteArea}</div>`;
 }
 
-function leadTableHtml() {
+/**
+ * הטבלה כולה. options.showAdd = להציג כפתור "הוספת ליד" (במסך הבית; בלשונית הלידים הטופס כבר מעל).
+ */
+function leadTableHtml({ showAdd = false } = {}) {
   const s = ui.leads;
   const leads = filteredLeads();
   s.shown = leads;   // לייצוא לאקסל
@@ -2645,15 +2785,20 @@ function leadTableHtml() {
   const coordFilter = managers ? `<div><label for="ld_coord">רכז/ת</label>
     <select id="ld_coord" data-chg="leadCoordFilter"><option value="">כל הרכזים</option>
       ${options(coordinators().map(u => u.id), s.coordFilter, userName)}</select></div>` : '';
-  const head = `<tr><th>נפתח</th><th>שם</th><th>ת.ז</th><th>טלפון</th><th>עיר</th><th>מקור</th><th>סטטוס</th><th>שיחה נוספת</th>${managers ? '<th>רכז/ת</th>' : ''}<th></th></tr>`;
+  const head = `<tr><th>נפתח</th><th>עודכן</th><th>ימים</th><th>שם</th><th>ת.ז</th><th>טלפון</th><th>עיר</th><th>מקור</th><th>סטטוס</th><th>שיחה נוספת</th>${managers ? '<th>רכז/ת</th>' : ''}<th></th></tr>`;
   const body = leads.length
-    ? `<div class="scroll"><table class="lead-table"><thead>${head}</thead><tbody>${leads.map(l => rowHtml(l, managers)).join('')}</tbody></table></div>`
+    ? `<div class="lead-table-wrap scroll"><table class="lead-table"><thead>${head}</thead><tbody>${leads.map(l => rowHtml(l, managers)).join('')}</tbody></table></div>
+       <div class="lead-cards">${leads.map(l => cardHtml(l, managers)).join('')}</div>`
     : emptyNote(store.leads.length ? 'אין לידים שמתאימים לסינון.' : 'עדיין לא נוספו לידים.');
   return `${editPanel()}
-    <div class="card">
-      <div class="row between"><h3 style="margin:0">טבלת מעקב לידים (${leads.length})</h3>
-        <button class="btn small" data-act="exportLeads">ייצוא לאקסל</button></div>
-      ${followupBanner()}${statusChips()}
+    <div class="card tone-mint has-sticker">
+      <div class="sticker-title">טבלת מעקב לידים (${leads.length})</div>
+      ${followupBanner()}
+      <div class="row" style="flex-wrap:wrap;margin-top:6px">
+        ${showAdd ? '<button class="btn small" data-act="openTab" data-tab="leads">הוספת ליד</button>' : ''}
+        <button class="btn small" data-act="exportLeads">ייצוא לאקסל</button>
+      </div>
+      ${statusChips()}
       <div class="grid2">
         <div><label for="ld_search">חיפוש (שם, טלפון, ת.ז, עיר)</label>
           <input id="ld_search" type="search" data-inp="leadSearch" value="${esc(s.search)}"></div>
@@ -2683,11 +2828,14 @@ const { me } = __req('js/domain/permissions.js');
 const { insertLead, updateLeadStatus, deleteLead, leadErrorText } = __req('js/api/leadsApi.js');
 const { logChange } = __req('js/api/logApi.js');
 const { exportLeads } = __req('js/exports/leadsExcel.js');
+const { backButton } = __req('js/ui/components/card.js');
 const { leadFormHtml, validateDraft, needsReferrer, needsEventLocation } = __req('js/ui/screens/leadForm.js');
 const { leadTableHtml } = __req('js/ui/screens/leadTable.js');
 
 function render() {
-  return `<h2 style="margin-top:4px">מעקב לידים</h2>${leadFormHtml()}${leadTableHtml()}`;
+  // כפתור חזרה רק אם הגענו לכאן ממסך אחר (למשל "הוספת ליד" מהבית)
+  const back = ui.history.length ? backButton('goBack', 'חזרה', 'home') : '';
+  return `${back}<h2 style="margin-top:4px">מעקב לידים</h2>${leadFormHtml()}${leadTableHtml()}`;
 }
 
 /** מראה או מסתיר אזור בטופס, בלי לצייר את המסך מחדש (כדי לא למחוק מה שהוקלד) */
@@ -2868,7 +3016,7 @@ __defs['js/ui/screens/visitDetail.js'] = function (__exports) {
  * עריכה, העתקת סיכום ומחיקה (מחיקה למנהל ולנופר בלבד, עם אישור בתוך הדף).
  */
 const { ui, store } = __req('js/core/state.js');
-const { requestRender } = __req('js/core/bus.js');
+const { requestRender, goBack } = __req('js/core/bus.js');
 const { toast, errorText, scrollTop } = __req('js/core/dom.js');
 const { esc, fmtDate, todayIso } = __req('js/utils/format.js');
 const { clinicName, userName, getClinic, canVisit, canDeleteVisit } = __req('js/domain/permissions.js');
@@ -2978,11 +3126,14 @@ async function deleteYes(el) {
 }
 
 const handlers = {
-  /** חזרה: מעריכה לצפייה, ומצפייה לרשימה */
+  /** חזרה: מעריכה לצפייה, ומשם למסך הקודם (דף מרפאה, רשימת הביקורים וכו') */
   backVisits() {
-    if (ui.editVisit) { ui.showVisit = ui.editVisit; ui.editVisit = null; ui.visitClinic = null; }
-    else { ui.visitClinic = null; ui.showVisit = null; }
-    requestRender();
+    if (ui.editVisit) {
+      ui.showVisit = ui.editVisit; ui.editVisit = null; ui.visitClinic = null;
+      requestRender();
+      return;
+    }
+    goBack('visits');
   },
   editVisit(el) {
     const visit = findVisit(el.dataset.v);
@@ -3390,6 +3541,19 @@ function fmtDateTime(iso) {
   return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
+/**
+ * כמה ימים עברו מתאריך מסוים עד היום (תאריך היום פחות התאריך, לפי ימי לוח ולא לפי שעות).
+ * ליד שנפתח היום = 0, אתמול = 1.
+ */
+function daysSince(iso) {
+  if (!iso) return null;
+  const start = new Date(iso);
+  const from = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  const now = new Date();
+  const to = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((to - from) / 86400000);
+}
+
 /** ערך לשדה datetime-local (YYYY-MM-DDTHH:MM) מתוך תאריך ISO */
 function toLocalInput(iso) {
   if (!iso) return '';
@@ -3397,9 +3561,24 @@ function toLocalInput(iso) {
   return `${isoDate(d)}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
-/** מספר עם סימן: 5 -> "+5", -3 -> "-3", 0 -> "0" */
+/** מספר עם מפריד אלפים: 6595 -> "6,595" */
+function fmtInt(n) {
+  return Number(n).toLocaleString('he-IL');
+}
+
+/** מספר עם סימן ומפריד אלפים: 5 -> "+5", -1833 -> "-1,833", 0 -> "0" */
 function sign(n) {
-  return (n > 0 ? '+' : '') + n;
+  return (n > 0 ? '+' : '') + fmtInt(n);
+}
+
+/** האם הערך הוא מספר או ביטוי מספרי (כמו "-1,833", "72%", "0 / 160") שצריך להיות מוצג משמאל לימין */
+function isNumeric(value) {
+  return typeof value === 'number' || /^[+\-−\d.,%\s/]+$/.test(String(value));
+}
+
+/** ערך להצגה: מספרים מקבלים מפריד אלפים, וטקסט נשאר כמו שהוא */
+function fmtValue(value) {
+  return typeof value === 'number' ? fmtInt(value) : value;
 }
 
 /** CSS class לפי סימן המספר: ירוק לחיובי, אדום לשלילי */
@@ -3434,8 +3613,12 @@ __exports.todayIso = todayIso;
 __exports.addDays = addDays;
 __exports.fmtDate = fmtDate;
 __exports.fmtDateTime = fmtDateTime;
+__exports.daysSince = daysSince;
 __exports.toLocalInput = toLocalInput;
+__exports.fmtInt = fmtInt;
 __exports.sign = sign;
+__exports.isNumeric = isNumeric;
+__exports.fmtValue = fmtValue;
 __exports.signClass = signClass;
 __exports.toInt = toInt;
 __exports.pctLabel = pctLabel;
