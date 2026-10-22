@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>מערכת רכזים – מרפאות וביצועים</title>
+<title>קומנדו שו״ש</title>
+<meta name="theme-color" content="#ffd84d">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd84d' stroke='%23151515' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23fff' stroke='%23151515' stroke-width='5'/%3E%3Ccircle cx='50' cy='50' r='15' fill='%23ff9ec4' stroke='%23151515' stroke-width='5'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* משתני עיצוב: עיצוב "בנטו מדבקות" (בהיר, מסגרות עבות, צללים מלאים). שינוי צבע כאן משנה את כל האפליקציה */
@@ -58,6 +60,7 @@ nav.tabs button[aria-current="page"]{background:var(--yellow);border-color:var(-
 
 .back{background:none;border:0;color:var(--ink);font-weight:700;padding:6px 0;min-height:44px;cursor:pointer;text-decoration:underline}
 .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:14px;z-index:30;font-size:.9rem}
+nav.tabs .in:empty{display:none}
 /* קומפוננטות משותפות: כרטיסים ומדבקות כותרת, תגיות, טבלאות, רשימות, צ'יפים, שורות סטטיסטיקה */
 .card{position:relative;background:var(--surface);border:2.5px solid var(--ink);border-radius:22px;padding:16px;margin-bottom:18px;box-shadow:4px 4px 0 var(--ink)}
 /* צבעי כרטיס */
@@ -105,6 +108,12 @@ thead th{border-top:0;font-weight:600;color:var(--ink2);font-size:.8rem}
 .big.num,.s1 b.num,.s2 b.num{display:inline-block}
 .s2 span b.num{text-align:left}
 td:first-child{white-space:nowrap}
+/* כרטיס "מצטרפים בקפיטציה הנוכחית": מספרים, פס התקדמות ואזהרת נתון ישן */
+.live-nums{display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;flex-wrap:wrap}
+.live-nums .big{font-size:2rem;margin:0}
+.bar{height:16px;border:2.5px solid var(--ink);border-radius:99px;background:#fff;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--mint);border-left:2.5px solid var(--ink)}
+.live-warn{margin-top:8px;font-weight:700;color:var(--bad)}
 /* סגנונות ייעודיים למסכים: דשבורד הבית ודף מרפאה, תגית גודל, מעקב לידים */
 .dash{gap:14px}
 .dash .card{margin-bottom:14px;padding:14px}
@@ -138,11 +147,27 @@ td:first-child{white-space:nowrap}
   .lead-table-wrap{display:none}
 }
 .lead-table{font-size:.8rem}
+/* כותרת עליונה: סמל ושם */
+header.top h1 .logo{display:inline-flex;vertical-align:middle;margin-inline-end:8px}
+header.top h1{font-size:1.7rem;display:flex;align-items:center}
+/* מסך הפתיחה: סמל גדול, שם, סלוגן ומדבקות מסביב */
+.login-hero{position:relative;text-align:center;padding:30px 0 8px;margin-top:6px}
+.login-emblem svg{display:block;margin:0 auto;filter:drop-shadow(5px 5px 0 var(--ink))}
+.login-title{font-family:'Secular One','Rubik',sans-serif;font-weight:400;font-size:2.7rem;line-height:1.05;margin:14px 0 8px}
+.login-tag{display:inline-block;background:var(--ink);color:var(--yellow);border:2.5px solid var(--ink);border-radius:12px;padding:4px 16px;font-weight:700;transform:rotate(-2deg)}
+.login-card{max-width:380px;margin:30px auto}
+.deco{position:absolute;width:48px;height:48px;border:2.5px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);display:flex;align-items:center;justify-content:center}
+.deco-1{top:26px;right:6%;transform:rotate(9deg)}
+.deco-2{top:58px;left:5%;transform:rotate(-8deg)}
+.deco-3{top:150px;right:3%;transform:rotate(-7deg)}
+.deco-4{top:128px;left:3%;transform:rotate(10deg);width:40px;height:40px}
+.deco-5{top:6px;left:30%;transform:rotate(-5deg);width:40px;height:40px}
+@media (min-width:560px){.deco-1{right:14%}.deco-2{left:12%}.deco-3{right:10%}.deco-4{left:16%}}
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap">
-  <div><h1>מערכת הרכזים</h1><div class="sub" id="hdate"></div></div>
+<header class="top" id="topbar"><div class="wrap">
+  <div><h1 id="brand">קומנדו שו״ש</h1><div class="sub" id="hdate"></div></div>
   <div class="who" id="who"></div>
 </div></header>
 
@@ -341,6 +366,25 @@ async function loadLog() {
   }));
 }
 
+/**
+ * מרענן רק את נתוני המצטרפים היומיים (live_j, live_asof) על המרפאות שכבר בזיכרון,
+ * כדי שעדכון יומי יופיע בלי כניסה מחדש, וגם בלי לדרוס עריכה שמתבצעת.
+ */
+async function loadLiveJoiners() {
+  const rows = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await sb.from('clinics').select('id,live_j,live_asof').range(from, from + PAGE - 1);
+    if (error) throw error;
+    rows.push(...data);
+    if (data.length < PAGE) break;
+  }
+  const byId = new Map(rows.map(r => [r.id, r]));
+  store.clinics.forEach(c => {
+    const r = byId.get(c.id);
+    if (r) { c.liveJ = r.live_j; c.liveAsof = r.live_asof; }
+  });
+}
+
 /** טוען הגדרה שנשמרה בטבלת settings אל store.settings */
 function applySetting(row) {
   if (row.key === 'checklist') store.settings.checklist = row.value;
@@ -364,6 +408,7 @@ async function loadAll() {
 __exports.loadVisits = loadVisits;
 __exports.loadLeads = loadLeads;
 __exports.loadLog = loadLog;
+__exports.loadLiveJoiners = loadLiveJoiners;
 __exports.loadAll = loadAll;
 };
 
@@ -414,6 +459,7 @@ function mapClinic(r) {
     ins: r.ins, hospital: r.hospital, pool: r.pool,
     j, l, j0: j.slice(), l0: l.slice(), rs: r.rs || {},
     updated: r.updated, source: r.source,
+    liveJ: r.live_j, liveAsof: r.live_asof,   // מצטרפים בקפיטציה הנוכחית (מתעדכן יומית) ותאריך העדכון
   };
 }
 
@@ -541,6 +587,9 @@ const ROLE_NAMES = {
 // ---------- ספי תצוגה ----------
 const TARGET_ALERT_PCT = 70;      // מתחת לאחוז הזה מהיעד מרפאה נחשבת "בפיגור"
 const BELOW_PREVIEW_COUNT = 8;    // כמה מרפאות מוצגות לפני לחיצה על "הצגת הכל"
+const APP_NAME = 'קומנדו שו״ש';
+const APP_TAGLINE = 'מעל היעד. בכל יום.';
+const LIVE_STALE_DAYS = 3;        // אם נתון המצטרפים היומי ישן מהמספר הזה, מסמנים שהעדכון האוטומטי נתקע
 const VISIT_STALE_DAYS = 20;      // מרפאה ללא ביקור מעל מספר הימים הזה מסומנת
 const LIST_PAGE_SIZE = 40;        // גודל "עמוד" ברשימת היחידות
 
@@ -577,6 +626,9 @@ __exports.MG_NAMES = MG_NAMES;
 __exports.ROLE_NAMES = ROLE_NAMES;
 __exports.TARGET_ALERT_PCT = TARGET_ALERT_PCT;
 __exports.BELOW_PREVIEW_COUNT = BELOW_PREVIEW_COUNT;
+__exports.APP_NAME = APP_NAME;
+__exports.APP_TAGLINE = APP_TAGLINE;
+__exports.LIVE_STALE_DAYS = LIVE_STALE_DAYS;
 __exports.VISIT_STALE_DAYS = VISIT_STALE_DAYS;
 __exports.LIST_PAGE_SIZE = LIST_PAGE_SIZE;
 __exports.DEFAULT_CHECKLIST = DEFAULT_CHECKLIST;
@@ -948,6 +1000,22 @@ function clinicStats(clinic) {
   };
 }
 
+/**
+ * התקדמות המצטרפים בקפיטציה הנוכחית (נתון יומי מהקובץ "סטטוס מצטרפים לפי מנהלות").
+ * סופרים רק מרפאות עם יעד ועם נתון יומי. asof = התאריך העדכני ביותר, או null אם אין נתון בכלל.
+ */
+function liveProgress(clinics) {
+  let joiners = 0, target = 0, asof = null;
+  clinics.forEach(c => {
+    if (c.liveAsof && (!asof || c.liveAsof > asof)) asof = c.liveAsof;
+    if (!c.pool && c.target > 0 && c.liveJ !== null && c.liveJ !== undefined) {
+      joiners += c.liveJ;
+      target += c.target;
+    }
+  });
+  return { j: joiners, t: target, asof, pct: target ? (joiners / target) * 100 : null };
+}
+
 /** סיכום של קבוצת מרפאות (מינהלת, כל היחידות וכו') */
 function aggregate(clinics) {
   let J = 0, L = 0, withTargetJ = 0, relTarget = 0, annualTarget = 0, maxReported = 0, reportingClinics = 0;
@@ -1077,6 +1145,7 @@ function completionTone(pct) {
 
 __exports.isReported = isReported;
 __exports.clinicStats = clinicStats;
+__exports.liveProgress = liveProgress;
 __exports.aggregate = aggregate;
 __exports.capSeries = capSeries;
 __exports.lastReportedCap = lastReportedCap;
@@ -1407,6 +1476,62 @@ startApp();
 __exports.startApp = startApp;
 };
 
+/* ===== js/ui/components/brand.js ===== */
+__defs['js/ui/components/brand.js'] = function (__exports) {
+/**
+ * components/brand.js - שם האפליקציה, הסמל והאיורים של מסך הפתיחה.
+ * הסמל: מטרה (ביצוע מול יעד) עם כוכב במרכז וחץ שפוגע בול. האיורים הם מדבקות בסגנון העיצוב.
+ * כל האיורים הם SVG פנימיים (בלי תמונות חיצוניות), כך שנטענים מיד ומתאימים לכל גודל מסך.
+ */
+const { APP_NAME, APP_TAGLINE } = __req('js/config.js');
+const { esc } = __req('js/utils/format.js');
+
+const INK = '#151515';
+
+/** הסמל הראשי: מטרה עם כוכב וחץ. size = גודל בפיקסלים */
+function emblem(size = 40) {
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="סמל ${esc(APP_NAME)}">
+    <circle cx="50" cy="50" r="46" fill="#ffd84d" stroke="${INK}" stroke-width="4"/>
+    <circle cx="50" cy="50" r="34" fill="#ffffff" stroke="${INK}" stroke-width="3.5"/>
+    <circle cx="50" cy="50" r="22" fill="#ff9ec4" stroke="${INK}" stroke-width="3.5"/>
+    <polygon points="50,35 53.7,44.9 64.3,45.4 56,51.9 58.8,62.1 50,56.3 41.2,62.1 44,51.9 35.7,45.4 46.3,44.9" fill="${INK}"/>
+    <path d="M90 10 L55 45" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M90 10 L78 10 M90 10 L90 22" stroke="${INK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>`;
+}
+
+/** שם האפליקציה עם הסמל, לכותרת העליונה */
+function brandHtml() {
+  return `<span class="logo">${emblem(36)}</span>${esc(APP_NAME)}`;
+}
+
+/** מדבקות קישוט: [צבע, תוכן ה-SVG בתוך ריבוע 24x24] */
+const DECOR = [
+  ['yellow', `<path d="M13 2L4 14h7l-2 8 11-13h-7z" fill="${INK}"/>`],                                  // ברק: אנרגיה
+  ['mint', `<path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" fill="${INK}"/>`],                                  // צלב: מרפאות
+  ['sky', `<polygon points="12,2 14.5,8.6 21.5,8.9 16,13.3 17.9,20.1 12,16.2 6.1,20.1 8,13.3 2.5,8.9 9.5,8.6" fill="${INK}"/>`], // כוכב
+  ['pink', `<path d="M4 13l8-8 8 8M4 20l8-8 8 8" stroke="${INK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`], // דרגות
+  ['orange', `<circle cx="12" cy="12" r="9" stroke="${INK}" stroke-width="2.5" fill="none"/><circle cx="12" cy="12" r="4.5" stroke="${INK}" stroke-width="2.5" fill="none"/><circle cx="12" cy="12" r="1.2" fill="${INK}"/>`], // מטרה
+];
+
+/** מסך הפתיחה: סמל גדול, שם, סלוגן ומדבקות מסביב */
+function loginHero() {
+  const stickers = DECOR
+    .map(([tone, shape], i) => `<span class="deco deco-${i + 1} tone-${tone}" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26">${shape}</svg></span>`)
+    .join('');
+  return `<div class="login-hero">
+    ${stickers}
+    <div class="login-emblem">${emblem(132)}</div>
+    <h1 class="login-title">${esc(APP_NAME)}</h1>
+    <div class="login-tag">${esc(APP_TAGLINE)}</div>
+  </div>`;
+}
+
+__exports.emblem = emblem;
+__exports.brandHtml = brandHtml;
+__exports.loginHero = loginHero;
+};
+
 /* ===== js/ui/components/capTable.js ===== */
 __defs['js/ui/components/capTable.js'] = function (__exports) {
 /**
@@ -1565,6 +1690,40 @@ function listItem({ action, id, title, subtitle = '', badgeHtml = '' }) {
 __exports.listItem = listItem;
 };
 
+/* ===== js/ui/components/liveCard.js ===== */
+__defs['js/ui/components/liveCard.js'] = function (__exports) {
+/**
+ * components/liveCard.js - כרטיס "מצטרפים בקפיטציה הנוכחית": נתון שמתעדכן יומית מקובץ המצטרפים.
+ * מציג מספר מצטרפים מתוך יעד, פס התקדמות, ותאריך העדכון. אם הנתון ישן, מוצגת אזהרה.
+ */
+const { esc, fmtInt, fmtDayMonth, daysSince, pctLabel } = __req('js/utils/format.js');
+const { LIVE_STALE_DAYS } = __req('js/config.js');
+
+/**
+ * @param {{j:number, t:number|null, asof:string, scopeLabel?:string}} live
+ *   j = מצטרפים עד כה, t = יעד (או null אם אין), asof = תאריך הנתון (YYYY-MM-DD)
+ */
+function liveCard({ j, t, asof, scopeLabel = '' }) {
+  const stale = daysSince(asof) >= LIVE_STALE_DAYS;
+  const pct = t ? (j / t) * 100 : null;
+  const bar = pct === null ? '' : `<div class="bar" aria-hidden="true"><i style="width:${Math.min(100, Math.round(pct))}%"></i></div>`;
+  const target = t ? `<span class="muted"> מתוך </span><span class="num">${fmtInt(t)}</span>` : '';
+  const pctText = pct === null ? '' : `<span class="pill good num">${esc(pctLabel(pct))}</span>`;
+  const warning = stale
+    ? `<div class="live-warn">הנתון לא התעדכן מ־${esc(fmtDayMonth(asof))}: העדכון היומי האוטומטי כנראה לא רץ.</div>` : '';
+  return `<div class="card live-card">
+    <div class="row between">
+      <b>מצטרפים בקפיטציה הנוכחית${scopeLabel ? ` · ${esc(scopeLabel)}` : ''}</b>
+      <span class="muted">נכון ל־${esc(fmtDayMonth(asof))}</span>
+    </div>
+    <div class="live-nums"><span class="big num">${fmtInt(j)}</span>${target}${pctText}</div>
+    ${bar}${warning}
+  </div>`;
+}
+
+__exports.liveCard = liveCard;
+};
+
 /* ===== js/ui/components/pill.js ===== */
 __defs['js/ui/components/pill.js'] = function (__exports) {
 /**
@@ -1637,6 +1796,7 @@ __defs['js/ui/components/tabs.js'] = function (__exports) {
 const { $ } = __req('js/core/dom.js');
 const { esc } = __req('js/utils/format.js');
 const { me } = __req('js/domain/permissions.js');
+const { brandHtml } = __req('js/ui/components/brand.js');
 
 /** adminOnly = מוצג למנהל בלבד */
 const TAB_DEFS = [
@@ -1659,6 +1819,8 @@ function renderTabs(activeTab) {
 
 /** הכותרת העליונה: תאריך היום, וכפתור עם שם המשתמש (פותח את מסך "החשבון שלי") */
 function renderWho() {
+  $('#topbar').hidden = false;
+  $('#brand').innerHTML = brandHtml();
   $('#hdate').textContent = new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
   $('#who').innerHTML = `<button class="btn small" data-act="openTab" data-tab="account">${esc(me().name)} ▾</button>`;
 }
@@ -1713,7 +1875,7 @@ __defs['js/ui/router.js'] = function (__exports) {
 const { ui } = __req('js/core/state.js');
 const { $, scrollTop } = __req('js/core/dom.js');
 const { setRenderer, setNavigator, setBackNavigator } = __req('js/core/bus.js');
-const { loadVisits, loadLeads, loadLog } = __req('js/api/loaders.js');
+const { loadVisits, loadLeads, loadLog, loadLiveJoiners } = __req('js/api/loaders.js');
 const { renderTabs, renderWho } = __req('js/ui/components/tabs.js');
 const { showLogin } = __req('js/ui/screens/login.js');
 const home = __req('js/ui/screens/home.js');
@@ -1745,7 +1907,7 @@ function render() {
 
 /** מסכים שכדאי לרענן מהשרת בכל כניסה אליהם (כדי לראות מה שאחרים עדכנו) */
 const REFRESH_ON_ENTER = {
-  home: [loadVisits, loadLeads],
+  home: [loadVisits, loadLeads, loadLiveJoiners],
   visits: [loadVisits],
   leads: [loadLeads],
   admin: [loadLog],
@@ -2012,6 +2174,7 @@ const { pill } = __req('js/ui/components/pill.js');
 const { card, backButton, emptyNote } = __req('js/ui/components/card.js');
 const { stackedStats, bigNumber, keyValue } = __req('js/ui/components/statRows.js');
 const { clinicCapTable } = __req('js/ui/components/capTable.js');
+const { liveCard } = __req('js/ui/components/liveCard.js');
 const { visitItem } = __req('js/ui/components/visitItem.js');
 const { editFormHtml } = __req('js/ui/screens/clinicEditForm.js');
 
@@ -2057,6 +2220,12 @@ function balanceCard(clinic, s) {
 }
 
 /** כרטיס נתוני המרפאה (ישוב, כתובת, מנהלים, מבוטחים...) */
+/** המצטרפים בקפיטציה הנוכחית של המרפאה (נתון יומי), ביחס ליעד. לא מוצג אם אין נתון יומי */
+function liveSection(clinic) {
+  if (!clinic.liveAsof || clinic.liveJ === null || clinic.liveJ === undefined) return '';
+  return liveCard({ j: clinic.liveJ, t: clinic.target > 0 ? clinic.target : null, asof: clinic.liveAsof });
+}
+
 function infoCard(clinic) {
   const size = sizeOf(clinic);
   const fields = [
@@ -2097,6 +2266,7 @@ function render() {
     ${headerCard(clinic, stats, canEdit)}
     ${ui.editClinic && canEdit ? editFormHtml(clinic) : ''}
     <div class="grid2 dash">${balanceCard(clinic, stats)}${infoCard(clinic)}</div>
+    ${liveSection(clinic)}
     ${card('מאזן לפי קפיטציה', clinicCapTable(clinic, stats), 'sticker')}
     ${reasonsCard(clinic)}
     ${historyCard(clinic)}`;
@@ -2322,13 +2492,14 @@ const { requestRender } = __req('js/core/bus.js');
 const { esc, addDays, todayIso, fmtDate, pctLabel, sign, signClass } = __req('js/utils/format.js');
 const { BELOW_PREVIEW_COUNT, CAPS, TARGET_ALERT_PCT, VISIT_STALE_DAYS, MG_NAMES } = __req('js/config.js');
 const { me, visibleClinics, coordinators, coordinatorOf, canVisit, clinicName, isManagerView, scopeTitle } = __req('js/domain/permissions.js');
-const { aggregate, capSeries, lastReportedCap, clinicStats, isReported, openTasks, lastVisitDate, belowTargetClinics, targetTone, SIZE_LABELS, isOverdue } = __req('js/domain/metrics.js');
+const { aggregate, capSeries, lastReportedCap, clinicStats, isReported, openTasks, lastVisitDate, belowTargetClinics, targetTone, SIZE_LABELS, isOverdue, liveProgress } = __req('js/domain/metrics.js');
 const { pill } = __req('js/ui/components/pill.js');
 const { stackedStats, bigNumber } = __req('js/ui/components/statRows.js');
 const { capTable } = __req('js/ui/components/capTable.js');
 const { listItem } = __req('js/ui/components/listItem.js');
 const { options } = __req('js/ui/components/formFields.js');
 const { card, emptyNote } = __req('js/ui/components/card.js');
+const { liveCard } = __req('js/ui/components/liveCard.js');
 const { leadTableHtml } = __req('js/ui/screens/leadTable.js');
 
 // ---------- חישוב ----------
@@ -2514,9 +2685,16 @@ function render() {
   const attention = hasData ? belowTargetCard(model) + negativeBalanceCard(model) : '';
   return `${greetingHtml(model)}
     <div class="grid2 dash">${balanceCard(model)}${visitsCard(model)}</div>
+    ${liveSection(model)}
     ${capCard}
     ${leadTableHtml({ showAdd: true })}
     ${attention}${visitsSummaryCard(model)}${lateTasksCard(model)}${missingDataCard(model)}`;
+}
+
+/** כרטיס המצטרפים בקפיטציה הנוכחית (נתון יומי). לא מוצג אם עדיין אין נתון יומי */
+function liveSection(model) {
+  const live = liveProgress(model.clinics);
+  return live.asof ? liveCard({ j: live.j, t: live.t, asof: live.asof }) : '';
 }
 
 /** יעד כולל לקפיטציה שעוד לא דווחה: סכום היעדים של כל המרפאות */
@@ -2974,13 +3152,15 @@ const { esc } = __req('js/utils/format.js');
 const { signIn } = __req('js/api/auth.js');
 const { startSession } = __req('js/core/session.js');
 const { clearChrome } = __req('js/ui/components/tabs.js');
+const { loginHero } = __req('js/ui/components/brand.js');
 
 /** מצייר את מסך הכניסה (message = הודעת שגיאה אופציונלית) */
 function showLogin(message = '') {
   clearChrome();
-  $('#app').innerHTML = `
-    <div class="card" style="max-width:380px;margin:30px auto">
-      <h2 style="margin-top:0">כניסה למערכת</h2>
+  $('#topbar').hidden = true;      // במסך הפתיחה השם והסמל מוצגים בגדול, בלי כותרת עליונה
+  $('#app').innerHTML = `${loginHero()}
+    <div class="card has-sticker login-card">
+      <div class="sticker-title">כניסה למערכת</div>
       <label for="lg_u">שם משתמש</label>
       <input id="lg_u" autocomplete="username" autocapitalize="none" dir="ltr">
       <label for="lg_p">סיסמה</label>
@@ -3534,6 +3714,13 @@ function fmtDate(s) {
   return `${d}/${m}/${y}`;
 }
 
+/** YYYY-MM-DD ל-DD/MM (בלי שנה): 2026-10-21 -> 21/10 */
+function fmtDayMonth(s) {
+  if (!s) return '—';
+  const [, m, d] = String(s).slice(0, 10).split('-');
+  return `${d}/${m}`;
+}
+
 /** תאריך ושעה מלאים (ISO) להצגה: 20/10/2026 14:30 */
 function fmtDateTime(iso) {
   if (!iso) return '—';
@@ -3612,6 +3799,7 @@ __exports.isoDate = isoDate;
 __exports.todayIso = todayIso;
 __exports.addDays = addDays;
 __exports.fmtDate = fmtDate;
+__exports.fmtDayMonth = fmtDayMonth;
 __exports.fmtDateTime = fmtDateTime;
 __exports.daysSince = daysSince;
 __exports.toLocalInput = toLocalInput;
