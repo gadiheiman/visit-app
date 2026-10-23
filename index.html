@@ -108,12 +108,36 @@ thead th{border-top:0;font-weight:600;color:var(--ink2);font-size:.8rem}
 .big.num,.s1 b.num,.s2 b.num{display:inline-block}
 .s2 span b.num{text-align:left}
 td:first-child{white-space:nowrap}
-/* כרטיס "מצטרפים בקפיטציה הנוכחית": מספרים, פס התקדמות ואזהרת נתון ישן */
-.live-nums{display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;flex-wrap:wrap}
-.live-nums .big{font-size:2rem;margin:0}
+/* "ביצוע מול יעד" של הקפיטציה הנוכחית: ריבוע במסך הבית וכרטיס רחב בדף מרפאה */
 .bar{height:16px;border:2.5px solid var(--ink);border-radius:99px;background:#fff;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--mint);border-left:2.5px solid var(--ink)}
+.bar.time i{background:var(--yellow)}
 .live-warn{margin-top:8px;font-weight:700;color:var(--bad)}
+.live-nums{display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;flex-wrap:wrap}
+.live-nums .big{font-size:2rem;margin:0}
+.live-square{display:flex;flex-direction:column}
+.cap-chip{align-self:flex-start;background:#fff;border:2.5px solid var(--ink);border-radius:10px;padding:2px 8px;font-weight:700;font-size:.74rem;white-space:nowrap}
+.live-range{font-size:.75rem;margin:4px 0 6px}
+.live-title{font-weight:700;font-size:.9rem;line-height:1.25}
+.live-big{font-family:'Secular One','Rubik',sans-serif;font-size:2.7rem;line-height:1;margin:4px 0 0}
+.live-of{font-size:.85rem;margin:2px 0 8px}
+.live-wait{margin:8px 0}
+.live-days{margin-top:10px;border-top:2.5px dashed var(--ink);padding-top:8px}
+.live-days-title{font-weight:700;font-size:.85rem;margin-bottom:4px}
+.live-days-row{display:flex;justify-content:space-between;font-size:.88rem}
+.live-days .bar{margin-top:8px}
+.live-days-note{font-size:.75rem;margin-top:4px}
+/* שורת המאזן: שורה אחת עם כפתור הרחבה, ובהרחבה ארבעה תאים */
+.bal-row{padding:10px 14px}
+.bal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px}
+.bal-lbl{font-weight:800;font-size:.95rem;white-space:nowrap}
+.bal-head .big{font-size:1.9rem;margin:0;line-height:1}
+.bal-btn{background:#fff;border:2.5px solid var(--ink);border-radius:99px;padding:2px 12px;font-weight:700;font-size:.78rem;min-height:34px;white-space:nowrap;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+.bal-sub{margin-top:2px}
+.cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px;margin-top:10px}
+.cell{background:#fff;border:2.5px solid var(--ink);border-radius:14px;padding:8px 6px;text-align:center}
+.cell b{display:block;font-size:1.05rem}
+.cell span{font-size:.72rem;color:var(--ink2)}
 /* סגנונות ייעודיים למסכים: דשבורד הבית ודף מרפאה, תגית גודל, מעקב לידים */
 .dash{gap:14px}
 .dash .card{margin-bottom:14px;padding:14px}
@@ -587,6 +611,23 @@ const ROLE_NAMES = {
 // ---------- ספי תצוגה ----------
 const TARGET_ALERT_PCT = 70;      // מתחת לאחוז הזה מהיעד מרפאה נחשבת "בפיגור"
 const BELOW_PREVIEW_COUNT = 8;    // כמה מרפאות מוצגות לפני לחיצה על "הצגת הכל"
+// סיבות עזיבה שלא מוצגות באף מסך (הנתון נשאר בבסיס הנתונים, רק לא מוצג)
+const HIDDEN_LEAVE_REASONS = ['לא ניתן לדעת את סיבת העזיבה'];
+/**
+ * ימי חופש שאינם ימי עבודה (בנוסף לשישי ושבת), לצורך ספירת ימי עבודה בקפיטציה.
+ * חגים: ראש השנה, יום כיפור, סוכות, שמיני עצרת, פסח, שביעי של פסח, שבועות ויום העצמאות (עם ההזזות הרשמיות).
+ * חול המועד נחשב יום עבודה (הכרעה של הבעלים). יום בחירות נחשב יום חופש.
+ * התאריכים חושבו מלוח השנה העברי עד סוף 2028. בסוף 2028 צריך להוסיף את השנים הבאות, וכן יום בחירות חדש כשייקבע.
+ */
+const NON_WORKING_DAYS = [
+  '2026-04-02', '2026-04-08', '2026-04-22', '2026-05-22',
+  '2026-09-12', '2026-09-13', '2026-09-21', '2026-09-26', '2026-10-03',
+  '2026-10-27',                                  // יום בחירות
+  '2027-04-22', '2027-04-28', '2027-05-12', '2027-06-11',
+  '2027-10-02', '2027-10-03', '2027-10-11', '2027-10-16', '2027-10-23',
+  '2028-04-11', '2028-04-17', '2028-05-02', '2028-05-31',
+  '2028-09-21', '2028-09-22', '2028-09-30', '2028-10-05', '2028-10-12',
+];
 const APP_NAME = 'קומנדו שו״ש';
 const APP_TAGLINE = 'מעל היעד. בכל יום.';
 const LIVE_STALE_DAYS = 3;        // אם נתון המצטרפים היומי ישן מהמספר הזה, מסמנים שהעדכון האוטומטי נתקע
@@ -626,6 +667,8 @@ __exports.MG_NAMES = MG_NAMES;
 __exports.ROLE_NAMES = ROLE_NAMES;
 __exports.TARGET_ALERT_PCT = TARGET_ALERT_PCT;
 __exports.BELOW_PREVIEW_COUNT = BELOW_PREVIEW_COUNT;
+__exports.HIDDEN_LEAVE_REASONS = HIDDEN_LEAVE_REASONS;
+__exports.NON_WORKING_DAYS = NON_WORKING_DAYS;
 __exports.APP_NAME = APP_NAME;
 __exports.APP_TAGLINE = APP_TAGLINE;
 __exports.LIVE_STALE_DAYS = LIVE_STALE_DAYS;
@@ -886,6 +929,7 @@ const ui = {
   userId: null,             // מזהה המשתמש המחובר
   tab: 'home',              // המסך הפעיל
   busy: false,              // true בזמן שמירה, למניעת לחיצה כפולה
+  balanceOpen: false,       // האם שורת המאזן במסך הבית מורחבת (חוזרת להיות מצומצמת בכל כניסה לבית)
   history: [],              // מסכים קודמים, לכפתור "חזרה" (נשמרים רק במעבר עומק, לא בלחיצה על לשונית)
   // מרפאות
   clinicId: null,           // מרפאה פתוחה (דף מרפאה)
@@ -911,7 +955,7 @@ const ui = {
 /** מאפס את מצב התצוגה (בכניסה ובצאת מהמערכת) */
 function resetUi() {
   const fresh = {
-    tab: 'home', busy: false, history: [], clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
+    tab: 'home', busy: false, balanceOpen: false, history: [], clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
     filters: { mg: '', sector: '', kind: '', sort: 'bal' },
     visitClinic: null, showVisit: null, editVisit: null, confirmDeleteVisit: null,
     visitFilters: { clinic: '', coord: '', rc: '', status: '', period: '' }, visitsShown: [],
@@ -931,6 +975,75 @@ __exports.resetUi = resetUi;
 __exports.clearStore = clearStore;
 __exports.store = store;
 __exports.ui = ui;
+};
+
+/* ===== js/domain/capitation.js ===== */
+__defs['js/domain/capitation.js'] = function (__exports) {
+/**
+ * domain/capitation.js - הקפיטציה הנוכחית וימי עבודה.
+ * כל קפיטציה מתחילה ב-16 בחודש אי זוגי ומסתיימת ב-15 בחודש האי זוגי הבא (למשל 16.9 עד 15.11).
+ * שם הקפיטציה לפי החודש שבו היא משולמת: ארבעה חודשים אחרי תחילתה (16.9 -> "ינואר" של השנה הבאה).
+ * יום עבודה: ראשון עד חמישי, שאינו ב-NON_WORKING_DAYS.
+ * כל החישובים לפי תאריך לוח מקומי (שנה, חודש, יום), בלי תלות בשעה ובאזור זמן.
+ */
+const { NON_WORKING_DAYS } = __req('js/config.js');
+
+const MONTH_NAMES = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+const OFF = new Set(NON_WORKING_DAYS);
+
+/** מספר רץ לכל יום (ימים מאז 1970), כדי שחיסור ימים לא יושפע משעון קיץ */
+const dayNumber = (y, m, d) => Math.round(Date.UTC(y, m - 1, d) / 86400000);
+
+/** תאריך ISO (YYYY-MM-DD) מתוך מספר יום רץ */
+const isoOf = n => new Date(n * 86400000).toISOString().slice(0, 10);
+
+/** האם יום (לפי מספר רץ) הוא יום עבודה: ראשון עד חמישי, ולא חג או יום חופש */
+function isWorkingDay(n) {
+  const weekday = new Date(n * 86400000).getUTCDay();   // 0 = ראשון ... 6 = שבת
+  return weekday <= 4 && !OFF.has(isoOf(n));
+}
+
+/** מוסיף חודשים לזוג (שנה, חודש) ומחזיר { y, m } */
+function addMonths(y, m, delta) {
+  const idx = y * 12 + (m - 1) + delta;
+  return { y: Math.floor(idx / 12), m: (idx % 12) + 1 };
+}
+
+/** תחילת הקפיטציה שהתאריך שייך אליה: { y, m } של ה-16 בחודש האי זוגי */
+function capitationStart(y, m, d) {
+  if (d >= 16) return m % 2 === 1 ? { y, m } : addMonths(y, m, -1);
+  return m % 2 === 1 ? addMonths(y, m, -2) : addMonths(y, m, -1);
+}
+
+/**
+ * הקפיטציה של תאריך ומצב ימי העבודה בה.
+ * @param {Date} [now] ברירת מחדל: היום
+ * @returns {{label:string, rangeLabel:string, startIso:string, endIso:string, total:number, passed:number, left:number}}
+ *   passed כולל את היום עצמו אם הוא יום עבודה. left = total פחות passed.
+ */
+function capitationInfo(now = new Date()) {
+  const y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
+  const start = capitationStart(y, m, d);
+  const end = addMonths(start.y, start.m, 2);                 // 15 בחודש האי זוגי הבא
+  const startN = dayNumber(start.y, start.m, 16);
+  const endN = dayNumber(end.y, end.m, 15);
+  const todayN = dayNumber(y, m, d);
+  let total = 0, passed = 0;
+  for (let n = startN; n <= endN; n++) {
+    if (!isWorkingDay(n)) continue;
+    total++;
+    if (n <= todayN) passed++;
+  }
+  const name = addMonths(start.y, start.m, 4);                // חודש התשלום
+  return {
+    label: `קפיטציית ${MONTH_NAMES[name.m - 1]} ${name.y}`,
+    rangeLabel: `16.${start.m}–15.${end.m}`,
+    startIso: isoOf(startN), endIso: isoOf(endN),
+    total, passed, left: total - passed,
+  };
+}
+
+__exports.capitationInfo = capitationInfo;
 };
 
 /* ===== js/domain/checklist.js ===== */
@@ -970,7 +1083,7 @@ __defs['js/domain/metrics.js'] = function (__exports) {
  *  - מאזן: מצטרפים פחות עוזבים.
  */
 const { store } = __req('js/core/state.js');
-const { CAPS_2026, CAPS_PER_YEAR, CAP_COUNT, FIRST_CAP_2026, TARGET_ALERT_PCT } = __req('js/config.js');
+const { CAPS_2026, CAPS_PER_YEAR, CAP_COUNT, FIRST_CAP_2026, TARGET_ALERT_PCT, HIDDEN_LEAVE_REASONS } = __req('js/config.js');
 
 /** האם נתוני קפיטציה דווחו (גם מצטרפים וגם עוזבים) */
 function isReported(clinic, capIndex) {
@@ -1061,11 +1174,16 @@ function lastReportedCap(series) {
   return -1;
 }
 
-/** סכום סיבות עזיבה לפי סיבה, בטווח קפיטציות. מחזיר { אינדקס סיבה: סכום } */
+/**
+ * סכום סיבות עזיבה לפי סיבה, בטווח קפיטציות. מחזיר { אינדקס סיבה: סכום }.
+ * סיבות שמוגדרות כמוסתרות (HIDDEN_LEAVE_REASONS, למשל "לא ניתן לדעת את סיבת העזיבה") לא נכללות כלל,
+ * ולכן גם לא בסכום ובאחוזים.
+ */
 function reasonTotals(clinics, capIndexes) {
   const totals = {};
   clinics.forEach(c => {
     Object.keys(c.rs).forEach(reason => {
+      if (HIDDEN_LEAVE_REASONS.indexOf(store.reasons[reason]) >= 0) return;
       const perCap = c.rs[reason];
       const sum = capIndexes.reduce((s, i) => s + (perCap[i] || 0), 0);
       if (sum) totals[reason] = (totals[reason] || 0) + sum;
@@ -1473,7 +1591,6 @@ function startApp() {
 
 startApp();
 
-__exports.startApp = startApp;
 };
 
 /* ===== js/ui/components/brand.js ===== */
@@ -1527,7 +1644,6 @@ function loginHero() {
   </div>`;
 }
 
-__exports.emblem = emblem;
 __exports.brandHtml = brandHtml;
 __exports.loginHero = loginHero;
 };
@@ -1693,34 +1809,78 @@ __exports.listItem = listItem;
 /* ===== js/ui/components/liveCard.js ===== */
 __defs['js/ui/components/liveCard.js'] = function (__exports) {
 /**
- * components/liveCard.js - כרטיס "מצטרפים בקפיטציה הנוכחית": נתון שמתעדכן יומית מקובץ המצטרפים.
- * מציג מספר מצטרפים מתוך יעד, פס התקדמות, ותאריך העדכון. אם הנתון ישן, מוצגת אזהרה.
+ * components/liveCard.js - "ביצוע מול יעד" של הקפיטציה הנוכחית (נתון יומי מהקובץ "סטטוס מצטרפים לפי מנהלות").
+ * שני כרטיסים:
+ *  - liveSquare: ריבוע במסך הבית: שם הקפיטציה, מצטרפים מתוך יעד, פס התקדמות וימי עבודה (עברו ונותרו).
+ *  - liveCard: כרטיס רחב בדף מרפאה: המצטרפים של המרפאה ביחס ליעד שלה.
+ * אם הנתון היומי ישן (LIVE_STALE_DAYS ומעלה) מוצגת אזהרה שהעדכון האוטומטי לא רץ.
  */
 const { esc, fmtInt, fmtDayMonth, daysSince, pctLabel } = __req('js/utils/format.js');
 const { LIVE_STALE_DAYS } = __req('js/config.js');
 
-/**
- * @param {{j:number, t:number|null, asof:string, scopeLabel?:string}} live
- *   j = מצטרפים עד כה, t = יעד (או null אם אין), asof = תאריך הנתון (YYYY-MM-DD)
- */
-function liveCard({ j, t, asof, scopeLabel = '' }) {
-  const stale = daysSince(asof) >= LIVE_STALE_DAYS;
-  const pct = t ? (j / t) * 100 : null;
-  const bar = pct === null ? '' : `<div class="bar" aria-hidden="true"><i style="width:${Math.min(100, Math.round(pct))}%"></i></div>`;
-  const target = t ? `<span class="muted"> מתוך </span><span class="num">${fmtInt(t)}</span>` : '';
-  const pctText = pct === null ? '' : `<span class="pill good num">${esc(pctLabel(pct))}</span>`;
-  const warning = stale
-    ? `<div class="live-warn">הנתון לא התעדכן מ־${esc(fmtDayMonth(asof))}: העדכון היומי האוטומטי כנראה לא רץ.</div>` : '';
-  return `<div class="card live-card">
-    <div class="row between">
-      <b>מצטרפים בקפיטציה הנוכחית${scopeLabel ? ` · ${esc(scopeLabel)}` : ''}</b>
-      <span class="muted">נכון ל־${esc(fmtDayMonth(asof))}</span>
-    </div>
-    <div class="live-nums"><span class="big num">${fmtInt(j)}</span>${target}${pctText}</div>
-    ${bar}${warning}
+/** פס התקדמות (0 עד 100 אחוז). tone = time צובע בצהוב, אחרת בצבע ברירת המחדל */
+function progressBar(pct, tone = '') {
+  return `<div class="bar ${tone}" aria-hidden="true"><i style="width:${Math.max(0, Math.min(100, Math.round(pct)))}%"></i></div>`;
+}
+
+/** אזהרה כשהנתון היומי לא התעדכן כמה ימים */
+function staleWarning(asof) {
+  if (!asof || daysSince(asof) < LIVE_STALE_DAYS) return '';
+  return `<div class="live-warn">הנתון לא התעדכן מ־${esc(fmtDayMonth(asof))}: העדכון היומי האוטומטי כנראה לא רץ.</div>`;
+}
+
+/** חלק ימי העבודה של הריבוע: עברו, נותרו, ופס זמן */
+function workingDaysBlock(cap) {
+  const elapsed = cap.total ? (cap.passed / cap.total) * 100 : 0;
+  return `<div class="live-days">
+    <div class="live-days-title">ימי עבודה</div>
+    <div class="live-days-row"><span>עברו</span><b class="num">${fmtInt(cap.passed)}</b></div>
+    <div class="live-days-row"><span>נותרו</span><b class="num">${fmtInt(cap.left)}</b></div>
+    ${progressBar(elapsed, 'time')}
+    <div class="live-days-note">${Math.round(elapsed)}% מהזמן עבר (מתוך ${fmtInt(cap.total)} ימי עבודה)</div>
   </div>`;
 }
 
+/**
+ * ריבוע הבית.
+ * @param {{j:number, t:number, asof:string|null, pct:number|null}} live נתוני הגיוס (asof = null אם עדיין אין נתון יומי)
+ * @param {object} cap תוצאת capitationInfo()
+ */
+function liveSquare(live, cap) {
+  const hasData = !!live.asof;
+  const joiners = hasData
+    ? `<div class="live-big num">${fmtInt(live.j)}</div>
+       <div class="live-of">מתוך <span class="num">${fmtInt(live.t)}</span>${live.pct === null ? '' : ` · <b class="num">${esc(pctLabel(live.pct))}</b>`}</div>
+       ${live.pct === null ? '' : progressBar(live.pct)}${staleWarning(live.asof)}`
+    : '<div class="muted live-wait">נתוני הגיוס היומיים עדיין לא התקבלו</div>';
+  return `<div class="card tone-mint live-square">
+    <div class="cap-chip">${esc(cap.label)}</div>
+    <div class="muted live-range">${esc(cap.rangeLabel)}${hasData ? `<br>נתוני גיוס נכון ל־${esc(fmtDayMonth(live.asof))}` : ''}</div>
+    <div class="live-title">מצטרפים מול יעד</div>
+    ${joiners}
+    ${workingDaysBlock(cap)}
+  </div>`;
+}
+
+/**
+ * כרטיס רחב (דף מרפאה): מצטרפים של המרפאה בקפיטציה הנוכחית מתוך היעד שלה.
+ * @param {{j:number, t:number|null, asof:string}} live  @param {object} cap תוצאת capitationInfo()
+ */
+function liveCard({ j, t, asof }, cap) {
+  const pct = t ? (j / t) * 100 : null;
+  const target = t ? `<span class="muted"> מתוך </span><span class="num">${fmtInt(t)}</span>` : '';
+  const pctText = pct === null ? '' : `<span class="pill good num">${esc(pctLabel(pct))}</span>`;
+  return `<div class="card live-card">
+    <div class="row between">
+      <b>מצטרפים ב${esc(cap.label)}</b>
+      <span class="muted">נכון ל־${esc(fmtDayMonth(asof))}</span>
+    </div>
+    <div class="live-nums"><span class="big num">${fmtInt(j)}</span>${target}${pctText}</div>
+    ${pct === null ? '' : progressBar(pct)}${staleWarning(asof)}
+  </div>`;
+}
+
+__exports.liveSquare = liveSquare;
 __exports.liveCard = liveCard;
 };
 
@@ -1949,6 +2109,7 @@ function goBack(fallbackTab = 'home') {
 /** עובר ללשונית. extra = מצב תצוגה נוסף, למשל { clinicId } */
 function goTo(tab, extra) {
   ui.tab = tab;
+  if (tab === 'home') ui.balanceOpen = false;   // שורת המאזן מצומצמת בכל כניסה למסך הבית
   ui.clinicId = null;
   ui.editClinic = false;
   ui.visitClinic = null;
@@ -2175,6 +2336,7 @@ const { card, backButton, emptyNote } = __req('js/ui/components/card.js');
 const { stackedStats, bigNumber, keyValue } = __req('js/ui/components/statRows.js');
 const { clinicCapTable } = __req('js/ui/components/capTable.js');
 const { liveCard } = __req('js/ui/components/liveCard.js');
+const { capitationInfo } = __req('js/domain/capitation.js');
 const { visitItem } = __req('js/ui/components/visitItem.js');
 const { editFormHtml } = __req('js/ui/screens/clinicEditForm.js');
 
@@ -2203,11 +2365,11 @@ function balanceCard(clinic, s) {
       : 'אין נתוני קפיטציות ב־2026.';
     return card('מאזן', `<div class="muted">${text}</div>`, 'tone-yellow');
   }
-  const items = [{ label: 'מצטרפים', value: s.j }, { label: 'עוזבים', value: s.l }];
+  const items = [{ label: 'מצטרפים בכל 2026', value: s.j }, { label: 'עוזבים בכל 2026', value: s.l }];
   if (s.yt) {
     items.push(
       { label: 'יעד לקפיטציה', value: s.tg },
-      { label: 'ביצוע מול יעד', value: pctLabel(s.pct) },
+      { label: 'ביצוע מול יעד בכל 2026', value: pctLabel(s.pct) },
       { label: 'יעד שנתי', value: s.ya },
       { label: 'נותרו ליעד', value: Math.max(0, s.ya - s.j) });
   } else {
@@ -2223,17 +2385,16 @@ function balanceCard(clinic, s) {
 /** המצטרפים בקפיטציה הנוכחית של המרפאה (נתון יומי), ביחס ליעד. לא מוצג אם אין נתון יומי */
 function liveSection(clinic) {
   if (!clinic.liveAsof || clinic.liveJ === null || clinic.liveJ === undefined) return '';
-  return liveCard({ j: clinic.liveJ, t: clinic.target > 0 ? clinic.target : null, asof: clinic.liveAsof });
+  return liveCard({ j: clinic.liveJ, t: clinic.target > 0 ? clinic.target : null, asof: clinic.liveAsof }, capitationInfo());
 }
 
 function infoCard(clinic) {
   const size = sizeOf(clinic);
   const fields = [
-    ['ישוב', clinic.town], ['כתובת', clinic.addr], ['מגזר', clinic.sector], ['סוג יחידה', clinic.kind],
+    ['ישוב', clinic.town], ['כתובת', clinic.addr], ['מגזר', clinic.sector],
     ['גודל מרפאה', size ? SIZE_LABELS[size] : null],
     ['מנהל רפואי', clinic.dr], ['מנהל אדמיניסטרטיבי', clinic.adm], ['מנהל סיעוד', clinic.nur],
     ['מספר מבוטחים', clinic.ins != null ? clinic.ins.toLocaleString('he-IL') : null],
-    ['קוד מרפאה', clinic.code],
   ].filter(([, value]) => value !== null && value !== undefined && value !== '');
   return card('נתוני מרפאה', fields.map(([label, value]) => keyValue(label, value)).join(''), 'tone-sky');
 }
@@ -2415,7 +2576,7 @@ function clinicCard(c) {
         { label: 'עוזבים', value: s.l },
         { label: 'מאזן', value: sign(s.bal), cls: signClass(s.bal) },
       ])}
-      <div class="muted">${s.pct === null ? 'אין יעד מוגדר' : `ביצוע מול יעד: ${Math.round(s.pct)}% (${s.j} מתוך ${Math.round(s.yt)})`}</div>`
+      <div class="muted">${s.pct === null ? 'אין יעד מוגדר' : `ביצוע מול יעד בכל 2026: ${Math.round(s.pct)}% (${s.j} מתוך ${Math.round(s.yt)})`}</div>`
     : '<div class="muted" style="margin-top:8px">אין נתוני קפיטציות ב־2026</div>';
   return `<div class="card" data-act="openClinic" data-id="${esc(c.id)}" tabindex="0" role="button" style="cursor:pointer">
     <div class="row between">
@@ -2489,7 +2650,7 @@ __defs['js/ui/screens/home.js'] = function (__exports) {
  */
 const { ui, store } = __req('js/core/state.js');
 const { requestRender } = __req('js/core/bus.js');
-const { esc, addDays, todayIso, fmtDate, pctLabel, sign, signClass } = __req('js/utils/format.js');
+const { esc, addDays, todayIso, fmtDate, pctLabel, sign, signClass, fmtInt } = __req('js/utils/format.js');
 const { BELOW_PREVIEW_COUNT, CAPS, TARGET_ALERT_PCT, VISIT_STALE_DAYS, MG_NAMES } = __req('js/config.js');
 const { me, visibleClinics, coordinators, coordinatorOf, canVisit, clinicName, isManagerView, scopeTitle } = __req('js/domain/permissions.js');
 const { aggregate, capSeries, lastReportedCap, clinicStats, isReported, openTasks, lastVisitDate, belowTargetClinics, targetTone, SIZE_LABELS, isOverdue, liveProgress } = __req('js/domain/metrics.js');
@@ -2499,7 +2660,8 @@ const { capTable } = __req('js/ui/components/capTable.js');
 const { listItem } = __req('js/ui/components/listItem.js');
 const { options } = __req('js/ui/components/formFields.js');
 const { card, emptyNote } = __req('js/ui/components/card.js');
-const { liveCard } = __req('js/ui/components/liveCard.js');
+const { liveSquare } = __req('js/ui/components/liveCard.js');
+const { capitationInfo } = __req('js/domain/capitation.js');
 const { leadTableHtml } = __req('js/ui/screens/leadTable.js');
 
 // ---------- חישוב ----------
@@ -2556,24 +2718,37 @@ function greetingHtml(model) {
     <div class="muted" style="margin-bottom:10px">${esc(user.title)} · ${esc(scopeTitle())} · ${model.clinics.length} יחידות</div>`;
 }
 
-/** כרטיס מאזן (ימין): מאזן 2026, מצטרפים, עוזבים, והקפיטציה האחרונה */
-function balanceCard(model) {
+/** תא נתון בשורת המאזן המורחבת: ערך בולט ותווית מתחתיו */
+function balanceCell(value, label, cls = '') {
+  return `<div class="cell"><b class="num ${cls}">${esc(value)}</b><span>${esc(label)}</span></div>`;
+}
+
+/**
+ * שורת המאזן: שורה אחת (תווית, המאזן, כפתור הרחבה). בהרחבה נפתחים ארבעה תאים:
+ * מצטרפים ועוזבים בכל 2026, המאזן של הקפיטציה האחרונה, והביצוע מול יעד של כל 2026.
+ * הצבע: ורוד כשהמאזן שלילי, מנטה כשהוא חיובי.
+ */
+function balanceRow(model) {
   if (!model.agg.reporting) {
     return card('מאזן', '<div class="muted">עדיין לא הוזנו נתוני קפיטציות. אפשר להזין אותם במסך היחידה.</div>', 'tone-yellow');
   }
   const a = model.agg;
-  const items = [
-    { label: 'מצטרפים', value: a.J },
-    { label: 'עוזבים', value: a.L },
+  const open = ui.balanceOpen;
+  const cells = [
+    balanceCell(fmtInt(a.J), 'מצטרפים בכל 2026'),
+    balanceCell(fmtInt(a.L), 'עוזבים בכל 2026'),
   ];
-  if (model.last) {
-    items.push({ label: CAPS[model.lastIdx], value: sign(model.last.bal), cls: signClass(model.last.bal) });
-  }
-  if (a.targetPct !== null) items.push({ label: 'ביצוע מול יעד', value: pctLabel(a.targetPct) });
-  return card('מאזן',
-    `${bigNumber(sign(a.bal), a.bal >= 0 ? 'pos' : 'neg')}
-     <div class="muted">מאזן 2026 (${a.nmax} מתוך 6 קפיטציות)</div>${stackedStats(items)}`,
-    a.bal >= 0 ? 'tone-mint' : 'tone-pink');
+  if (model.last) cells.push(balanceCell(sign(model.last.bal), CAPS[model.lastIdx], signClass(model.last.bal)));
+  if (a.targetPct !== null) cells.push(balanceCell(pctLabel(a.targetPct), 'ביצוע מול יעד בכל 2026'));
+  const details = open
+    ? `<div class="muted bal-sub">${a.nmax} מתוך 6 קפיטציות</div><div class="cells">${cells.join('')}</div>` : '';
+  return `<div class="card bal-row ${a.bal >= 0 ? 'tone-mint' : 'tone-pink'}">
+    <div class="bal-head">
+      <span class="bal-lbl">מאזן 2026</span>
+      <span class="big num ${a.bal >= 0 ? 'pos' : 'neg'}">${esc(sign(a.bal))}</span>
+      <button class="bal-btn" data-act="toggleBalance" aria-expanded="${open}">${open ? 'צמצום ▴' : 'הרחבה ▾'}</button>
+    </div>${details}
+  </div>`;
 }
 
 /** כרטיס ביקורים (שמאל), עם סינון לפי רכז למנהל ולנופר */
@@ -2684,17 +2859,16 @@ function render() {
     : '';
   const attention = hasData ? belowTargetCard(model) + negativeBalanceCard(model) : '';
   return `${greetingHtml(model)}
-    <div class="grid2 dash">${balanceCard(model)}${visitsCard(model)}</div>
-    ${liveSection(model)}
+    <div class="grid2 dash">${liveSquareHtml(model)}${visitsCard(model)}</div>
+    ${balanceRow(model)}
     ${capCard}
     ${leadTableHtml({ showAdd: true })}
     ${attention}${visitsSummaryCard(model)}${lateTasksCard(model)}${missingDataCard(model)}`;
 }
 
-/** כרטיס המצטרפים בקפיטציה הנוכחית (נתון יומי). לא מוצג אם עדיין אין נתון יומי */
-function liveSection(model) {
-  const live = liveProgress(model.clinics);
-  return live.asof ? liveCard({ j: live.j, t: live.t, asof: live.asof }) : '';
+/** ריבוע "ביצוע מול יעד" של הקפיטציה הנוכחית: גיוס יומי וימי עבודה */
+function liveSquareHtml(model) {
+  return liveSquare(liveProgress(model.clinics), capitationInfo());
 }
 
 /** יעד כולל לקפיטציה שעוד לא דווחה: סכום היעדים של כל המרפאות */
@@ -2712,6 +2886,8 @@ const handlers = {
     requestRender();
   },
   belowSmall(el) { ui.belowIncludeSmall = el.dataset.value === '1'; requestRender(); },
+  /** הרחבה וצמצום של שורת המאזן */
+  toggleBalance() { ui.balanceOpen = !ui.balanceOpen; requestRender(); },
 };
 
 __exports.render = render;
