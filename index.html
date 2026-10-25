@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>קומנדו שו״ש</title>
 <meta name="theme-color" content="#ffd84d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="קומנדו שו״ש">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd84d' stroke='%23151515' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='30' fill='%23fff' stroke='%23151515' stroke-width='5'/%3E%3Ccircle cx='50' cy='50' r='15' fill='%23ff9ec4' stroke='%23151515' stroke-width='5'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -138,6 +144,17 @@ td:first-child{white-space:nowrap}
 .cell{background:#fff;border:2.5px solid var(--ink);border-radius:14px;padding:8px 6px;text-align:center}
 .cell b{display:block;font-size:1.05rem}
 .cell span{font-size:.72rem;color:var(--ink2)}
+/* קצב הגיוס: שורה מצומצמת שמתרחבת לגרף */
+.pace-row{background:var(--mint);padding:10px 14px 12px}
+.pace-head{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:40px}
+.pace-head b{font-size:.95rem}
+.pace-line2{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.88rem;margin-top:2px}
+.pace-line{margin-top:10px;line-height:1.7}
+.pace-chart{background:#fff;border:2.5px solid var(--ink);border-radius:14px;padding:6px 4px 2px;margin-top:10px}
+.pace-note{font-size:.75rem;margin-top:8px}
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:.72rem;margin:6px 4px 4px}
+.leg i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-inline-end:4px}
+.leg .l-actual{border-color:#0b6b3a}.leg .l-proj{border-color:#d6336c;border-top-style:dashed}.leg .l-goal{border-color:var(--ink);border-top-style:dotted}
 /* סגנונות ייעודיים למסכים: דשבורד הבית ודף מרפאה, תגית גודל, מעקב לידים */
 .dash{gap:14px}
 .dash .card{margin-bottom:14px;padding:14px}
@@ -409,6 +426,20 @@ async function loadLiveJoiners() {
   });
 }
 
+/**
+ * טוען את ההיסטוריה היומית של המצטרפים (לפי מינהלת) לגרף קצב הגיוס.
+ * אם הטבלה עדיין לא קיימת או שאין הרשאה, ההיסטוריה פשוט ריקה והגרף לא מוצג.
+ */
+async function loadLiveHistory() {
+  try {
+    const { data, error } = await sb.from('live_joiners_daily').select('asof,mg,joiners,target').order('asof').limit(2000);
+    if (error) throw error;
+    store.liveHistory = data;
+  } catch (e) {
+    store.liveHistory = [];
+  }
+}
+
 /** טוען הגדרה שנשמרה בטבלת settings אל store.settings */
 function applySetting(row) {
   if (row.key === 'checklist') store.settings.checklist = row.value;
@@ -433,6 +464,7 @@ __exports.loadVisits = loadVisits;
 __exports.loadLeads = loadLeads;
 __exports.loadLog = loadLog;
 __exports.loadLiveJoiners = loadLiveJoiners;
+__exports.loadLiveHistory = loadLiveHistory;
 __exports.loadAll = loadAll;
 };
 
@@ -628,6 +660,9 @@ const NON_WORKING_DAYS = [
   '2028-04-11', '2028-04-17', '2028-05-02', '2028-05-31',
   '2028-09-21', '2028-09-22', '2028-09-30', '2028-10-05', '2028-10-12',
 ];
+// קצב הגיוס: חלון הימים האחרונים לחישוב קצב עדכני, וימי עבודה בשבוע (ראשון עד חמישי)
+const PACE_RECENT_DAYS = 4;
+const WORK_DAYS_PER_WEEK = 5;
 const APP_NAME = 'קומנדו שו״ש';
 const APP_TAGLINE = 'מעל היעד. בכל יום.';
 const LIVE_STALE_DAYS = 3;        // אם נתון המצטרפים היומי ישן מהמספר הזה, מסמנים שהעדכון האוטומטי נתקע
@@ -669,6 +704,8 @@ __exports.TARGET_ALERT_PCT = TARGET_ALERT_PCT;
 __exports.BELOW_PREVIEW_COUNT = BELOW_PREVIEW_COUNT;
 __exports.HIDDEN_LEAVE_REASONS = HIDDEN_LEAVE_REASONS;
 __exports.NON_WORKING_DAYS = NON_WORKING_DAYS;
+__exports.PACE_RECENT_DAYS = PACE_RECENT_DAYS;
+__exports.WORK_DAYS_PER_WEEK = WORK_DAYS_PER_WEEK;
 __exports.APP_NAME = APP_NAME;
 __exports.APP_TAGLINE = APP_TAGLINE;
 __exports.LIVE_STALE_DAYS = LIVE_STALE_DAYS;
@@ -898,6 +935,7 @@ const store = {
   visits: [],         // ביקורים
   leads: [],          // לידים (רק של המשתמש, או כולם למנהל)
   log: [],            // יומן שינויים (למנהל בלבד)
+  liveHistory: [],    // היסטוריה יומית של המצטרפים בקפיטציה, לפי מינהלת: { asof, mg, joiners, target }
   settings: {
     checklist: DEFAULT_CHECKLIST.slice(),
     leadSources: DEFAULT_LEAD_SOURCES.slice(),
@@ -930,6 +968,7 @@ const ui = {
   tab: 'home',              // המסך הפעיל
   busy: false,              // true בזמן שמירה, למניעת לחיצה כפולה
   balanceOpen: false,       // האם שורת המאזן במסך הבית מורחבת (חוזרת להיות מצומצמת בכל כניסה לבית)
+  paceOpen: false,          // האם שורת קצב הגיוס במסך הבית מורחבת (גם היא מצומצמת בכל כניסה)
   history: [],              // מסכים קודמים, לכפתור "חזרה" (נשמרים רק במעבר עומק, לא בלחיצה על לשונית)
   // מרפאות
   clinicId: null,           // מרפאה פתוחה (דף מרפאה)
@@ -955,7 +994,7 @@ const ui = {
 /** מאפס את מצב התצוגה (בכניסה ובצאת מהמערכת) */
 function resetUi() {
   const fresh = {
-    tab: 'home', busy: false, balanceOpen: false, history: [], clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
+    tab: 'home', busy: false, balanceOpen: false, paceOpen: false, history: [], clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
     filters: { mg: '', sector: '', kind: '', sort: 'bal' },
     visitClinic: null, showVisit: null, editVisit: null, confirmDeleteVisit: null,
     visitFilters: { clinic: '', coord: '', rc: '', status: '', period: '' }, visitsShown: [],
@@ -967,7 +1006,7 @@ function resetUi() {
 /** מנקה את כל הנתונים שנטענו (ביציאה מהמערכת) */
 function clearStore() {
   store.users = []; store.clinics = []; store.reasons = []; store.visits = [];
-  store.leads = []; store.log = [];
+  store.leads = []; store.log = []; store.liveHistory = [];
 }
 
 __exports.emptyLeadsUi = emptyLeadsUi;
@@ -1001,6 +1040,22 @@ const isoOf = n => new Date(n * 86400000).toISOString().slice(0, 10);
 function isWorkingDay(n) {
   const weekday = new Date(n * 86400000).getUTCDay();   // 0 = ראשון ... 6 = שבת
   return weekday <= 4 && !OFF.has(isoOf(n));
+}
+
+/** תאריך מקומי מתוך מחרוזת YYYY-MM-DD */
+function dateFromIso(iso) {
+  const [y, m, d] = String(iso).slice(0, 10).split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/** כמה ימי עבודה עברו אחרי התאריך הראשון ועד התאריך השני (כולל), בפורמט YYYY-MM-DD. 0 אם התאריכים שווים */
+function workingDaysBetween(fromIso, toIso) {
+  const from = dateFromIso(fromIso), to = dateFromIso(toIso);
+  const a = dayNumber(from.getFullYear(), from.getMonth() + 1, from.getDate());
+  const b = dayNumber(to.getFullYear(), to.getMonth() + 1, to.getDate());
+  let count = 0;
+  for (let n = a + 1; n <= b; n++) if (isWorkingDay(n)) count++;
+  return count;
 }
 
 /** מוסיף חודשים לזוג (שנה, חודש) ומחזיר { y, m } */
@@ -1037,12 +1092,15 @@ function capitationInfo(now = new Date()) {
   const name = addMonths(start.y, start.m, 4);                // חודש התשלום
   return {
     label: `קפיטציית ${MONTH_NAMES[name.m - 1]} ${name.y}`,
+    monthLabel: `${MONTH_NAMES[name.m - 1]} ${name.y}`,
     rangeLabel: `16.${start.m}–15.${end.m}`,
     startIso: isoOf(startN), endIso: isoOf(endN),
     total, passed, left: total - passed,
   };
 }
 
+__exports.dateFromIso = dateFromIso;
+__exports.workingDaysBetween = workingDaysBetween;
 __exports.capitationInfo = capitationInfo;
 };
 
@@ -1276,6 +1334,79 @@ __exports.belowTargetClinics = belowTargetClinics;
 __exports.targetTone = targetTone;
 __exports.completionTone = completionTone;
 __exports.SIZE_LABELS = SIZE_LABELS;
+};
+
+/* ===== js/domain/pace.js ===== */
+__defs['js/domain/pace.js'] = function (__exports) {
+/**
+ * domain/pace.js - קצב הגיוס בקפיטציה הנוכחית.
+ * שואל: כמה עוד צריך לגייס, בכמה ימי עבודה, ומה הקצב הנדרש ליום ולשבוע, לעומת הקצב בפועל.
+ * הכול מחושב לפי ימי העבודה עד תאריך הנתון (ולא עד היום), כדי שהמספרים יתאימו לנתון שמוצג.
+ */
+const { PACE_RECENT_DAYS, WORK_DAYS_PER_WEEK } = __req('js/config.js');
+const { capitationInfo, dateFromIso, workingDaysBetween } = __req('js/domain/capitation.js');
+
+/**
+ * היסטוריית הקפיטציה הנוכחית לקבוצת מינהלות: סכום המצטרפים לכל תאריך, ממוין.
+ * תאריך שחסרה בו אחת מהמינהלות לא נכלל, כדי שלא יופיע סכום חלקי.
+ * @param {Array<{asof:string, mg:string, joiners:number}>} rows  @param {string[]} mgs  @param {{startIso:string,endIso:string}} cap
+ * @returns {Array<{asof:string, joiners:number}>}
+ */
+function scopeHistory(rows, mgs, cap) {
+  const byDate = new Map();
+  rows.forEach(r => {
+    if (mgs.indexOf(r.mg) < 0 || r.asof < cap.startIso || r.asof > cap.endIso) return;
+    const entry = byDate.get(r.asof) || { asof: r.asof, joiners: 0, seen: new Set() };
+    entry.joiners += r.joiners;
+    entry.seen.add(r.mg);
+    byDate.set(r.asof, entry);
+  });
+  return [...byDate.values()]
+    .filter(e => e.seen.size === mgs.length)
+    .map(e => ({ asof: e.asof, joiners: e.joiners }))
+    .sort((a, b) => a.asof.localeCompare(b.asof));
+}
+
+/**
+ * סיכום קצב.
+ * @param {{joiners:number, target:number, asofIso:string, history?:Array<{asof:string, joiners:number}>}} input
+ *   history = היסטוריה עולה של אותה קבוצה (נקודה אחרונה = הנתון הנוכחי, או שמוסיפים אותו אוטומטית)
+ * @returns {object} status: none / done / ended / on / behind, וכן remaining, left, requiredPerDay, requiredPerWeek,
+ *   recentPerDay, avgPerDay, perDay (הקצב ששימש לצפי), recentDays, projection, projectionPct, gap, passed, total
+ */
+function paceSummary({ joiners, target, asofIso, history = [] }) {
+  const cap = capitationInfo(dateFromIso(asofIso));
+  const base = { passed: cap.passed, total: cap.total, left: cap.left, label: cap.label, joiners, target };
+  if (!target || target <= 0) return { ...base, status: 'none' };
+  const remaining = Math.max(0, target - joiners);
+  if (remaining === 0) return { ...base, status: 'done', remaining };
+  if (cap.left === 0) return { ...base, status: 'ended', remaining };
+
+  // קצב עדכני: מהנקודה הכי רחוקה בתוך חלון של PACE_RECENT_DAYS ימי עבודה אחורה
+  const points = history.some(h => h.asof === asofIso) ? history : [...history, { asof: asofIso, joiners }];
+  let recentPerDay = null, recentDays = 0;
+  points.forEach(p => {
+    const days = workingDaysBetween(p.asof, asofIso);
+    if (days >= 1 && days <= PACE_RECENT_DAYS && days > recentDays) {
+      recentDays = days;
+      recentPerDay = (joiners - p.joiners) / days;
+    }
+  });
+  const avgPerDay = cap.passed ? joiners / cap.passed : 0;
+  const perDay = recentPerDay !== null ? Math.max(0, recentPerDay) : avgPerDay;
+  const projection = joiners + perDay * cap.left;
+  const expected = target * cap.passed / cap.total;          // איפה צריך להיות לפי מסלול ישר ליעד
+  const requiredPerDay = remaining / cap.left;
+  return {
+    ...base, remaining, requiredPerDay, requiredPerWeek: requiredPerDay * WORK_DAYS_PER_WEEK,
+    recentPerDay, recentDays, avgPerDay, perDay, projection, projectionPct: (projection / target) * 100,
+    expected, gap: Math.round(expected - joiners),
+    status: joiners + 0.5 >= expected ? 'on' : 'behind',
+  };
+}
+
+__exports.scopeHistory = scopeHistory;
+__exports.paceSummary = paceSummary;
 };
 
 /* ===== js/domain/permissions.js ===== */
@@ -1581,7 +1712,17 @@ async function boot() {
   if (result.error) showLogin(result.error);
 }
 
+/**
+ * מתקין את ה-service worker (טעינה מהירה והתקנה כאפליקציה במסך הבית).
+ * נכשל בשקט כשלא נתמך או כשהדף לא נטען ב-https, והאפליקציה ממשיכה לעבוד כרגיל.
+ */
+function registerServiceWorker() {
+  if (typeof navigator === 'undefined' || !navigator.serviceWorker) return;
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
 function startApp() {
+  registerServiceWorker();
   initRouter();
   registerAllHandlers();
   initEvents();
@@ -1865,8 +2006,9 @@ function liveSquare(live, cap) {
 /**
  * כרטיס רחב (דף מרפאה): מצטרפים של המרפאה בקפיטציה הנוכחית מתוך היעד שלה.
  * @param {{j:number, t:number|null, asof:string}} live  @param {object} cap תוצאת capitationInfo()
+ * @param {string} [extraHtml] שורת הקצב (נדרשים עוד X מצטרפים), אם יש יעד
  */
-function liveCard({ j, t, asof }, cap) {
+function liveCard({ j, t, asof }, cap, extraHtml = '') {
   const pct = t ? (j / t) * 100 : null;
   const target = t ? `<span class="muted"> מתוך </span><span class="num">${fmtInt(t)}</span>` : '';
   const pctText = pct === null ? '' : `<span class="pill good num">${esc(pctLabel(pct))}</span>`;
@@ -1876,12 +2018,152 @@ function liveCard({ j, t, asof }, cap) {
       <span class="muted">נכון ל־${esc(fmtDayMonth(asof))}</span>
     </div>
     <div class="live-nums"><span class="big num">${fmtInt(j)}</span>${target}${pctText}</div>
-    ${pct === null ? '' : progressBar(pct)}${staleWarning(asof)}
+    ${pct === null ? '' : progressBar(pct)}${extraHtml}${staleWarning(asof)}
   </div>`;
 }
 
 __exports.liveSquare = liveSquare;
 __exports.liveCard = liveCard;
+};
+
+/* ===== js/ui/components/paceCard.js ===== */
+__defs['js/ui/components/paceCard.js'] = function (__exports) {
+/**
+ * components/paceCard.js - קצב הגיוס: איפה אנחנו מול מה שצריך כדי להגיע ליעד הקפיטציה.
+ *  - paceRow: שורה מצומצמת במסך הבית, שמתרחבת לשלושה מספרים וגרף.
+ *  - paceLine: משפט אחד לדף מרפאה (נדרשים עוד X מצטרפים בימי עבודה, בקצב או בפיגור).
+ */
+const { esc, fmtInt, fmtDayMonth } = __req('js/utils/format.js');
+const { paceChart } = __req('js/ui/components/paceChart.js');
+
+/** מספר לתצוגה: עד 10 עם נקודה עשרונית אחת, מעל זה שלם */
+function fmtRate(n) {
+  const v = Math.round(n * 10) / 10;
+  return v >= 10 ? fmtInt(Math.round(v)) : String(v);
+}
+
+/** תגית סטטוס: בקצב / בפיגור של X / היעד הושג */
+function statusPill(s) {
+  if (s.status === 'done') return '<span class="pill good">היעד הושג</span>';
+  if (s.status === 'on') return '<span class="pill good">בקצב</span>';
+  if (s.status === 'behind') return `<span class="pill bad">בפיגור של <span class="num">${fmtInt(Math.max(1, s.gap))}</span></span>`;
+  return '';
+}
+
+/** משפט הקצב הנדרש: "נדרשים עוד 6 מצטרפים ב־15 ימי עבודה (כ־2 בשבוע)" */
+function paceLine(s) {
+  if (s.status === 'none') return '';
+  if (s.status === 'done') return '<div class="pace-line">היעד של הקפיטציה הושג.</div>';
+  if (s.status === 'ended') return `<div class="pace-line">הקפיטציה הסתיימה: חסרו <span class="num">${fmtInt(s.remaining)}</span> מצטרפים ליעד.</div>`;
+  const week = s.requiredPerWeek >= 1 ? `כ־${fmtRate(s.requiredPerWeek)} בשבוע` : 'פחות מאחד בשבוע';
+  return `<div class="pace-line">נדרשים עוד <b class="num">${fmtInt(s.remaining)}</b> מצטרפים ב־<b class="num">${fmtInt(s.left)}</b> ימי עבודה (${week}) ${statusPill(s)}</div>`;
+}
+
+/**
+ * שורת קצב הגיוס למסך הבית.
+ * @param {object} summary תוצאת paceSummary  @param {Array} series נקודות בפועל  @param {object} cap תוצאת capitationInfo  @param {boolean} open
+ */
+function paceRow(summary, series, cap, open) {
+  if (summary.status === 'none') return '';
+  const title = `קצב הגיוס · ${esc(cap.monthLabel)}`;
+  if (summary.status === 'done' || summary.status === 'ended') {
+    return `<div class="card pace-row"><div class="pace-head"><b>${title}</b></div>${paceLine(summary)}</div>`;
+  }
+  const head = `<div class="pace-head"><b>${title}</b>
+    <button class="bal-btn" data-act="togglePace" aria-expanded="${open}">${open ? 'צמצום ▴' : 'הרחבה ▾'}</button></div>`;
+  const line = `<div class="pace-line2"><span>בקצב הנוכחי: <b class="num">~${fmtInt(Math.round(summary.projection))}</b> מתוך <span class="num">${fmtInt(summary.target)}</span></span>
+    <span>נדרש <b class="num">${fmtRate(summary.requiredPerDay)}</b> ליום</span></div>`;
+  if (!open) return `<div class="card pace-row">${head}${line}</div>`;
+
+  const windowLabel = summary.recentPerDay !== null ? `${summary.recentDays} ימים אחרונים` : 'מתחילת הקפיטציה';
+  const chips = `<div class="cells">
+    <div class="cell"><b class="num">${fmtRate(summary.perDay)}</b><span>בפועל ליום (${windowLabel})</span></div>
+    <div class="cell"><b class="num">${fmtRate(summary.requiredPerDay)}</b><span>נדרש ליום עבודה</span></div>
+    <div class="cell"><b class="num">~${Math.round(summary.projectionPct)}%</b><span>צפי בסוף הקפיטציה</span></div>
+  </div>`;
+  const chart = series.length
+    ? `<div class="pace-chart">${paceChart(series, { target: summary.target, projection: summary.projection }, { total: summary.total })}
+        <div class="leg"><span><i class="l-actual"></i>בפועל</span><span><i class="l-proj"></i>הערכה בקצב הנוכחי</span><span><i class="l-goal"></i>המסלול ליעד</span></div></div>`
+    : '<div class="muted">עדיין אין היסטוריה יומית לגרף.</div>';
+  const first = series.length ? `הנתונים מ־${fmtDayMonth(series[0].asof)}, תחילת האיסוף היומי. ` : '';
+  const note = `<div class="muted pace-note">${first}ימי העבודה נספרים מתאריך הנתון (${fmtDayMonth(series[series.length - 1].asof)}). ההערכה היא קו ישר בקצב ${summary.recentPerDay !== null ? 'הימים האחרונים' : 'הממוצע מתחילת הקפיטציה'}, ואינה מובטחת. ${summary.status === 'behind' ? `הגיוס בפיגור של ${fmtInt(Math.max(1, summary.gap))} מצטרפים ביחס למסלול ישר ליעד.` : 'הגיוס בקצב ביחס למסלול ישר ליעד.'}</div>`;
+  return `<div class="card pace-row">${head}${line}${chips}${chart}${note}</div>`;
+}
+
+__exports.paceLine = paceLine;
+__exports.paceRow = paceRow;
+};
+
+/* ===== js/ui/components/paceChart.js ===== */
+__defs['js/ui/components/paceChart.js'] = function (__exports) {
+/**
+ * components/paceChart.js - גרף SVG של צבירת המצטרפים לפי ימי עבודה בקפיטציה.
+ * קו מלא = בפועל, קו מקווקו = הערכה בקצב הנוכחי, קו נקודות = המסלול הישר ליעד.
+ * הגרף משמאל לימין (כמו מספרים), גם בתוך ממשק בעברית.
+ */
+const { capitationInfo, dateFromIso } = __req('js/domain/capitation.js');
+const { fmtInt } = __req('js/utils/format.js');
+
+const W = 350, H = 210;
+const M = { left: 36, right: 12, top: 20, bottom: 44 };   // שוליים: מקום לתוויות הצירים
+const PLOT_W = W - M.left - M.right, PLOT_H = H - M.top - M.bottom;
+const STEPS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000];
+
+/** גודל צעד "יפה" לציר האנכי, כך שיהיו בערך 3 קווי רשת */
+function niceStep(max) {
+  const wanted = max / 3;
+  return STEPS.find(s => s >= wanted) || STEPS[STEPS.length - 1];
+}
+
+/**
+ * @param {Array<{asof:string, joiners:number}>} series נקודות בפועל, בסדר עולה (לפחות אחת)
+ * @param {{target:number, projection:number|null}} info  @param {{total:number}} cap
+ */
+function paceChart(series, info, cap) {
+  const days = series.map(p => capitationInfo(dateFromIso(p.asof)).passed);
+  const step = niceStep(Math.max(info.target, info.projection || 0));
+  const yMax = Math.ceil(Math.max(info.target, info.projection || 0) / step) * step;
+  const xMin = Math.max(0, Math.floor((Math.min(...days) - 1) / 5) * 5);
+  const xMax = cap.total;
+  const X = d => M.left + ((d - xMin) / (xMax - xMin)) * PLOT_W;
+  const Y = v => M.top + PLOT_H - (v / yMax) * PLOT_H;
+
+  const grid = [];
+  for (let v = 0; v <= yMax; v += step) {
+    grid.push(`<line x1="${M.left}" y1="${Y(v).toFixed(1)}" x2="${W - M.right}" y2="${Y(v).toFixed(1)}" stroke="#cbd0e4" stroke-width="1"/>
+      <text x="${M.left - 5}" y="${(Y(v) + 3.5).toFixed(1)}" text-anchor="end">${fmtInt(v)}</text>`);
+  }
+  const ticks = [];
+  for (let d = Math.ceil(xMin / 5) * 5; d <= xMax; d += 5) {
+    ticks.push(`<text x="${X(d).toFixed(1)}" y="${H - M.bottom + 15}" text-anchor="middle">${d}</text>`);
+  }
+  const last = series[series.length - 1], lastDay = days[days.length - 1];
+  const actual = series.map((p, i) => `${X(days[i]).toFixed(1)},${Y(p.joiners).toFixed(1)}`).join(' ');
+  const dots = series.slice(0, -1).map((p, i) =>
+    `<circle cx="${X(days[i]).toFixed(1)}" cy="${Y(p.joiners).toFixed(1)}" r="4" fill="#fff" stroke="#151515" stroke-width="2.5"/>`).join('');
+  const projection = info.projection === null ? '' : `
+    <line x1="${X(lastDay).toFixed(1)}" y1="${Y(last.joiners).toFixed(1)}" x2="${X(xMax).toFixed(1)}" y2="${Y(info.projection).toFixed(1)}" stroke="#d6336c" stroke-width="3" stroke-dasharray="7 5"/>
+    <text x="${(X(xMax) - 6).toFixed(1)}" y="${(Y(info.projection) - 8).toFixed(1)}" fill="#d6336c" font-weight="700" text-anchor="end">~${fmtInt(Math.round(info.projection))}</text>`;
+
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="direction:ltr" role="img" aria-label="גרף צבירת מצטרפים לפי ימי עבודה בקפיטציה">
+    <g font-size="10" fill="#454b63">
+      ${grid.join('')}
+      <line x1="${M.left}" y1="${M.top + PLOT_H}" x2="${W - M.right}" y2="${M.top + PLOT_H}" stroke="#151515" stroke-width="1.5"/>
+      <line x1="${M.left}" y1="${M.top}" x2="${M.left}" y2="${M.top + PLOT_H}" stroke="#151515" stroke-width="1.5"/>
+      ${ticks.join('')}
+      <text x="${M.left + PLOT_W / 2}" y="${H - 6}" text-anchor="middle">יום עבודה בקפיטציה (מתוך ${cap.total})</text>
+    </g>
+    <line x1="${X(xMin).toFixed(1)}" y1="${Y(info.target * xMin / cap.total).toFixed(1)}" x2="${X(xMax).toFixed(1)}" y2="${Y(info.target).toFixed(1)}" stroke="#151515" stroke-width="2.5" stroke-dasharray="2 5" stroke-linecap="round"/>
+    <text x="${(X(xMax) - 4).toFixed(1)}" y="${(Y(info.target) - 6).toFixed(1)}" font-size="10" font-weight="700" fill="#151515" text-anchor="end">יעד ${fmtInt(info.target)}</text>
+    ${projection}
+    <polyline fill="none" stroke="#0b6b3a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" points="${actual}"/>
+    ${dots}
+    <circle cx="${X(lastDay).toFixed(1)}" cy="${Y(last.joiners).toFixed(1)}" r="6" fill="#ffd84d" stroke="#151515" stroke-width="2.5"/>
+    <text x="${X(lastDay).toFixed(1)}" y="${(Y(last.joiners) - 11).toFixed(1)}" font-size="10" font-weight="700" fill="#151515" text-anchor="middle">${fmtInt(last.joiners)}</text>
+  </svg>`;
+}
+
+__exports.paceChart = paceChart;
 };
 
 /* ===== js/ui/components/pill.js ===== */
@@ -1936,8 +2218,10 @@ function bigNumber(text, cls = '') {
 }
 
 /** פריט "תווית + ערך" לפרטי מרפאה (כרטיס נתוני מרפאה) */
+/** תווית וערך. ערך ריק, או "0" בשדה טקסט (כך מגיע מהאקסל כשאין איש קשר), מוצג כמקף */
 function keyValue(label, value) {
-  return `<div class="kv"><span>${esc(label)}</span><b>${esc(value)}</b></div>`;
+  const empty = value === null || value === undefined || String(value).trim() === '' || String(value).trim() === '0';
+  return `<div class="kv"><span>${esc(label)}</span><b>${empty ? '—' : esc(value)}</b></div>`;
 }
 
 
@@ -2035,7 +2319,7 @@ __defs['js/ui/router.js'] = function (__exports) {
 const { ui } = __req('js/core/state.js');
 const { $, scrollTop } = __req('js/core/dom.js');
 const { setRenderer, setNavigator, setBackNavigator } = __req('js/core/bus.js');
-const { loadVisits, loadLeads, loadLog, loadLiveJoiners } = __req('js/api/loaders.js');
+const { loadVisits, loadLeads, loadLog, loadLiveJoiners, loadLiveHistory } = __req('js/api/loaders.js');
 const { renderTabs, renderWho } = __req('js/ui/components/tabs.js');
 const { showLogin } = __req('js/ui/screens/login.js');
 const home = __req('js/ui/screens/home.js');
@@ -2067,7 +2351,7 @@ function render() {
 
 /** מסכים שכדאי לרענן מהשרת בכל כניסה אליהם (כדי לראות מה שאחרים עדכנו) */
 const REFRESH_ON_ENTER = {
-  home: [loadVisits, loadLeads, loadLiveJoiners],
+  home: [loadVisits, loadLeads, loadLiveJoiners, loadLiveHistory],
   visits: [loadVisits],
   leads: [loadLeads],
   admin: [loadLog],
@@ -2109,7 +2393,7 @@ function goBack(fallbackTab = 'home') {
 /** עובר ללשונית. extra = מצב תצוגה נוסף, למשל { clinicId } */
 function goTo(tab, extra) {
   ui.tab = tab;
-  if (tab === 'home') ui.balanceOpen = false;   // שורת המאזן מצומצמת בכל כניסה למסך הבית
+  if (tab === 'home') { ui.balanceOpen = false; ui.paceOpen = false; }   // השורות מצומצמות בכל כניסה למסך הבית
   ui.clinicId = null;
   ui.editClinic = false;
   ui.visitClinic = null;
@@ -2337,6 +2621,8 @@ const { stackedStats, bigNumber, keyValue } = __req('js/ui/components/statRows.j
 const { clinicCapTable } = __req('js/ui/components/capTable.js');
 const { liveCard } = __req('js/ui/components/liveCard.js');
 const { capitationInfo } = __req('js/domain/capitation.js');
+const { paceSummary } = __req('js/domain/pace.js');
+const { paceLine } = __req('js/ui/components/paceCard.js');
 const { visitItem } = __req('js/ui/components/visitItem.js');
 const { editFormHtml } = __req('js/ui/screens/clinicEditForm.js');
 
@@ -2385,7 +2671,8 @@ function balanceCard(clinic, s) {
 /** המצטרפים בקפיטציה הנוכחית של המרפאה (נתון יומי), ביחס ליעד. לא מוצג אם אין נתון יומי */
 function liveSection(clinic) {
   if (!clinic.liveAsof || clinic.liveJ === null || clinic.liveJ === undefined) return '';
-  return liveCard({ j: clinic.liveJ, t: clinic.target > 0 ? clinic.target : null, asof: clinic.liveAsof }, capitationInfo());
+  const summary = paceSummary({ joiners: clinic.liveJ, target: clinic.target || 0, asofIso: clinic.liveAsof });
+  return liveCard({ j: clinic.liveJ, t: clinic.target > 0 ? clinic.target : null, asof: clinic.liveAsof }, capitationInfo(), paceLine(summary));
 }
 
 function infoCard(clinic) {
@@ -2661,7 +2948,9 @@ const { listItem } = __req('js/ui/components/listItem.js');
 const { options } = __req('js/ui/components/formFields.js');
 const { card, emptyNote } = __req('js/ui/components/card.js');
 const { liveSquare } = __req('js/ui/components/liveCard.js');
-const { capitationInfo } = __req('js/domain/capitation.js');
+const { capitationInfo, dateFromIso } = __req('js/domain/capitation.js');
+const { paceSummary, scopeHistory } = __req('js/domain/pace.js');
+const { paceRow } = __req('js/ui/components/paceCard.js');
 const { leadTableHtml } = __req('js/ui/screens/leadTable.js');
 
 // ---------- חישוב ----------
@@ -2860,10 +3149,26 @@ function render() {
   const attention = hasData ? belowTargetCard(model) + negativeBalanceCard(model) : '';
   return `${greetingHtml(model)}
     <div class="grid2 dash">${liveSquareHtml(model)}${visitsCard(model)}</div>
+    ${paceSection(model)}
     ${balanceRow(model)}
     ${capCard}
     ${leadTableHtml({ showAdd: true })}
     ${attention}${visitsSummaryCard(model)}${lateTasksCard(model)}${missingDataCard(model)}`;
+}
+
+/**
+ * שורת קצב הגיוס: כמה עוד צריך לגייס ובאיזה קצב, עם גרף בהרחבה.
+ * ההיסטוריה היא סכום המינהלות שהמשתמש רואה (מנהל ונופר: כולן, רכז: המינהלת שלו).
+ */
+function paceSection(model) {
+  const live = liveProgress(model.clinics);
+  if (!live.asof) return '';
+  const cap = capitationInfo(dateFromIso(live.asof));
+  const mgs = [...new Set(model.clinics.filter(c => !c.pool && !c.hospital).map(c => c.mg))];
+  const series = scopeHistory(store.liveHistory, mgs, cap).filter(p => p.asof !== live.asof);
+  series.push({ asof: live.asof, joiners: live.j });          // הנתון הנוכחי תמיד הנקודה האחרונה
+  const summary = paceSummary({ joiners: live.j, target: live.t, asofIso: live.asof, history: series });
+  return paceRow(summary, series, cap, ui.paceOpen);
 }
 
 /** ריבוע "ביצוע מול יעד" של הקפיטציה הנוכחית: גיוס יומי וימי עבודה */
@@ -2886,6 +3191,8 @@ const handlers = {
     requestRender();
   },
   belowSmall(el) { ui.belowIncludeSmall = el.dataset.value === '1'; requestRender(); },
+  /** הרחבה וצמצום של שורת קצב הגיוס */
+  togglePace() { ui.paceOpen = !ui.paceOpen; requestRender(); },
   /** הרחבה וצמצום של שורת המאזן */
   toggleBalance() { ui.balanceOpen = !ui.balanceOpen; requestRender(); },
 };
