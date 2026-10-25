@@ -155,6 +155,7 @@ td:first-child{white-space:nowrap}
 .leg{display:flex;gap:12px;flex-wrap:wrap;font-size:.72rem;margin:6px 4px 4px}
 .leg i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-inline-end:4px}
 .leg .l-actual{border-color:#0b6b3a}.leg .l-proj{border-color:#d6336c;border-top-style:dashed}.leg .l-goal{border-color:var(--ink);border-top-style:dotted}
+.live-pool{font-size:.75rem;margin-top:6px}
 /* סגנונות ייעודיים למסכים: דשבורד הבית ודף מרפאה, תגית גודל, מעקב לידים */
 .dash{gap:14px}
 .dash .card{margin-bottom:14px;padding:14px}
@@ -1173,18 +1174,20 @@ function clinicStats(clinic) {
 
 /**
  * התקדמות המצטרפים בקפיטציה הנוכחית (נתון יומי מהקובץ "סטטוס מצטרפים לפי מנהלות").
- * סופרים רק מרפאות עם יעד ועם נתון יומי. asof = התאריך העדכני ביותר, או null אם אין נתון בכלל.
+ * סך המצטרפים = מרפאות + מאגר המבוטחים (כמו "total" בדוח המקור). היעד הוא סכום יעדי המרפאות בלבד,
+ * כי למאגר אין יעד. סופרים רק מרפאות עם נתון יומי. asof = התאריך העדכני ביותר, או null אם אין נתון בכלל.
+ * @returns {{j:number, clinicJ:number, pool:number, t:number, asof:string|null, pct:number|null}}
  */
 function liveProgress(clinics) {
-  let joiners = 0, target = 0, asof = null;
+  let clinicJ = 0, pool = 0, target = 0, asof = null;
   clinics.forEach(c => {
     if (c.liveAsof && (!asof || c.liveAsof > asof)) asof = c.liveAsof;
-    if (!c.pool && c.target > 0 && c.liveJ !== null && c.liveJ !== undefined) {
-      joiners += c.liveJ;
-      target += c.target;
-    }
+    if (c.liveJ === null || c.liveJ === undefined) return;
+    if (c.pool) { pool += c.liveJ; return; }
+    if (c.target > 0) { clinicJ += c.liveJ; target += c.target; }
   });
-  return { j: joiners, t: target, asof, pct: target ? (joiners / target) * 100 : null };
+  const joiners = clinicJ + pool;
+  return { j: joiners, clinicJ, pool, t: target, asof, pct: target ? (joiners / target) * 100 : null };
 }
 
 /** סיכום של קבוצת מרפאות (מינהלת, כל היחידות וכו') */
@@ -1984,7 +1987,7 @@ function workingDaysBlock(cap) {
 
 /**
  * ריבוע הבית.
- * @param {{j:number, t:number, asof:string|null, pct:number|null}} live נתוני הגיוס (asof = null אם עדיין אין נתון יומי)
+ * @param {{j:number, pool:number, t:number, asof:string|null, pct:number|null}} live נתוני הגיוס (asof = null אם עדיין אין נתון יומי)
  * @param {object} cap תוצאת capitationInfo()
  */
 function liveSquare(live, cap) {
@@ -1992,7 +1995,9 @@ function liveSquare(live, cap) {
   const joiners = hasData
     ? `<div class="live-big num">${fmtInt(live.j)}</div>
        <div class="live-of">מתוך <span class="num">${fmtInt(live.t)}</span>${live.pct === null ? '' : ` · <b class="num">${esc(pctLabel(live.pct))}</b>`}</div>
-       ${live.pct === null ? '' : progressBar(live.pct)}${staleWarning(live.asof)}`
+       ${live.pct === null ? '' : progressBar(live.pct)}
+       ${live.pool > 0 ? `<div class="muted live-pool">כולל <span class="num">${fmtInt(live.pool)}</span> במאגר המבוטחים</div>` : ''}
+       ${staleWarning(live.asof)}`
     : '<div class="muted live-wait">נתוני הגיוס היומיים עדיין לא התקבלו</div>';
   return `<div class="card tone-mint live-square">
     <div class="cap-chip">${esc(cap.label)}</div>
