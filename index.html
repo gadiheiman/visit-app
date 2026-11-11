@@ -77,7 +77,6 @@ nav.tabs .in:empty{display:none}
 .has-sticker{margin-top:30px;padding-top:24px}
 .sticker-title{position:absolute;top:-17px;right:16px;background:var(--yellow);border:2.5px solid var(--ink);border-radius:12px;padding:3px 14px;font-family:'Secular One','Rubik',sans-serif;font-size:1.05rem;transform:rotate(-2deg)}
 .tone-mint .sticker-title,.tone-orange .sticker-title{background:#fff;transform:rotate(2deg)}
-.card-subtitle{font-weight:700;line-height:1.35;margin-bottom:8px}
 .row{display:flex;gap:10px;align-items:center}
 .between{justify-content:space-between}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -121,34 +120,26 @@ td:first-child{white-space:nowrap}
 .live-warn{margin-top:8px;font-weight:700;color:var(--bad)}
 .live-nums{display:flex;align-items:baseline;gap:8px;margin:6px 0 8px;flex-wrap:wrap}
 .live-nums .big{font-size:2rem;margin:0}
-.live-square{display:flex;flex-direction:column}
-.cap-chip{align-self:flex-start;background:#fff;border:2.5px solid var(--ink);border-radius:10px;padding:2px 8px;font-weight:700;font-size:.74rem;white-space:nowrap}
-.live-range{font-size:.75rem;margin:4px 0 6px}
+.live-square{display:flex;flex-direction:column;padding:12px 14px 14px}
+.live-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.live-cols{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
+.cap-chip{background:#fff;border:2.5px solid var(--ink);border-radius:10px;padding:2px 8px;font-weight:700;font-size:.74rem;white-space:nowrap}
+.live-range{font-size:.75rem}
 .live-title{font-weight:700;font-size:.9rem;line-height:1.25}
 .live-big{font-family:'Secular One','Rubik',sans-serif;font-size:2.7rem;line-height:1;margin:4px 0 0}
 .live-of{font-size:.85rem;margin:2px 0 8px}
 .live-wait{margin:8px 0}
-.live-days{margin-top:10px;border-top:2.5px dashed var(--ink);padding-top:8px}
+.live-days{border-inline-start:2.5px dashed var(--ink);padding-inline-start:12px}
 .live-days-title{font-weight:700;font-size:.85rem;margin-bottom:4px}
 .live-days-row{display:flex;justify-content:space-between;font-size:.88rem}
 .live-days .bar{margin-top:8px}
+.live-main .bar{margin-top:6px}
 .live-days-note{font-size:.75rem;margin-top:4px}
-/* שורת המאזן: שורה אחת עם כפתור הרחבה, ובהרחבה ארבעה תאים */
-.bal-row{padding:10px 14px}
-.bal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px}
-.bal-lbl{font-weight:800;font-size:.95rem;white-space:nowrap}
-.bal-head .big{font-size:1.9rem;margin:0;line-height:1}
-.bal-btn{background:#fff;border:2.5px solid var(--ink);border-radius:99px;padding:2px 12px;font-weight:700;font-size:.78rem;min-height:34px;white-space:nowrap;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
-.bal-sub{margin-top:2px}
 .cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px;margin-top:10px}
 .cell{background:#fff;border:2.5px solid var(--ink);border-radius:14px;padding:8px 6px;text-align:center}
 .cell b{display:block;font-size:1.05rem}
 .cell span{font-size:.72rem;color:var(--ink2)}
 /* קצב הגיוס: שורה מצומצמת שמתרחבת לגרף */
-.pace-row{background:var(--mint);padding:10px 14px 12px}
-.pace-head{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:40px}
-.pace-head b{font-size:.95rem}
-.pace-line2{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.88rem;margin-top:2px}
 .pace-line{margin-top:10px;line-height:1.7}
 .pace-chart{background:#fff;border:2.5px solid var(--ink);border-radius:14px;padding:6px 4px 2px;margin-top:10px}
 .pace-note{font-size:.75rem;margin-top:8px}
@@ -156,6 +147,21 @@ td:first-child{white-space:nowrap}
 .leg i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:middle;margin-inline-end:4px}
 .leg .l-actual{border-color:#0b6b3a}.leg .l-proj{border-color:#d6336c;border-top-style:dashed}.leg .l-goal{border-color:var(--ink);border-top-style:dotted}
 .live-pool{font-size:.75rem;margin-top:6px}
+/* כרטיס מצומצם לשורה אחת שמתרחב בלחיצה (מסך הבית) */
+.coll{padding:10px 14px 12px}
+.coll-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px}
+.coll-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.95rem}
+.coll-count{background:#fff;border:2px solid var(--ink);border-radius:99px;padding:0 9px;font-size:.78rem;font-weight:700}
+.coll-btn{background:#fff;border:2.5px solid var(--ink);border-radius:99px;padding:2px 12px;font-weight:700;font-size:.78rem;min-height:34px;white-space:nowrap;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+.coll-sum{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.88rem;margin-top:2px}
+.coll-body{margin-top:10px}
+/* טבלת גיוס לפי יום עבודה */
+.day-table{font-size:.82rem}
+.day-table th,.day-table td{white-space:nowrap;text-align:center;padding:7px 5px}
+.day-table small{display:block;font-size:.68rem;color:var(--ink2);font-weight:400}
+.day-note{font-size:.75rem;margin-top:8px}
+.day-closed{margin-top:10px;padding:10px 12px;background:#fff;border:2.5px solid var(--ink);border-radius:14px;font-size:.85rem;line-height:1.7}
+.coll.has-sticker{padding-top:24px}
 /* סגנונות ייעודיים למסכים: דשבורד הבית ודף מרפאה, תגית גודל, מעקב לידים */
 .dash{gap:14px}
 .dash .card{margin-bottom:14px;padding:14px}
@@ -458,7 +464,7 @@ async function loadAll() {
   store.reasons = [];
   reasons.forEach(r => { store.reasons[r.idx] = r.name; });
   settings.forEach(applySetting);
-  await Promise.all([loadVisits(), loadLeads()]);
+  await Promise.all([loadVisits(), loadLeads(), loadLiveHistory()]);   // ההיסטוריה היומית נחוצה כבר בציור הראשון של מסך הבית
 }
 
 __exports.loadVisits = loadVisits;
@@ -968,8 +974,7 @@ const ui = {
   userId: null,             // מזהה המשתמש המחובר
   tab: 'home',              // המסך הפעיל
   busy: false,              // true בזמן שמירה, למניעת לחיצה כפולה
-  balanceOpen: false,       // האם שורת המאזן במסך הבית מורחבת (חוזרת להיות מצומצמת בכל כניסה לבית)
-  paceOpen: false,          // האם שורת קצב הגיוס במסך הבית מורחבת (גם היא מצומצמת בכל כניסה)
+  open: {},                 // אילו מקטעים במסך הבית מורחבים: { id: true }. מתאפס (הכול מצומצם) בכל כניסה לבית
   history: [],              // מסכים קודמים, לכפתור "חזרה" (נשמרים רק במעבר עומק, לא בלחיצה על לשונית)
   // מרפאות
   clinicId: null,           // מרפאה פתוחה (דף מרפאה)
@@ -995,7 +1000,7 @@ const ui = {
 /** מאפס את מצב התצוגה (בכניסה ובצאת מהמערכת) */
 function resetUi() {
   const fresh = {
-    tab: 'home', busy: false, balanceOpen: false, paceOpen: false, history: [], clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
+    tab: 'home', busy: false, open: {}, history: [], clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
     filters: { mg: '', sector: '', kind: '', sort: 'bal' },
     visitClinic: null, showVisit: null, editVisit: null, confirmDeleteVisit: null,
     visitFilters: { clinic: '', coord: '', rc: '', status: '', period: '' }, visitsShown: [],
@@ -1028,6 +1033,7 @@ __defs['js/domain/capitation.js'] = function (__exports) {
  */
 const { NON_WORKING_DAYS } = __req('js/config.js');
 
+const MONTH_SHORT = ['ינו׳', 'פבר׳', 'מרץ', 'אפר׳', 'מאי', 'יוני', 'יולי', 'אוג׳', 'ספט׳', 'אוק׳', 'נוב׳', 'דצמ׳'];
 const MONTH_NAMES = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
 const OFF = new Set(NON_WORKING_DAYS);
 
@@ -1094,15 +1100,24 @@ function capitationInfo(now = new Date()) {
   return {
     label: `קפיטציית ${MONTH_NAMES[name.m - 1]} ${name.y}`,
     monthLabel: `${MONTH_NAMES[name.m - 1]} ${name.y}`,
+    shortLabel: `${MONTH_SHORT[name.m - 1]} ${name.y}`,          // כמו בטבלת הקפיטציות, למשל "נוב׳ 2026"
     rangeLabel: `16.${start.m}–15.${end.m}`,
     startIso: isoOf(startN), endIso: isoOf(endN),
     total, passed, left: total - passed,
   };
 }
 
+/** הקפיטציה שלפני הקפיטציה של info (היום שלפני התחלתה שייך לקודמת) */
+function previousCapitation(info) {
+  const day = dateFromIso(info.startIso);
+  day.setDate(day.getDate() - 1);
+  return capitationInfo(day);
+}
+
 __exports.dateFromIso = dateFromIso;
 __exports.workingDaysBetween = workingDaysBetween;
 __exports.capitationInfo = capitationInfo;
+__exports.previousCapitation = previousCapitation;
 };
 
 /* ===== js/domain/checklist.js ===== */
@@ -1350,24 +1365,63 @@ const { PACE_RECENT_DAYS, WORK_DAYS_PER_WEEK } = __req('js/config.js');
 const { capitationInfo, dateFromIso, workingDaysBetween } = __req('js/domain/capitation.js');
 
 /**
- * היסטוריית הקפיטציה הנוכחית לקבוצת מינהלות: סכום המצטרפים לכל תאריך, ממוין.
- * תאריך שחסרה בו אחת מהמינהלות לא נכלל, כדי שלא יופיע סכום חלקי.
- * @param {Array<{asof:string, mg:string, joiners:number}>} rows  @param {string[]} mgs  @param {{startIso:string,endIso:string}} cap
- * @returns {Array<{asof:string, joiners:number}>}
+ * כל ההיסטוריה היומית של קבוצת מינהלות, מקובצת לפי קפיטציה: Map(תחילת קפיטציה -> נקודות ממוינות).
+ * נקודה = סכום המצטרפים והיעד של כל המינהלות בקבוצה בתאריך. תאריך שחסרה בו אחת מהמינהלות לא נכלל,
+ * כדי שלא יופיע סכום חלקי.
+ * @param {Array<{asof:string, mg:string, joiners:number, target?:number}>} rows  @param {string[]} mgs
+ * @returns {Map<string, Array<{asof:string, joiners:number, target:number}>>}
  */
-function scopeHistory(rows, mgs, cap) {
+function historyByCapitation(rows, mgs) {
   const byDate = new Map();
   rows.forEach(r => {
-    if (mgs.indexOf(r.mg) < 0 || r.asof < cap.startIso || r.asof > cap.endIso) return;
-    const entry = byDate.get(r.asof) || { asof: r.asof, joiners: 0, seen: new Set() };
+    if (mgs.indexOf(r.mg) < 0) return;
+    const entry = byDate.get(r.asof) || { asof: r.asof, joiners: 0, target: 0, seen: new Set() };
     entry.joiners += r.joiners;
+    entry.target += r.target || 0;
     entry.seen.add(r.mg);
     byDate.set(r.asof, entry);
   });
-  return [...byDate.values()]
-    .filter(e => e.seen.size === mgs.length)
-    .map(e => ({ asof: e.asof, joiners: e.joiners }))
-    .sort((a, b) => a.asof.localeCompare(b.asof));
+  const byCap = new Map();
+  [...byDate.values()].filter(e => e.seen.size === mgs.length).sort((a, b) => a.asof.localeCompare(b.asof)).forEach(e => {
+    const start = capitationInfo(dateFromIso(e.asof)).startIso;
+    if (!byCap.has(start)) byCap.set(start, []);
+    byCap.get(start).push({ asof: e.asof, joiners: e.joiners, target: e.target });
+  });
+  return byCap;
+}
+
+/**
+ * טבלת "גיוס לפי יום עבודה": שורה לכל תאריך בקפיטציה הנוכחית (מהחדש לישן), עם השוואה לאותו יום עבודה
+ * בעד שתי קפיטציות קודמות. אם בקפיטציה קודמת אין נתון באותו יום, לוקחים את הקרוב שלפניו (עד יומיים) ומסמנים.
+ * @param {Map} byCap תוצאת historyByCapitation  @param {{startIso:string}} cap הקפיטציה הנוכחית  @param {number} fallbackTarget יעד אם בנקודה אין יעד
+ * @returns {{rows:Array, prevLabels:string[]}}
+ *   row = { asof, day, delta, gap, joiners, pct, compare: Array<{joiners, pct, diffPts, exact}|null> }
+ */
+function dayTable(byCap, cap, fallbackTarget = 0) {
+  const current = byCap.get(cap.startIso) || [];
+  const prevKeys = [...byCap.keys()].filter(k => k < cap.startIso).sort().reverse().slice(0, 2);
+  const prev = prevKeys.map(k => ({
+    label: capitationInfo(dateFromIso(k)).monthLabel,
+    points: byCap.get(k).map(p => ({ ...p, day: capitationInfo(dateFromIso(p.asof)).passed })),
+  }));
+  const pctOf = (joiners, target) => (target > 0 ? (joiners / target) * 100 : null);
+  const rows = current.map((p, i) => {
+    const before = i > 0 ? current[i - 1] : null;
+    const day = capitationInfo(dateFromIso(p.asof)).passed;
+    const pct = pctOf(p.joiners, p.target || fallbackTarget);
+    const compare = prev.map(pc => {
+      const near = pc.points.filter(q => q.day <= day && day - q.day <= 2).sort((a, b) => b.day - a.day)[0];
+      if (!near) return null;
+      const nearPct = pctOf(near.joiners, near.target);
+      return { joiners: near.joiners, pct: nearPct, exact: near.day === day, diffPts: pct !== null && nearPct !== null ? pct - nearPct : null };
+    });
+    return {
+      asof: p.asof, day, joiners: p.joiners, pct, compare,
+      delta: before ? p.joiners - before.joiners : null,
+      gap: before ? workingDaysBetween(before.asof, p.asof) : 0,
+    };
+  });
+  return { rows: rows.reverse(), prevLabels: prev.map(pc => pc.label) };
 }
 
 /**
@@ -1408,7 +1462,8 @@ function paceSummary({ joiners, target, asofIso, history = [] }) {
   };
 }
 
-__exports.scopeHistory = scopeHistory;
+__exports.historyByCapitation = historyByCapitation;
+__exports.dayTable = dayTable;
 __exports.paceSummary = paceSummary;
 };
 
@@ -1886,6 +1941,99 @@ __exports.emptyNote = emptyNote;
 __exports.backButton = backButton;
 };
 
+/* ===== js/ui/components/collapsible.js ===== */
+__defs['js/ui/components/collapsible.js'] = function (__exports) {
+/**
+ * components/collapsible.js - כרטיס מצומצם לשורה אחת שמתרחב בלחיצה.
+ * המצב נשמר ב-ui.open[id], והוא מתאפס (הכול מצומצם) בכל כניסה למסך הבית.
+ * הפעולה: data-act="toggleSection" data-id="<id>" (ראו js/ui/screens/home.js).
+ */
+const { ui } = __req('js/core/state.js');
+const { esc } = __req('js/utils/format.js');
+
+/**
+ * @param {object} o
+ * @param {string} o.id מזהה ייחודי של המקטע
+ * @param {string} o.title כותרת השורה
+ * @param {string} [o.summaryHtml] שורת תקציר שמוצגת גם כשהכרטיס מצומצם
+ * @param {string} [o.bodyHtml] התוכן שנחשף בהרחבה
+ * @param {string} [o.tone] צבע הכרטיס: tone-mint / tone-orange / tone-pink ...
+ * @param {string} [o.sticker] אם מוגדר, הכותרת מוצגת כמדבקה על שפת הכרטיס, והתוכן הוא שורת הכותרת
+ * @param {number|string|null} [o.count] מונה לצד הכותרת
+ */
+function collapsible({ id, title, summaryHtml = '', bodyHtml = '', tone = '', sticker = '', count = null }) {
+  const open = !!ui.open[id];
+  const stickerHtml = sticker ? `<div class="sticker-title">${esc(sticker)}</div>` : '';
+  const counter = count === null || count === undefined ? '' : `<span class="coll-count num">${esc(String(count))}</span>`;
+  return `<div class="card coll ${tone}${sticker ? ' has-sticker' : ''}">
+    ${stickerHtml}
+    <div class="coll-head">
+      <span class="coll-title"><b>${esc(title)}</b>${counter}</span>
+      <button class="coll-btn" data-act="toggleSection" data-id="${esc(id)}" aria-expanded="${open}">${open ? 'צמצום ▴' : 'הרחבה ▾'}</button>
+    </div>
+    ${summaryHtml}
+    ${open ? `<div class="coll-body">${bodyHtml}</div>` : ''}
+  </div>`;
+}
+
+__exports.collapsible = collapsible;
+};
+
+/* ===== js/ui/components/dayTable.js ===== */
+__defs['js/ui/components/dayTable.js'] = function (__exports) {
+/**
+ * components/dayTable.js - "גיוס לפי יום עבודה": טבלה של הגיוס היומי בקפיטציה הנוכחית,
+ * עם השוואה לאותו יום עבודה בקפיטציות קודמות (כשיש להן נתון יומי), וסיכום של קפיטציות שכבר הסתיימו.
+ */
+const { esc, fmtInt, fmtDayMonth } = __req('js/utils/format.js');
+
+/** סימן מספר עם צבע: חיובי ירוק, שלילי אדום */
+function signedNum(n, suffix = '') {
+  const cls = n > 0 ? 'pos' : n < 0 ? 'neg' : '';
+  const txt = (n > 0 ? '+' : '') + fmtInt(n);
+  return `<b class="num ${cls}">${txt}${suffix}</b>`;
+}
+
+/** אחוז עם נקודה עשרונית אחת: 33.5% */
+const pct1 = p => (p === null ? '—' : `${(Math.round(p * 10) / 10).toLocaleString('he-IL')}%`);
+
+/** תא השוואה לקפיטציה קודמת: הפער בנקודות אחוז, ומתחתיו הנתון של אותו יום */
+function compareCell(c) {
+  if (!c || c.pct === null) return '<td>—</td>';
+  const diff = c.diffPts === null ? '' : signedNum(Math.round(c.diffPts * 10) / 10, ' נק׳');
+  const note = c.exact ? '' : ' (יום קרוב)';
+  return `<td>${diff}<small>${fmtInt(c.joiners)} (${pct1(c.pct)})${note}</small></td>`;
+}
+
+/**
+ * @param {{rows:Array, prevLabels:string[]}} model תוצאת dayTable
+ * @param {Array<{label:string, joiners:number, pct:number}>} closed קפיטציות שהסתיימו (סיכום סופי), מהחדשה לישנה
+ * @param {number|null} projectionPct צפי נוכחי באחוזים, להשוואה לסיכומים
+ */
+function dayTableHtml(model, closed, projectionPct) {
+  const head = `<tr><th>יום</th><th>תאריך</th><th>ביום</th><th>מצטבר</th><th>% מהיעד</th>${model.prevLabels.map(l => `<th>אותו יום ב${esc(l)}</th>`).join('')}</tr>`;
+  const body = model.rows.map(r => `<tr>
+      <td class="num">${r.day}</td><td class="num">${esc(fmtDayMonth(r.asof))}</td>
+      <td>${r.delta === null ? '—' : signedNum(r.delta)}${r.gap > 1 ? `<small>ב־${r.gap} ימי עבודה</small>` : ''}</td>
+      <td class="num">${fmtInt(r.joiners)}</td><td class="num">${pct1(r.pct)}</td>
+      ${r.compare.map(compareCell).join('')}
+    </tr>`).join('');
+  const compareNote = model.prevLabels.length
+    ? 'ההשוואה בנקודות אחוז מהיעד, לאותו יום עבודה.'
+    : 'השוואה לאותו יום בקפיטציות קודמות תופיע כשיהיו נתונים יומיים מהן (הקפיטציה הבאה מתחילה ב־16.11).';
+  const closedLines = closed.length
+    ? `<div class="day-closed"><b>לשם השוואה, קפיטציות שהסתיימו:</b>
+        ${closed.map(c => `<div>${esc(c.label)}: <span class="num">${fmtInt(c.joiners)}</span> מצטרפים, <b class="num">${pct1(c.pct)}</b> מהיעד</div>`).join('')}
+        ${projectionPct === null ? '' : `<div>הקפיטציה הנוכחית, צפי: <b class="num">~${Math.round(projectionPct)}%</b></div>`}
+      </div>` : '';
+  return `<div class="scroll"><table class="day-table"><thead>${head}</thead><tbody>${body}</tbody></table></div>
+    <div class="muted day-note">ביום = ההפרש בין שני עדכונים יומיים עוקבים (נטו, כולל מעבר מהמאגר למרפאות). ${compareNote}</div>
+    ${closedLines}`;
+}
+
+__exports.dayTableHtml = dayTableHtml;
+};
+
 /* ===== js/ui/components/formFields.js ===== */
 __defs['js/ui/components/formFields.js'] = function (__exports) {
 /**
@@ -1986,7 +2134,7 @@ function workingDaysBlock(cap) {
 }
 
 /**
- * ריבוע הבית.
+ * ריבוע הבית: רוחב מלא, בשתי עמודות (גיוס מול יעד, וימי עבודה).
  * @param {{j:number, pool:number, t:number, asof:string|null, pct:number|null}} live נתוני הגיוס (asof = null אם עדיין אין נתון יומי)
  * @param {object} cap תוצאת capitationInfo()
  */
@@ -2000,11 +2148,14 @@ function liveSquare(live, cap) {
        ${staleWarning(live.asof)}`
     : '<div class="muted live-wait">נתוני הגיוס היומיים עדיין לא התקבלו</div>';
   return `<div class="card tone-mint live-square">
-    <div class="cap-chip">${esc(cap.label)}</div>
-    <div class="muted live-range">${esc(cap.rangeLabel)}${hasData ? `<br>נתוני גיוס נכון ל־${esc(fmtDayMonth(live.asof))}` : ''}</div>
-    <div class="live-title">מצטרפים מול יעד</div>
-    ${joiners}
-    ${workingDaysBlock(cap)}
+    <div class="live-top">
+      <span class="cap-chip">${esc(cap.label)}</span>
+      <span class="muted live-range">${esc(cap.rangeLabel)}${hasData ? ` · נתוני גיוס נכון ל־${esc(fmtDayMonth(live.asof))}` : ''}</span>
+    </div>
+    <div class="live-cols">
+      <div class="live-main"><div class="live-title">מצטרפים מול יעד</div>${joiners}</div>
+      ${workingDaysBlock(cap)}
+    </div>
   </div>`;
 }
 
@@ -2040,6 +2191,7 @@ __defs['js/ui/components/paceCard.js'] = function (__exports) {
  */
 const { esc, fmtInt, fmtDayMonth } = __req('js/utils/format.js');
 const { paceChart } = __req('js/ui/components/paceChart.js');
+const { collapsible } = __req('js/ui/components/collapsible.js');
 
 /** מספר לתצוגה: עד 10 עם נקודה עשרונית אחת, מעל זה שלם */
 function fmtRate(n) {
@@ -2065,21 +2217,17 @@ function paceLine(s) {
 }
 
 /**
- * שורת קצב הגיוס למסך הבית.
- * @param {object} summary תוצאת paceSummary  @param {Array} series נקודות בפועל  @param {object} cap תוצאת capitationInfo  @param {boolean} open
+ * שורת קצב הגיוס למסך הבית: מצומצמת כברירת מחדל, ובהרחבה שלושה מספרים וגרף.
+ * @param {object} summary תוצאת paceSummary  @param {Array} series נקודות בפועל  @param {object} cap תוצאת capitationInfo
  */
-function paceRow(summary, series, cap, open) {
+function paceRow(summary, series, cap) {
   if (summary.status === 'none') return '';
-  const title = `קצב הגיוס · ${esc(cap.monthLabel)}`;
+  const title = `קצב הגיוס · ${cap.monthLabel}`;
   if (summary.status === 'done' || summary.status === 'ended') {
-    return `<div class="card pace-row"><div class="pace-head"><b>${title}</b></div>${paceLine(summary)}</div>`;
+    return `<div class="card coll tone-mint"><div class="coll-head"><span class="coll-title"><b>${esc(title)}</b></span></div>${paceLine(summary)}</div>`;
   }
-  const head = `<div class="pace-head"><b>${title}</b>
-    <button class="bal-btn" data-act="togglePace" aria-expanded="${open}">${open ? 'צמצום ▴' : 'הרחבה ▾'}</button></div>`;
-  const line = `<div class="pace-line2"><span>בקצב הנוכחי: <b class="num">~${fmtInt(Math.round(summary.projection))}</b> מתוך <span class="num">${fmtInt(summary.target)}</span></span>
+  const summaryHtml = `<div class="coll-sum"><span>בקצב הנוכחי: <b class="num">~${fmtInt(Math.round(summary.projection))}</b> מתוך <span class="num">${fmtInt(summary.target)}</span></span>
     <span>נדרש <b class="num">${fmtRate(summary.requiredPerDay)}</b> ליום</span></div>`;
-  if (!open) return `<div class="card pace-row">${head}${line}</div>`;
-
   const windowLabel = summary.recentPerDay !== null ? `${summary.recentDays} ימים אחרונים` : 'מתחילת הקפיטציה';
   const chips = `<div class="cells">
     <div class="cell"><b class="num">${fmtRate(summary.perDay)}</b><span>בפועל ליום (${windowLabel})</span></div>
@@ -2092,7 +2240,7 @@ function paceRow(summary, series, cap, open) {
     : '<div class="muted">עדיין אין היסטוריה יומית לגרף.</div>';
   const first = series.length ? `הנתונים מ־${fmtDayMonth(series[0].asof)}, תחילת האיסוף היומי. ` : '';
   const note = `<div class="muted pace-note">${first}ימי העבודה נספרים מתאריך הנתון (${fmtDayMonth(series[series.length - 1].asof)}). ההערכה היא קו ישר בקצב ${summary.recentPerDay !== null ? 'הימים האחרונים' : 'הממוצע מתחילת הקפיטציה'}, ואינה מובטחת. ${summary.status === 'behind' ? `הגיוס בפיגור של ${fmtInt(Math.max(1, summary.gap))} מצטרפים ביחס למסלול ישר ליעד.` : 'הגיוס בקצב ביחס למסלול ישר ליעד.'}</div>`;
-  return `<div class="card pace-row">${head}${line}${chips}${chart}${note}</div>`;
+  return collapsible({ id: 'pace', title, tone: 'tone-mint', summaryHtml, bodyHtml: chips + chart + note });
 }
 
 __exports.paceLine = paceLine;
@@ -2229,7 +2377,6 @@ function keyValue(label, value) {
   return `<div class="kv"><span>${esc(label)}</span><b>${empty ? '—' : esc(value)}</b></div>`;
 }
 
-
 __exports.inlineStats = inlineStats;
 __exports.stackedStats = stackedStats;
 __exports.bigNumber = bigNumber;
@@ -2308,7 +2455,6 @@ function visitItem(visit) {
     badgeHtml: pill(`${pct}%`, completionTone(pct)),
   });
 }
-
 
 __exports.visitItem = visitItem;
 };
@@ -2398,7 +2544,7 @@ function goBack(fallbackTab = 'home') {
 /** עובר ללשונית. extra = מצב תצוגה נוסף, למשל { clinicId } */
 function goTo(tab, extra) {
   ui.tab = tab;
-  if (tab === 'home') { ui.balanceOpen = false; ui.paceOpen = false; }   // השורות מצומצמות בכל כניסה למסך הבית
+  if (tab === 'home') ui.open = {};            // כל המקטעים מצומצמים בכל כניסה למסך הבית
   ui.clinicId = null;
   ui.editClinic = false;
   ui.visitClinic = null;
@@ -2601,7 +2747,6 @@ const handlers = {
   saveSizes,
 };
 
-
 __exports.render = render;
 __exports.handlers = handlers;
 };
@@ -2763,7 +2908,6 @@ const handlers = {
   toggleClinicEdit() { ui.editClinic = !ui.editClinic; requestRender(); },
   saveClinicEdit: saveEdit,
 };
-
 
 __exports.render = render;
 __exports.handlers = handlers;
@@ -2935,14 +3079,16 @@ __defs['js/ui/screens/home.js'] = function (__exports) {
 /**
  * ui/screens/home.js - מסך הבית.
  *
- * מבנה: homeModel() מחשב את כל המספרים, ופונקציות ה-view הקטנות מציירות כל חלק.
- *  1. כרטיסי דשבורד: מאזן (ימין) וביקורים במרפאות (שמאל)
- *  2. מאזן לפי קפיטציה
- *  3. "מה דורש תשומת לב": מרפאות מתחת ליעד, מאזן שלילי, ביקורים, משימות באיחור, חוסר דיווח
+ * מבנה: homeModel() מחשב את כל המספרים, ופונקציות ה-view הקטנות מציירות כל חלק. סדר המקטעים:
+ *  1. ריבוע הגיוס מול יעד של הקפיטציה הנוכחית (ימי עבודה)
+ *  2. שורות מצומצמות: קצב הגיוס, גיוס לפי יום עבודה (עם השוואה לקפיטציות קודמות), מאזן לפי קפיטציה
+ *  3. טבלת מעקב לידים, ואחריה כרטיס הביקורים
+ *  4. "מה דורש תשומת לב" ומאזן שלילי (מצומצמים), ביקורים, משימות באיחור, חוסר דיווח
+ * מקטע מצומצם נפתח בלחיצה (ui.open), וחוזר להיות מצומצם בכל כניסה למסך הבית.
  */
 const { ui, store } = __req('js/core/state.js');
 const { requestRender } = __req('js/core/bus.js');
-const { esc, addDays, todayIso, fmtDate, pctLabel, sign, signClass, fmtInt } = __req('js/utils/format.js');
+const { esc, addDays, todayIso, fmtDate, pctLabel, sign, signClass } = __req('js/utils/format.js');
 const { BELOW_PREVIEW_COUNT, CAPS, TARGET_ALERT_PCT, VISIT_STALE_DAYS, MG_NAMES } = __req('js/config.js');
 const { me, visibleClinics, coordinators, coordinatorOf, canVisit, clinicName, isManagerView, scopeTitle } = __req('js/domain/permissions.js');
 const { aggregate, capSeries, lastReportedCap, clinicStats, isReported, openTasks, lastVisitDate, belowTargetClinics, targetTone, SIZE_LABELS, isOverdue, liveProgress } = __req('js/domain/metrics.js');
@@ -2953,8 +3099,10 @@ const { listItem } = __req('js/ui/components/listItem.js');
 const { options } = __req('js/ui/components/formFields.js');
 const { card, emptyNote } = __req('js/ui/components/card.js');
 const { liveSquare } = __req('js/ui/components/liveCard.js');
-const { capitationInfo, dateFromIso } = __req('js/domain/capitation.js');
-const { paceSummary, scopeHistory } = __req('js/domain/pace.js');
+const { collapsible } = __req('js/ui/components/collapsible.js');
+const { dayTableHtml } = __req('js/ui/components/dayTable.js');
+const { capitationInfo, dateFromIso, previousCapitation } = __req('js/domain/capitation.js');
+const { paceSummary, historyByCapitation, dayTable } = __req('js/domain/pace.js');
 const { paceRow } = __req('js/ui/components/paceCard.js');
 const { leadTableHtml } = __req('js/ui/screens/leadTable.js');
 
@@ -3012,40 +3160,7 @@ function greetingHtml(model) {
     <div class="muted" style="margin-bottom:10px">${esc(user.title)} · ${esc(scopeTitle())} · ${model.clinics.length} יחידות</div>`;
 }
 
-/** תא נתון בשורת המאזן המורחבת: ערך בולט ותווית מתחתיו */
-function balanceCell(value, label, cls = '') {
-  return `<div class="cell"><b class="num ${cls}">${esc(value)}</b><span>${esc(label)}</span></div>`;
-}
-
-/**
- * שורת המאזן: שורה אחת (תווית, המאזן, כפתור הרחבה). בהרחבה נפתחים ארבעה תאים:
- * מצטרפים ועוזבים בכל 2026, המאזן של הקפיטציה האחרונה, והביצוע מול יעד של כל 2026.
- * הצבע: ורוד כשהמאזן שלילי, מנטה כשהוא חיובי.
- */
-function balanceRow(model) {
-  if (!model.agg.reporting) {
-    return card('מאזן', '<div class="muted">עדיין לא הוזנו נתוני קפיטציות. אפשר להזין אותם במסך היחידה.</div>', 'tone-yellow');
-  }
-  const a = model.agg;
-  const open = ui.balanceOpen;
-  const cells = [
-    balanceCell(fmtInt(a.J), 'מצטרפים בכל 2026'),
-    balanceCell(fmtInt(a.L), 'עוזבים בכל 2026'),
-  ];
-  if (model.last) cells.push(balanceCell(sign(model.last.bal), CAPS[model.lastIdx], signClass(model.last.bal)));
-  if (a.targetPct !== null) cells.push(balanceCell(pctLabel(a.targetPct), 'ביצוע מול יעד בכל 2026'));
-  const details = open
-    ? `<div class="muted bal-sub">${a.nmax} מתוך 6 קפיטציות</div><div class="cells">${cells.join('')}</div>` : '';
-  return `<div class="card bal-row ${a.bal >= 0 ? 'tone-mint' : 'tone-pink'}">
-    <div class="bal-head">
-      <span class="bal-lbl">מאזן 2026</span>
-      <span class="big num ${a.bal >= 0 ? 'pos' : 'neg'}">${esc(sign(a.bal))}</span>
-      <button class="bal-btn" data-act="toggleBalance" aria-expanded="${open}">${open ? 'צמצום ▴' : 'הרחבה ▾'}</button>
-    </div>${details}
-  </div>`;
-}
-
-/** כרטיס ביקורים (שמאל), עם סינון לפי רכז למנהל ולנופר */
+/** כרטיס ביקורים (רוחב מלא, מתחת לטבלת הלידים), עם סינון לפי רכז למנהל ולנופר */
 function visitsCard(model) {
   const v = model.visits;
   const filter = canVisit() ? '' : `
@@ -3102,7 +3217,7 @@ function belowTargetCard(model) {
   const body = all.length
     ? `${sizeChips}<div class="list">${rows}</div>${toggle}`
     : `${sizeChips}${emptyNote(`אין מרפאות מתחת ל־${TARGET_ALERT_PCT}% מהיעד.`)}${toggle}`;
-  return card('מה דורש תשומת לב?', `<div class="card-subtitle">${esc(title)}</div>${body}`, 'tone-orange sticker');
+  return collapsible({ id: 'below', sticker: 'מה דורש תשומת לב?', title, tone: 'tone-orange', bodyHtml: body });
 }
 
 function negativeBalanceCard(model) {
@@ -3112,8 +3227,10 @@ function negativeBalanceCard(model) {
     subtitle: clinicSubtitle(c, null),
     badgeHtml: pill(sign(clinicStats(c).bal), 'bad'),
   })).join('');
-  return card(`מאזן שלילי מתחילת השנה (${list.length})`,
-    list.length ? `<div class="list">${rows}</div>` : emptyNote('אין מרפאות עם מאזן שלילי.'));
+  return collapsible({
+    id: 'negative', title: 'מאזן שלילי מתחילת השנה', count: list.length,
+    bodyHtml: list.length ? `<div class="list">${rows}</div>` : emptyNote('אין מרפאות עם מאזן שלילי.'),
+  });
 }
 
 function visitsSummaryCard(model) {
@@ -3145,40 +3262,80 @@ function missingDataCard(model) {
 
 // ---------- הרכבת המסך ----------
 
-function render() {
-  const model = homeModel();
-  const hasData = model.agg.reporting > 0;
-  const capCard = hasData
-    ? card('מאזן לפי קפיטציה', capTable(model.series, futureTarget(model), { target: model.agg.tt, j: model.agg.J, l: model.agg.L }), 'sticker')
-    : '';
-  const attention = hasData ? belowTargetCard(model) + negativeBalanceCard(model) : '';
-  return `${greetingHtml(model)}
-    <div class="grid2 dash">${liveSquareHtml(model)}${visitsCard(model)}</div>
-    ${paceSection(model)}
-    ${balanceRow(model)}
-    ${capCard}
-    ${leadTableHtml({ showAdd: true })}
-    ${attention}${visitsSummaryCard(model)}${lateTasksCard(model)}${missingDataCard(model)}`;
+/**
+ * הקשר הגיוס היומי: הנתון הנוכחי, הקפיטציה, וההיסטוריה של המינהלות שהמשתמש רואה
+ * (מנהל ונופר: כולן, רכז: המינהלת שלו). הנתון הנוכחי תמיד הנקודה האחרונה בקפיטציה.
+ * מחזיר null אם עדיין אין נתון יומי.
+ */
+function liveContext(model) {
+  const live = liveProgress(model.clinics);
+  if (!live.asof) return null;
+  const cap = capitationInfo(dateFromIso(live.asof));
+  const mgs = [...new Set(model.clinics.filter(c => !c.pool && !c.hospital).map(c => c.mg))];
+  const byCap = historyByCapitation(store.liveHistory, mgs);
+  const series = (byCap.get(cap.startIso) || []).filter(p => p.asof !== live.asof);
+  series.push({ asof: live.asof, joiners: live.j, target: live.t });
+  series.sort((a, b) => a.asof.localeCompare(b.asof));
+  byCap.set(cap.startIso, series);
+  return { live, cap, byCap, series };
+}
+
+/** שורת קצב הגיוס (מצומצמת): כמה עוד צריך לגייס ובאיזה קצב, עם גרף בהרחבה */
+function paceSection(ctx, summary) {
+  return paceRow(summary, ctx.series, ctx.cap);
 }
 
 /**
- * שורת קצב הגיוס: כמה עוד צריך לגייס ובאיזה קצב, עם גרף בהרחבה.
- * ההיסטוריה היא סכום המינהלות שהמשתמש רואה (מנהל ונופר: כולן, רכז: המינהלת שלו).
+ * קפיטציות שכבר הסתיימו (עד שתיים אחורה), לשם השוואה: מצטרפים ואחוז מהיעד בסיום.
+ * הנתון מטבלת הקפיטציות, ולכן קיים רק לקפיטציות שבטבלה.
  */
-function paceSection(model) {
-  const live = liveProgress(model.clinics);
-  if (!live.asof) return '';
-  const cap = capitationInfo(dateFromIso(live.asof));
-  const mgs = [...new Set(model.clinics.filter(c => !c.pool && !c.hospital).map(c => c.mg))];
-  const series = scopeHistory(store.liveHistory, mgs, cap).filter(p => p.asof !== live.asof);
-  series.push({ asof: live.asof, joiners: live.j });          // הנתון הנוכחי תמיד הנקודה האחרונה
-  const summary = paceSummary({ joiners: live.j, target: live.t, asofIso: live.asof, history: series });
-  return paceRow(summary, series, cap, ui.paceOpen);
+function closedCapitations(model, cap) {
+  const out = [];
+  let info = cap;
+  for (let i = 0; i < 2; i++) {
+    info = previousCapitation(info);
+    const s = model.series[CAPS.indexOf(info.shortLabel)];
+    if (s && s.tt > 0) out.push({ label: `${info.shortLabel}${i === 0 ? ' (הקודמת)' : ''}`, joiners: s.j, pct: (s.j / s.tt) * 100 });
+  }
+  return out;
 }
 
-/** ריבוע "ביצוע מול יעד" של הקפיטציה הנוכחית: גיוס יומי וימי עבודה */
-function liveSquareHtml(model) {
-  return liveSquare(liveProgress(model.clinics), capitationInfo());
+/** "גיוס לפי יום עבודה": שורה מצומצמת, ובהרחבה טבלה עם השוואה לקפיטציות קודמות (גם לרכזים: לפי המינהלת שלהם) */
+function dayTableSection(model, ctx, summary) {
+  const table = dayTable(ctx.byCap, ctx.cap, ctx.live.t);
+  const projectionPct = summary.status === 'on' || summary.status === 'behind' ? summary.projectionPct : null;
+  return collapsible({
+    id: 'byday', title: 'גיוס לפי יום עבודה', count: table.rows.length,
+    bodyHtml: dayTableHtml(table, closedCapitations(model, ctx.cap), projectionPct),
+  });
+}
+
+/** מאזן לפי קפיטציה: שורה מצומצמת עם סיכום, ובהרחבה הטבלה המלאה */
+function capTableSection(model) {
+  const a = model.agg;
+  const last = model.last
+    ? `<span>${esc(CAPS[model.lastIdx])} <b class="num ${signClass(model.last.bal)}">${esc(sign(model.last.bal))}</b></span>` : '';
+  const summaryHtml = `<div class="coll-sum"><span>מאזן שנתי <b class="num ${a.bal >= 0 ? 'pos' : 'neg'}">${esc(sign(a.bal))}</b></span>${last}</div>`;
+  return collapsible({
+    id: 'capTable', sticker: 'מאזן לפי קפיטציה', title: 'סה״כ 2026', summaryHtml,
+    bodyHtml: capTable(model.series, futureTarget(model), { target: a.tt, j: a.J, l: a.L }),
+  });
+}
+
+function render() {
+  const model = homeModel();
+  const hasData = model.agg.reporting > 0;
+  const ctx = liveContext(model);
+  const summary = ctx && paceSummary({ joiners: ctx.live.j, target: ctx.live.t, asofIso: ctx.live.asof, history: ctx.series });
+  const attention = hasData ? belowTargetCard(model) + negativeBalanceCard(model) : '';
+  return `${greetingHtml(model)}
+    ${liveSquare(ctx ? ctx.live : liveProgress(model.clinics), capitationInfo())}
+    ${ctx ? paceSection(ctx, summary) : ''}
+    ${ctx ? dayTableSection(model, ctx, summary) : ''}
+    ${hasData ? capTableSection(model) : ''}
+    ${leadTableHtml({ showAdd: true })}
+    ${visitsCard(model)}
+    ${attention}${visitsSummaryCard(model)}${lateTasksCard(model)}${missingDataCard(model)}`;
 }
 
 /** יעד כולל לקפיטציה שעוד לא דווחה: סכום היעדים של כל המרפאות */
@@ -3196,10 +3353,8 @@ const handlers = {
     requestRender();
   },
   belowSmall(el) { ui.belowIncludeSmall = el.dataset.value === '1'; requestRender(); },
-  /** הרחבה וצמצום של שורת קצב הגיוס */
-  togglePace() { ui.paceOpen = !ui.paceOpen; requestRender(); },
-  /** הרחבה וצמצום של שורת המאזן */
-  toggleBalance() { ui.balanceOpen = !ui.balanceOpen; requestRender(); },
+  /** הרחבה וצמצום של מקטע במסך הבית (מזהה ב-data-id) */
+  toggleSection(el) { ui.open[el.dataset.id] = !ui.open[el.dataset.id]; requestRender(); },
 };
 
 __exports.render = render;
@@ -3623,7 +3778,6 @@ const handlers = {
   deleteLeadNo() { ui.leads.confirmDelete = null; requestRender(); },
   deleteLeadYes,
 };
-
 
 __exports.render = render;
 __exports.handlers = handlers;
@@ -4128,7 +4282,6 @@ const handlers = {
   showVisit(el) { navigate('visits', { showVisit: el.dataset.id }); },
   exportVisits() { if (isManagerView()) exportVisits(ui.visitsShown); },
 };
-
 
 __exports.render = render;
 __exports.handlers = handlers;
