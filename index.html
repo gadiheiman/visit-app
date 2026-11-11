@@ -162,6 +162,7 @@ td:first-child{white-space:nowrap}
 .day-note{font-size:.75rem;margin-top:8px}
 .day-closed{margin-top:10px;padding:10px 12px;background:#fff;border:2.5px solid var(--ink);border-radius:14px;font-size:.85rem;line-height:1.7}
 .coll.has-sticker{padding-top:24px}
+.home-search{margin-bottom:14px}
 /* סגנונות ייעודיים למסכים: דשבורד הבית ודף מרפאה, תגית גודל, מעקב לידים */
 .dash{gap:14px}
 .dash .card{margin-bottom:14px;padding:14px}
@@ -974,6 +975,7 @@ const ui = {
   userId: null,             // מזהה המשתמש המחובר
   tab: 'home',              // המסך הפעיל
   busy: false,              // true בזמן שמירה, למניעת לחיצה כפולה
+  homeSearch: '',           // מה שהוקלד בחיפוש המרפאות של מסך הבית
   open: {},                 // אילו מקטעים במסך הבית מורחבים: { id: true }. מתאפס (הכול מצומצם) בכל כניסה לבית
   history: [],              // מסכים קודמים, לכפתור "חזרה" (נשמרים רק במעבר עומק, לא בלחיצה על לשונית)
   // מרפאות
@@ -1000,7 +1002,7 @@ const ui = {
 /** מאפס את מצב התצוגה (בכניסה ובצאת מהמערכת) */
 function resetUi() {
   const fresh = {
-    tab: 'home', busy: false, open: {}, history: [], clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
+    tab: 'home', busy: false, homeSearch: '', open: {}, history: [], clinicId: null, editClinic: false, search: '', limit: LIST_PAGE_SIZE,
     filters: { mg: '', sector: '', kind: '', sort: 'bal' },
     visitClinic: null, showVisit: null, editVisit: null, confirmDeleteVisit: null,
     visitFilters: { clinic: '', coord: '', rc: '', status: '', period: '' }, visitsShown: [],
@@ -2531,6 +2533,7 @@ function navigate(tab, extra) {
 /** מעבר ללשונית ראשית (סרגל הניווט): מאפס את ההיסטוריה */
 function goTop(tab) {
   ui.history.length = 0;
+  if (tab === 'home') ui.homeSearch = '';        // לחיצה על לשונית הבית מנקה את החיפוש
   goTo(tab);
 }
 
@@ -3080,6 +3083,7 @@ __defs['js/ui/screens/home.js'] = function (__exports) {
  * ui/screens/home.js - מסך הבית.
  *
  * מבנה: homeModel() מחשב את כל המספרים, ופונקציות ה-view הקטנות מציירות כל חלק. סדר המקטעים:
+ *  0. חיפוש מרפאה (תוצאה פותחת את דף המרפאה)
  *  1. ריבוע הגיוס מול יעד של הקפיטציה הנוכחית (ימי עבודה)
  *  2. שורות מצומצמות: קצב הגיוס, גיוס לפי יום עבודה (עם השוואה לקפיטציות קודמות), מאזן לפי קפיטציה
  *  3. טבלת מעקב לידים, ואחריה כרטיס הביקורים
@@ -3087,7 +3091,8 @@ __defs['js/ui/screens/home.js'] = function (__exports) {
  * מקטע מצומצם נפתח בלחיצה (ui.open), וחוזר להיות מצומצם בכל כניסה למסך הבית.
  */
 const { ui, store } = __req('js/core/state.js');
-const { requestRender } = __req('js/core/bus.js');
+const { requestRender, navigate } = __req('js/core/bus.js');
+const { rerenderKeepingFocus } = __req('js/core/dom.js');
 const { esc, addDays, todayIso, fmtDate, pctLabel, sign, signClass } = __req('js/utils/format.js');
 const { BELOW_PREVIEW_COUNT, CAPS, TARGET_ALERT_PCT, VISIT_STALE_DAYS, MG_NAMES } = __req('js/config.js');
 const { me, visibleClinics, coordinators, coordinatorOf, canVisit, clinicName, isManagerView, scopeTitle } = __req('js/domain/permissions.js');
@@ -3260,6 +3265,33 @@ function missingDataCard(model) {
     `<div class="muted">ביחידות הבאות אין נתוני ${esc(CAPS[model.lastIdx])}:</div><div class="chips">${chips}${more}</div>`);
 }
 
+/** כמה תוצאות חיפוש מוצגות במסך הבית (השאר במסך היחידות) */
+const HOME_SEARCH_LIMIT = 8;
+
+/**
+ * חיפוש מרפאה במסך הבית: שדה, ומתחתיו תוצאות (שם או ישוב) שלחיצה עליהן פותחת את דף המרפאה.
+ * הנתונים הם היחידות שהמשתמש רשאי לראות (אותו חיפוש כמו במסך היחידות, בלי מאגרי מבוטחים).
+ */
+function searchBoxHtml(model) {
+  const q = ui.homeSearch.trim();
+  let results = '';
+  if (q) {
+    const found = model.real.filter(c => c.name.indexOf(q) >= 0 || (c.town || '').indexOf(q) >= 0);
+    const rows = found.slice(0, HOME_SEARCH_LIMIT).map(c => listItem({
+      action: 'openClinic', id: c.id, title: c.name, subtitle: clinicSubtitle(c, null),
+    })).join('');
+    const more = found.length > HOME_SEARCH_LIMIT
+      ? `<button class="btn ghost small" style="margin-top:8px" data-act="homeSearchAll">כל ${found.length} התוצאות במסך היחידות</button>` : '';
+    results = found.length
+      ? `<div class="list home-results" style="margin-top:8px">${rows}</div>${more}`
+      : emptyNote('לא נמצאו יחידות שמתאימות לחיפוש.');
+  }
+  return `<div class="home-search">
+    <input type="search" id="hq" placeholder="חיפוש מרפאה לפי שם או ישוב" value="${esc(ui.homeSearch)}" aria-label="חיפוש מרפאה" data-inp="homeSearch">
+    ${results}
+  </div>`;
+}
+
 // ---------- הרכבת המסך ----------
 
 /**
@@ -3329,6 +3361,7 @@ function render() {
   const summary = ctx && paceSummary({ joiners: ctx.live.j, target: ctx.live.t, asofIso: ctx.live.asof, history: ctx.series });
   const attention = hasData ? belowTargetCard(model) + negativeBalanceCard(model) : '';
   return `${greetingHtml(model)}
+    ${searchBoxHtml(model)}
     ${liveSquare(ctx ? ctx.live : liveProgress(model.clinics), capitationInfo())}
     ${ctx ? paceSection(ctx, summary) : ''}
     ${ctx ? dayTableSection(model, ctx, summary) : ''}
@@ -3353,6 +3386,10 @@ const handlers = {
     requestRender();
   },
   belowSmall(el) { ui.belowIncludeSmall = el.dataset.value === '1'; requestRender(); },
+  /** הקלדה בחיפוש המרפאות של מסך הבית */
+  homeSearch(el) { ui.homeSearch = el.value; rerenderKeepingFocus('hq', requestRender); },
+  /** "כל התוצאות": פותח את מסך היחידות עם אותו חיפוש */
+  homeSearchAll() { navigate('clinics', { search: ui.homeSearch.trim() }); },
   /** הרחבה וצמצום של מקטע במסך הבית (מזהה ב-data-id) */
   toggleSection(el) { ui.open[el.dataset.id] = !ui.open[el.dataset.id]; requestRender(); },
 };
