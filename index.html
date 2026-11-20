@@ -876,6 +876,35 @@ __exports.registerHandlers = registerHandlers;
 __exports.initEvents = initEvents;
 };
 
+/* ===== js/core/deeplink.js ===== */
+__defs['js/core/deeplink.js'] = function (__exports) {
+/**
+ * core/deeplink.js - קישור ישיר מתוך הודעת וואטסאפ.
+ * דוגמה: https://visit-app-d68.pages.dev/?go=followups פותח את מסך הלידים מסונן ל"המשך טיפול".
+ * הקישור נקרא פעם אחת בטעינת הדף, נשמר עד שהמשתמש מחובר, ואז נמחק מהכתובת.
+ */
+const { ui } = __req('js/core/state.js');
+const { LEAD_STATUS_FOLLOWUP } = __req('js/config.js');
+
+/** יעד לכל ערך של ?go= */
+const LINKS = {
+  followups: () => { ui.tab = 'leads'; ui.leads.statusFilter = LEAD_STATUS_FOLLOWUP; },
+};
+
+let pending = new URLSearchParams(location.search).get('go');
+
+/** מפעיל את הקישור (אם יש) אחרי שהמשתמש נכנס. נקרא מ-session.js */
+function applyDeepLink() {
+  if (!pending) return;
+  const go = LINKS[pending];
+  pending = null;
+  try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { /* לא קריטי */ }
+  if (go) go();
+}
+
+__exports.applyDeepLink = applyDeepLink;
+};
+
 /* ===== js/core/session.js ===== */
 __defs['js/core/session.js'] = function (__exports) {
 /**
@@ -888,6 +917,7 @@ const { loadAll } = __req('js/api/loaders.js');
 const { signOut } = __req('js/api/auth.js');
 const { me } = __req('js/domain/permissions.js');
 const { errorText } = __req('js/core/dom.js');
+const { applyDeepLink } = __req('js/core/deeplink.js');
 
 /**
  * נקרא אחרי כניסה מוצלחת (או כשמתגלה כניסה קיימת בטעינת הדף).
@@ -908,6 +938,7 @@ async function startSession(userId) {
     return { error: 'למשתמש הזה אין הרשאות במערכת' };
   }
   resetUi();
+  applyDeepLink();          // קישור ישיר מהודעה (למשל ?go=followups)
   requestRender();
   return {};
 }
