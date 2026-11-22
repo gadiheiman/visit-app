@@ -190,7 +190,7 @@ js/main.js              נקודת הכניסה: חיווט בלבד
 ### מה נשלח
 | מתי | למי | תבנית Meta | קטגוריה |
 |---|---|---|---|
-| כשמגיע `followup_at` של ליד בסטטוס "המשך טיפול" (נבדק כל 5 דקות, עד 24 שעות אחורה) | הרכז שהליד שלו | `lead_followup_reminder` | Utility |
+| כשמגיע `followup_at` של ליד בסטטוס "המשך טיפול" (נבדק כל דקה, עד 24 שעות אחורה) | הרכז שהליד שלו | `lead_followup_reminder` | Utility |
 | כל בוקר ב-08:00 (שעון ישראל) | נופר | `daily_followups_summary` | Marketing* |
 
 \* Meta דחתה בעבר סיכום יומי כ-Utility, ולכן הוא מוגש כ-Marketing.
@@ -217,7 +217,7 @@ js/main.js              נקודת הכניסה: חיווט בלבד
 
 ### איך זה עובד
 ```
-pg_cron ──(כל 5 דק')──► wa_invoke('due')    ──► Edge Function wa-reminders?mode=due
+pg_cron ──(כל דקה)──► wa_invoke('due')     ──► Edge Function wa-reminders?mode=due
 pg_cron ──(05:00, 06:00 UTC)► wa_invoke('digest') ──► wa-reminders?mode=digest
                                                      (שולח רק כשבישראל 08:00, עובד בשעון חורף ובשעון קיץ)
 ```
