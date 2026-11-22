@@ -191,7 +191,7 @@ js/main.js              נקודת הכניסה: חיווט בלבד
 | מתי | למי | תבנית Meta | קטגוריה |
 |---|---|---|---|
 | כשמגיע `followup_at` של ליד בסטטוס "המשך טיפול" (נבדק כל דקה, עד 24 שעות אחורה) | הרכז שהליד שלו | `lead_followup_reminder` | Utility |
-| כל בוקר ב-08:00 (שעון ישראל) | נופר | `daily_followups_summary` | Marketing* |
+| כל בוקר ב-08:00 (שעון ישראל, א'–ה') | נופר (+גדי) | `manager_daily_summary` (מ-22.11.2026; קודם `daily_followups_summary`) | Marketing* |
 
 \* Meta דחתה בעבר סיכום יומי כ-Utility, ולכן הוא מוגש כ-Marketing.
 
