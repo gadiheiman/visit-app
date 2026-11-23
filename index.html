@@ -673,7 +673,7 @@ const PACE_RECENT_DAYS = 4;
 const WORK_DAYS_PER_WEEK = 5;
 const APP_NAME = 'קומנדו שו״ש';
 const APP_TAGLINE = 'מעל היעד. בכל יום.';
-const LIVE_STALE_DAYS = 7;        // אם נתון המצטרפים היומי ישן מהמספר הזה, מסמנים שהעדכון האוטומטי נתקע
+const LIVE_STALE_DAYS = 3;        // אם נתון המצטרפים היומי ישן מהמספר הזה, מסמנים שהעדכון האוטומטי נתקע
 const VISIT_STALE_DAYS = 20;      // מרפאה ללא ביקור מעל מספר הימים הזה מסומנת
 const LIST_PAGE_SIZE = 40;        // גודל "עמוד" ברשימת היחידות
 
@@ -876,35 +876,6 @@ __exports.registerHandlers = registerHandlers;
 __exports.initEvents = initEvents;
 };
 
-/* ===== js/core/deeplink.js ===== */
-__defs['js/core/deeplink.js'] = function (__exports) {
-/**
- * core/deeplink.js - קישור ישיר מתוך הודעת וואטסאפ.
- * דוגמה: https://visit-app-d68.pages.dev/?go=followups פותח את מסך הלידים מסונן ל"המשך טיפול".
- * הקישור נקרא פעם אחת בטעינת הדף, נשמר עד שהמשתמש מחובר, ואז נמחק מהכתובת.
- */
-const { ui } = __req('js/core/state.js');
-const { LEAD_STATUS_FOLLOWUP } = __req('js/config.js');
-
-/** יעד לכל ערך של ?go= */
-const LINKS = {
-  followups: () => { ui.tab = 'leads'; ui.leads.statusFilter = LEAD_STATUS_FOLLOWUP; },
-};
-
-let pending = new URLSearchParams(location.search).get('go');
-
-/** מפעיל את הקישור (אם יש) אחרי שהמשתמש נכנס. נקרא מ-session.js */
-function applyDeepLink() {
-  if (!pending) return;
-  const go = LINKS[pending];
-  pending = null;
-  try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) { /* לא קריטי */ }
-  if (go) go();
-}
-
-__exports.applyDeepLink = applyDeepLink;
-};
-
 /* ===== js/core/session.js ===== */
 __defs['js/core/session.js'] = function (__exports) {
 /**
@@ -917,7 +888,6 @@ const { loadAll } = __req('js/api/loaders.js');
 const { signOut } = __req('js/api/auth.js');
 const { me } = __req('js/domain/permissions.js');
 const { errorText } = __req('js/core/dom.js');
-const { applyDeepLink } = __req('js/core/deeplink.js');
 
 /**
  * נקרא אחרי כניסה מוצלחת (או כשמתגלה כניסה קיימת בטעינת הדף).
@@ -938,7 +908,6 @@ async function startSession(userId) {
     return { error: 'למשתמש הזה אין הרשאות במערכת' };
   }
   resetUi();
-  applyDeepLink();          // קישור ישיר מהודעה (למשל ?go=followups)
   requestRender();
   return {};
 }
@@ -987,7 +956,6 @@ function emptyLeadsUi() {
   return {
     draft: {
       idNumber: '', firstName: '', lastName: '', phone: '', city: '', source: '', referrer: '', eventLocation: '',
-      status: 'חדש', followup: '',
     },
     error: '',
     statusFilter: '',
@@ -1053,6 +1021,52 @@ __exports.resetUi = resetUi;
 __exports.clearStore = clearStore;
 __exports.store = store;
 __exports.ui = ui;
+};
+
+/* ===== js/data/localities.js ===== */
+__defs['js/data/localities.js'] = function (__exports) {
+/**
+ * data/localities.js - רשימת ישובי וערי ישראל להשלמה אוטומטית בשדה "עיר מגורים".
+ * הרשימה נועדה להצעות בלבד: אפשר להקליד גם ישוב שאינו ברשימה.
+ * לרשימה מתווספים אוטומטית הישובים של המרפאות במערכת (ראו localityOptions).
+ * להוספת ישוב: מוסיפים אותו לאחת הקבוצות למטה (הסדר בתוך הקבוצה אינו משנה).
+ */
+
+/** ערים ומועצות מקומיות ואזוריות מרכזיות */
+const CITIES = `
+אום אל-פחם|אופקים|אור יהודה|אור עקיבא|אילת|אלעד|אריאל|אשדוד|אשקלון|באר שבע|באקה אל-גרבייה|בית שאן|בית שמש|ביתר עילית|בני ברק|בנימינה-גבעת עדה|בסמת טבעון|בקעת אל-חיט|גבעת שמואל|גבעתיים|גדרה|גן יבנה|דימונה|הוד השרון|הרצליה|זכרון יעקב|חדרה|חיפה|חולון|טבריה|טייבה|טירה|טירת כרמל|טמרה|יבנה|יהוד-מונוסון|יקנעם עילית|ירוחם|ירושלים|כפר יונה|כפר קאסם|כפר סבא|כרמיאל|לוד|מגדל העמק|מודיעין-מכבים-רעות|מודיעין עילית|מעלה אדומים|מעלות-תרשיחא|נהריה|נס ציונה|נצרת|נצרת עילית|נוף הגליל|נשר|נתיבות|נתניה|סח'נין|עכו|עפולה|ערד|עראבה|פרדס חנה-כרכור|פרדסיה|פתח תקווה|צפת|קלנסווה|קצרין|קריית אונו|קריית ארבע|קריית אתא|קריית ביאליק|קריית גת|קריית טבעון|קריית ים|קריית מוצקין|קריית מלאכי|קריית עקרון|קריית שמונה|ראש העין|ראשון לציון|רהט|רחובות|רמלה|רמת גן|רמת השרון|רעננה|שדרות|שוהם|שפרעם|תל אביב-יפו|תל שבע|מגדל|מבשרת ציון|אבן יהודה|אזור|אלפי מנשה|אורנית|בית אריה-עופרים|בית אל|גבעת זאב|גני תקווה|חצור הגלילית|חורה|כסייפה|כפר ורדים|לקיה|מיתר|מעלה אפרים|מעלה עמוס|מעלה אדומים|מצפה רמון|נחל עוז|עומר|עילוט|עספיא|ערערה|פוריידיס|פסגות|קדומים|קדימה-צורן|קריית יערים|קרני שומרון|רמת ישי|שלומי|שערי תקווה|תל מונד|דאלית אל-כרמל|עין מאהל|עין נקובא|ג'סר א-זרקא|ג'ת|ג'לג'וליה|זמר|בועיינה-נוג'ידאת|ברטעה|כפר ברא|כפר קרע|מעאוויה|מסעדה|משהד|ריינה|כפר כנא|כפר מנדא|כפר קמא|כפר תבור|מגאר|מזרעה|ג'דיידה-מכר|אבו גוש|אבו סנאן|יפיע|יפעת|ירכא|פקיעין|שייח' דנון|שגב-שלום|תראבין א-צאנע|ערב אל-נעים|אעבלין|בענה|דבורייה|דיר חנא|טורעאן|טובא-זנגריה|כאוכב אבו אל-היג'א|כפר יאסיף|מג'ד אל-כרום|מעיליא|סאג'ור|סאסא|פסוטה|קלנסווה|ראמה|רומת הייב|שבלי-אום אל-גנם|בית ג'ן|בוקעאתא|מסעדה|מג'דל שמס|חורפיש|פרדיס|ג'ולס|ירכא
+`;
+
+/** ישובים בגזרת חפר, שרון ושומרון (מושבים, קיבוצים, ישובים קהילתיים וכפרים) */
+const REGION = `
+אביחיל|אבן ספיר|אדנים|אודים|אומן|אושה|אחיטוב|אייל|אלישיב|אליכין|אלישמע|אלקנה|אלי זהב|אמץ|אמציה|ארסוף|בארותיים|בחן|ביצרון|בית ברל|בית הלוי|בית חרות|בית יהושע|בית יצחק-שער חפר|בית ינאי|בית נחמיה|בית עובד|בית שערים|בני דרור|בני ציון|בצרה|ברקן|בת חפר|בת חן|בת עין|גבעת חיים איחוד|גבעת חיים מאוחד|גבעת שפירא|גליל ים|געש|גן חיים|גן שמואל|גן שלמה|גנות הדר|גאולי תימן|גאולים|גבעת ברנר|דגניה|דור|דורות|הדר עם|העוגן|המעפיל|הוד השרון|הרצליה פיתוח|ורדון|זמרת|זרעית|חבצלת השרון|חגור|חגלה|חוג'ייראת|חופית|חרות|חרב לאת|חרבת סירקין|חניאל|חצב|חצור|חרשים|טירת יהודה|טל-אל|טלמון|יד חנה|יד רמב"ם|יובלים|יערה|ינוב|ירחיב|ירקונה|כפר אביב|כפר אז"ר|כפר ביל"ו|כפר ברוך|כפר גדעון|כפר הס|כפר הרא"ה|כפר חיים|כפר חב"ד|כפר יהושע|כפר מונש|כפר נטר|כפר סירקין|כפר עבודה|כפר פינס|כפר שמריהו|כפר תקווה|כפר ויתקין|כפר אלדד|להבות חביבה|להבות הבשן|לב השרון|לבנים|מאור|מגל|מזור|מכמורת|מעברות|מענית|מעש|משמרות|משמר השרון|משמר השבעה|משמר איילון|מצר|מרגליות|מי עמי|מעין צבי|מרכז שפירא|משגב דב|נווה ימין|נווה ירק|נווה מונסון|נורדיה|נחשונים|נחלים|ניר אליהו|ניר אליהו|נירית|נעורים|נצר סירני|נתן|סגולה|סער|עין איילה|עין החורש|עין השופט|עין ורד|עין שריד|עין שמר|עולש|עזריאל|עינת|עמיקם|עמק חפר|עמיקם|עץ אפרים|עין עירון|עדנים|עדי|ערוגות|פורת|פרדס חנה|פרדסיה|פתחיה|צופית|צופים|צור יצחק|צור משה|צור נתן|צוריאל|צפריה|קדימה|קלנסווה|קציר|קיבוץ מענית|קיסריה|רגבים|רמות השבים|רמת הכובש|רמת הדר|רמת השרון|רמת יוחנן|רנתיה|רשפון|שדה ורבורג|שדה יצחק|שדי חמד|שדמות מחולה|שער אפרים|שער חפר|שפיים|שרונה|שער מנשה|שושנת העמקים|שבי שומרון|שבות רחל|שקד|תנובות|תל יצחק|תל קציר|תלמי אלעזר|תלמים|תקומה|תחכמוני|תל מונד
+`;
+
+/** גלגולי כתיב נפוצים: "קריית" נכתב לעיתים "קרית", ומציעים את שני הכתיבים */
+function withSpellingVariants(names) {
+  const out = [];
+  for (const name of names) {
+    out.push(name);
+    if (name.startsWith('קריית ')) out.push(name.replace('קריית ', 'קרית '));
+  }
+  return out;
+}
+
+function split(block) {
+  return block.split('|').map(s => s.trim()).filter(Boolean);
+}
+
+/**
+ * הרשימה הסופית: ללא כפילויות, ממוינת לפי א-ב.
+ * @param {string[]} extra  ישובים נוספים (למשל ישובי המרפאות במערכת)
+ * @returns {string[]}
+ */
+function localityOptions(extra = []) {
+  const all = withSpellingVariants([...split(CITIES), ...split(REGION), ...extra.map(s => String(s || '').trim()).filter(Boolean)]);
+  return [...new Set(all)].sort((a, b) => a.localeCompare(b, 'he'));
+}
+
+__exports.localityOptions = localityOptions;
 };
 
 /* ===== js/domain/capitation.js ===== */
@@ -3436,8 +3450,9 @@ __defs['js/ui/screens/leadForm.js'] = function (__exports) {
  *
  * הטופס שומר "טיוטה" ב-ui.leads.draft בכל הקלדה, כדי שציור מחדש של המסך
  * (למשל בעת סינון הטבלה) לא ימחק מה שהוקלד.
+ * ליד חדש נשמר תמיד בסטטוס "חדש". את הסטטוס ואת מועד השיחה הנוספת מעדכנים אחר כך בטבלת המעקב.
+ * "עיר מגורים" כוללת השלמה אוטומטית לפי ישובי וערי ישראל (data/localities.js), ואפשר גם להקליד ישוב אחר.
  * שדות מותנים (מוצגים או מוסתרים לפי בחירה):
- *  - "מועד לשיחה נוספת": כשהסטטוס הוא "המשך טיפול"
  *  - "שם העובד הממליץ": כשהמקור הוא "תרומת עובדים"
  *  - "מיקום האירוע": כשהמקור הוא "פעילות שטח" או "מרתון גיוס"
  * ת.ז אינה חובה, אבל אם הוזנה היא נבדקת.
@@ -3445,7 +3460,8 @@ __defs['js/ui/screens/leadForm.js'] = function (__exports) {
 const { ui, store } = __req('js/core/state.js');
 const { esc } = __req('js/utils/format.js');
 const { normalizeIsraeliId, normalizePhone } = __req('js/utils/validate.js');
-const { LEAD_STATUSES, LEAD_STATUS_FOLLOWUP, LEAD_SOURCE_EMPLOYEE, LEAD_SOURCES_EVENT } = __req('js/config.js');
+const { LEAD_SOURCE_EMPLOYEE, LEAD_SOURCES_EVENT } = __req('js/config.js');
+const { localityOptions } = __req('js/data/localities.js');
 const { options } = __req('js/ui/components/formFields.js');
 
 /** שדה טקסט בטופס שמעדכן את הטיוטה בכל הקלדה */
@@ -3455,13 +3471,21 @@ function textField({ key, label, attrs = '' }) {
     <input id="ld_${key}" data-inp="leadDraft" data-key="${key}" value="${esc(value)}" ${attrs}></div>`;
 }
 
+/** כל ליד שנוסף בטופס מתחיל בסטטוס הזה */
+const NEW_LEAD_STATUS = 'חדש';
+
 /** האם המקור שנבחר דורש שם עובד ממליץ / מיקום אירוע */
 const needsReferrer = source => source === LEAD_SOURCE_EMPLOYEE;
 const needsEventLocation = source => LEAD_SOURCES_EVENT.indexOf(source) >= 0;
 
+/** רשימת ההצעות לשדה העיר: ישובי ישראל ועוד ישובי המרפאות במערכת */
+function cityDatalist() {
+  const names = localityOptions(store.clinics.map(c => c.town));
+  return `<datalist id="ld_city_list">${names.map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>`;
+}
+
 function leadFormHtml() {
   const d = ui.leads.draft;
-  const showFollowup = d.status === LEAD_STATUS_FOLLOWUP;
   return `<div class="card has-sticker">
     <div class="sticker-title">טופס הוספת ליד</div>
     ${textField({ key: 'idNumber', label: 'ת.ז (לא חובה)', attrs: 'inputmode="numeric" maxlength="9" autocomplete="off" dir="ltr"' })}
@@ -3470,7 +3494,8 @@ function leadFormHtml() {
       ${textField({ key: 'lastName', label: 'שם משפחה' })}
     </div>
     ${textField({ key: 'phone', label: 'טלפון', attrs: 'type="tel" inputmode="tel" dir="ltr"' })}
-    ${textField({ key: 'city', label: 'עיר מגורים' })}
+    ${textField({ key: 'city', label: 'עיר מגורים', attrs: 'list="ld_city_list" autocomplete="off" placeholder="התחילו להקליד שם ישוב"' })}
+    ${cityDatalist()}
     <label for="ld_source">מקור הליד</label>
     <select id="ld_source" data-chg="leadDraftSource">
       <option value="">בחרו מקור</option>${options(store.settings.leadSources, d.source)}
@@ -3480,12 +3505,6 @@ function leadFormHtml() {
     </div>
     <div class="cond-box cond-sky" id="ld_event_wrap"${needsEventLocation(d.source) ? '' : ' hidden'}>
       ${textField({ key: 'eventLocation', label: 'מיקום האירוע' })}
-    </div>
-    <label for="ld_status">סטטוס הליד</label>
-    <select id="ld_status" data-chg="leadDraftStatus" data-key="status">${options(LEAD_STATUSES, d.status)}</select>
-    <div class="lead-fu" id="ld_followup_wrap"${showFollowup ? '' : ' hidden'}>
-      <label for="ld_followup">מועד לשיחה נוספת (תאריך ושעה)</label>
-      <input type="datetime-local" id="ld_followup" data-inp="leadDraft" data-chg="leadDraft" data-key="followup" value="${esc(d.followup)}">
     </div>
     <div class="field-err" id="ld_error" role="alert"${ui.leads.error ? '' : ' hidden'}>${esc(ui.leads.error)}</div>
     <button class="btn" style="width:100%;margin-top:14px" data-act="saveLead">שמירת ליד</button>
@@ -3508,18 +3527,13 @@ function validateDraft(draft) {
   if (!draft.source) return { error: 'יש לבחור מקור ליד.' };
   if (needsReferrer(draft.source) && !draft.referrer.trim()) return { error: 'יש להזין את שם העובד הממליץ.' };
   if (needsEventLocation(draft.source) && !draft.eventLocation.trim()) return { error: 'יש להזין את מיקום האירוע.' };
-  let followupAt = null;
-  if (draft.status === LEAD_STATUS_FOLLOWUP) {
-    if (!draft.followup) return { error: 'בסטטוס "המשך טיפול" יש לבחור תאריך ושעה לשיחה נוספת.' };
-    followupAt = new Date(draft.followup).toISOString();
-  }
   return {
     lead: {
       idNumber, firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), phone,
       city: draft.city.trim(), source: draft.source,
       referrerName: needsReferrer(draft.source) ? draft.referrer.trim() : null,
       eventLocation: needsEventLocation(draft.source) ? draft.eventLocation.trim() : null,
-      status: draft.status, followupAt,
+      status: NEW_LEAD_STATUS, followupAt: null,
     },
   };
 }
@@ -3805,11 +3819,6 @@ async function deleteLeadYes(el) {
 const handlers = {
   /** עדכון טיוטת הטופס בכל הקלדה או בחירה */
   leadDraft(el) { ui.leads.draft[el.dataset.key] = el.value; },
-  /** שינוי סטטוס בטופס: מעדכן את הטיוטה ומציג/מסתיר את שדה מועד השיחה */
-  leadDraftStatus(el) {
-    ui.leads.draft.status = el.value;
-    toggleFollowupField('ld_followup_wrap', el.value);
-  },
   /** בחירת מקור: פותח שדה "שם העובד הממליץ" או "מיקום האירוע" לפי המקור */
   leadDraftSource(el) {
     ui.leads.draft.source = el.value;
