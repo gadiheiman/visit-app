@@ -347,7 +347,7 @@ function toRow(lead) {
     first_name: lead.firstName, last_name: lead.lastName,
     phone: lead.phone, city: lead.city, source: lead.source,
     referrer_name: lead.referrerName || null, event_location: lead.eventLocation || null,
-    status: lead.status, followup_at: lead.followupAt,
+    status: lead.status, followup_at: lead.followupAt, notes: lead.notes || null,
   };
 }
 
@@ -539,7 +539,7 @@ function mapLead(r) {
   return {
     id: r.id, ownerId: r.owner_id, idNumber: r.id_number, firstName: r.first_name, lastName: r.last_name,
     phone: r.phone, city: r.city, source: r.source, referrerName: r.referrer_name, eventLocation: r.event_location,
-    status: r.status, followupAt: r.followup_at, createdAt: r.created_at,
+    status: r.status, followupAt: r.followup_at, createdAt: r.created_at, notes: r.notes || '',
     updatedAt: r.updated_at || r.created_at,
   };
 }
@@ -958,7 +958,7 @@ function emptyLeadsUi() {
   return {
     draft: {
       idNumber: '', firstName: '', lastName: '', phone: '', city: '', source: '', referrer: '', eventLocation: '',
-      status: '', followup: '',
+      status: '', followup: '', notes: '',
     },
     error: '',
     statusFilter: '',
@@ -1655,6 +1655,7 @@ function leadRows(leads) {
     'מיקום האירוע': l.eventLocation || '',
     'סטטוס': l.status,
     'מועד שיחה נוספת': l.followupAt ? fmtDateTime(l.followupAt) : '',
+    'הערות': l.notes || '',
     'רכז/ת': userName(l.ownerId),
   }));
 }
@@ -3454,6 +3455,7 @@ __defs['js/ui/screens/leadForm.js'] = function (__exports) {
  * הטופס שומר "טיוטה" ב-ui.leads.draft בכל הקלדה, כדי שציור מחדש של המסך
  * (למשל בעת סינון הטבלה) לא ימחק מה שהוקלד.
  * הסטטוס חובה ונבחר בהזנה, בלי האפשרות "חדש" (היא קיימת רק בלידים ישנים). "מועד לשיחה נוספת" מופיע כשהסטטוס הוא "המשך טיפול".
+ * "הערות" הוא מלל חופשי, לא חובה, והשדה האחרון בטופס.
  * "עיר מגורים" כוללת השלמה אוטומטית לפי ישובי וערי ישראל (data/localities.js), ואפשר גם להקליד ישוב אחר.
  * שדות מותנים (מוצגים או מוסתרים לפי בחירה):
  *  - "מועד לשיחה נוספת": כשהסטטוס הוא "המשך טיפול"
@@ -3474,6 +3476,9 @@ function textField({ key, label, attrs = '' }) {
   return `<div><label for="ld_${key}">${esc(label)}</label>
     <input id="ld_${key}" data-inp="leadDraft" data-key="${key}" value="${esc(value)}" ${attrs}></div>`;
 }
+
+/** אורך מרבי להערות (תואם את ההגבלה בבסיס הנתונים) */
+const NOTES_MAX = 2000;
 
 /** הסטטוסים שאפשר לבחור בהזנת ליד: הכול חוץ מ"חדש" */
 const FORM_STATUSES = LEAD_STATUSES.filter(s => s !== LEAD_STATUS_NEW);
@@ -3519,6 +3524,8 @@ function leadFormHtml() {
       <label for="ld_followup">מועד לשיחה נוספת (תאריך ושעה)</label>
       <input type="datetime-local" id="ld_followup" data-inp="leadDraft" data-chg="leadDraft" data-key="followup" value="${esc(d.followup)}">
     </div>
+    <label for="ld_notes">הערות</label>
+    <textarea id="ld_notes" rows="3" maxlength="${NOTES_MAX}" data-inp="leadDraft" data-key="notes" placeholder="מלל חופשי (לא חובה)">${esc(d.notes)}</textarea>
     <div class="field-err" id="ld_error" role="alert"${ui.leads.error ? '' : ' hidden'}>${esc(ui.leads.error)}</div>
     <button class="btn" style="width:100%;margin-top:14px" data-act="saveLead">שמירת ליד</button>
   </div>`;
@@ -3552,7 +3559,7 @@ function validateDraft(draft) {
       city: draft.city.trim(), source: draft.source,
       referrerName: needsReferrer(draft.source) ? draft.referrer.trim() : null,
       eventLocation: needsEventLocation(draft.source) ? draft.eventLocation.trim() : null,
-      status: draft.status, followupAt,
+      status: draft.status, followupAt, notes: draft.notes.trim().slice(0, NOTES_MAX) || null,
     },
   };
 }
@@ -3588,7 +3595,7 @@ function filteredLeads() {
   const list = store.leads.filter(l =>
     (!s.statusFilter || l.status === s.statusFilter)
     && (!s.coordFilter || l.ownerId === s.coordFilter)
-    && (!q || [l.firstName, l.lastName, l.phone, l.idNumber, l.city, l.referrerName, l.eventLocation].some(x => String(x == null ? '' : x).indexOf(q) >= 0)));
+    && (!q || [l.firstName, l.lastName, l.phone, l.idNumber, l.city, l.referrerName, l.eventLocation, l.notes].some(x => String(x == null ? '' : x).indexOf(q) >= 0)));
   const followupKey = l => (l.status === LEAD_STATUS_FOLLOWUP && l.followupAt ? l.followupAt : '9999');
   return list.sort((a, b) => followupKey(a).localeCompare(followupKey(b)) || b.createdAt.localeCompare(a.createdAt));
 }
@@ -3626,6 +3633,13 @@ function followupCell(lead) {
   return `<span class="num ${late ? 'neg' : ''}">${fmtDateTime(lead.followupAt)}</span>`;
 }
 
+/** הערות הליד (אם יש), בשורה קטנה מתחת לשם. הטקסט נחתך בתצוגה, ובמלואו בייצוא */
+function notesLine(lead) {
+  if (!lead.notes) return '';
+  const short = lead.notes.length > 80 ? lead.notes.slice(0, 80) + '…' : lead.notes;
+  return `<div class="muted lead-notes" title="${esc(lead.notes)}">${esc(short)}</div>`;
+}
+
 /** מקור הליד, ומתחתיו הפרט הנוסף (שם העובד הממליץ או מיקום האירוע) */
 function sourceCell(lead) {
   const detail = lead.referrerName || lead.eventLocation;
@@ -3637,7 +3651,7 @@ function rowHtml(lead, showOwner) {
     <td>${shortDate(lead.createdAt)}</td>
     <td>${shortDate(lead.updatedAt)}</td>
     <td class="num"><b>${daysSince(lead.createdAt)}</b></td>
-    <td>${esc(lead.firstName)} ${esc(lead.lastName)}</td>
+    <td>${esc(lead.firstName)} ${esc(lead.lastName)}${notesLine(lead)}</td>
     <td dir="ltr">${maskId(lead.idNumber)}</td>
     <td dir="ltr"><a href="tel:${esc(lead.phone)}">${esc(lead.phone)}</a></td>
     <td>${esc(lead.city)}</td>
@@ -3664,6 +3678,7 @@ function cardHtml(lead, showOwner) {
     <div class="muted">${esc(lead.source)}${detail ? ` · ${esc(detail)}` : ''}</div>
     <div style="margin-top:4px"><a class="num" href="tel:${esc(lead.phone)}">${esc(lead.phone)}</a> · ${esc(lead.city)}</div>
     ${followup}
+    ${notesLine(lead)}
     <div class="muted" style="margin-top:6px">${esc(dates)}</div>
     ${who ? `<div class="muted">${esc(who)}</div>` : ''}
     <div style="margin-top:8px"><button class="btn ghost small" data-act="editLead" data-id="${esc(lead.id)}">עדכון</button></div>
