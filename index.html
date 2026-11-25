@@ -696,6 +696,7 @@ const DEFAULT_SIZE_THRESHOLDS = { medium: 3000, large: 8000 };
 
 // ---------- לידים ----------
 const LEAD_STATUSES = ['חדש', 'אין מענה', 'המשך טיפול', 'לא מעוניין', 'בוצע מעבר'];
+const LEAD_STATUS_NEW = 'חדש';              // סטטוס של לידים ישנים; לא ניתן לבחירה בהזנה
 const LEAD_STATUS_FOLLOWUP = 'המשך טיפול';   // הסטטוס שמחייב מועד לשיחה נוספת
 
 __exports.SB_URL = SB_URL;
@@ -725,6 +726,7 @@ __exports.LEAD_SOURCE_EMPLOYEE = LEAD_SOURCE_EMPLOYEE;
 __exports.LEAD_SOURCES_EVENT = LEAD_SOURCES_EVENT;
 __exports.DEFAULT_SIZE_THRESHOLDS = DEFAULT_SIZE_THRESHOLDS;
 __exports.LEAD_STATUSES = LEAD_STATUSES;
+__exports.LEAD_STATUS_NEW = LEAD_STATUS_NEW;
 __exports.LEAD_STATUS_FOLLOWUP = LEAD_STATUS_FOLLOWUP;
 };
 
@@ -956,6 +958,7 @@ function emptyLeadsUi() {
   return {
     draft: {
       idNumber: '', firstName: '', lastName: '', phone: '', city: '', source: '', referrer: '', eventLocation: '',
+      status: '', followup: '',
     },
     error: '',
     statusFilter: '',
@@ -3450,9 +3453,10 @@ __defs['js/ui/screens/leadForm.js'] = function (__exports) {
  *
  * הטופס שומר "טיוטה" ב-ui.leads.draft בכל הקלדה, כדי שציור מחדש של המסך
  * (למשל בעת סינון הטבלה) לא ימחק מה שהוקלד.
- * ליד חדש נשמר תמיד בסטטוס "חדש". את הסטטוס ואת מועד השיחה הנוספת מעדכנים אחר כך בטבלת המעקב.
+ * הסטטוס חובה ונבחר בהזנה, בלי האפשרות "חדש" (היא קיימת רק בלידים ישנים). "מועד לשיחה נוספת" מופיע כשהסטטוס הוא "המשך טיפול".
  * "עיר מגורים" כוללת השלמה אוטומטית לפי ישובי וערי ישראל (data/localities.js), ואפשר גם להקליד ישוב אחר.
  * שדות מותנים (מוצגים או מוסתרים לפי בחירה):
+ *  - "מועד לשיחה נוספת": כשהסטטוס הוא "המשך טיפול"
  *  - "שם העובד הממליץ": כשהמקור הוא "תרומת עובדים"
  *  - "מיקום האירוע": כשהמקור הוא "פעילות שטח" או "מרתון גיוס"
  * ת.ז אינה חובה, אבל אם הוזנה היא נבדקת.
@@ -3460,7 +3464,7 @@ __defs['js/ui/screens/leadForm.js'] = function (__exports) {
 const { ui, store } = __req('js/core/state.js');
 const { esc } = __req('js/utils/format.js');
 const { normalizeIsraeliId, normalizePhone } = __req('js/utils/validate.js');
-const { LEAD_SOURCE_EMPLOYEE, LEAD_SOURCES_EVENT } = __req('js/config.js');
+const { LEAD_STATUSES, LEAD_STATUS_FOLLOWUP, LEAD_STATUS_NEW, LEAD_SOURCE_EMPLOYEE, LEAD_SOURCES_EVENT } = __req('js/config.js');
 const { localityOptions } = __req('js/data/localities.js');
 const { options } = __req('js/ui/components/formFields.js');
 
@@ -3471,8 +3475,8 @@ function textField({ key, label, attrs = '' }) {
     <input id="ld_${key}" data-inp="leadDraft" data-key="${key}" value="${esc(value)}" ${attrs}></div>`;
 }
 
-/** כל ליד שנוסף בטופס מתחיל בסטטוס הזה */
-const NEW_LEAD_STATUS = 'חדש';
+/** הסטטוסים שאפשר לבחור בהזנת ליד: הכול חוץ מ"חדש" */
+const FORM_STATUSES = LEAD_STATUSES.filter(s => s !== LEAD_STATUS_NEW);
 
 /** האם המקור שנבחר דורש שם עובד ממליץ / מיקום אירוע */
 const needsReferrer = source => source === LEAD_SOURCE_EMPLOYEE;
@@ -3486,6 +3490,7 @@ function cityDatalist() {
 
 function leadFormHtml() {
   const d = ui.leads.draft;
+  const showFollowup = d.status === LEAD_STATUS_FOLLOWUP;
   return `<div class="card has-sticker">
     <div class="sticker-title">טופס הוספת ליד</div>
     ${textField({ key: 'idNumber', label: 'ת.ז (לא חובה)', attrs: 'inputmode="numeric" maxlength="9" autocomplete="off" dir="ltr"' })}
@@ -3505,6 +3510,14 @@ function leadFormHtml() {
     </div>
     <div class="cond-box cond-sky" id="ld_event_wrap"${needsEventLocation(d.source) ? '' : ' hidden'}>
       ${textField({ key: 'eventLocation', label: 'מיקום האירוע' })}
+    </div>
+    <label for="ld_status">סטטוס הליד</label>
+    <select id="ld_status" data-chg="leadDraftStatus" data-key="status">
+      <option value="">בחרו סטטוס</option>${options(FORM_STATUSES, d.status)}
+    </select>
+    <div class="lead-fu" id="ld_followup_wrap"${showFollowup ? '' : ' hidden'}>
+      <label for="ld_followup">מועד לשיחה נוספת (תאריך ושעה)</label>
+      <input type="datetime-local" id="ld_followup" data-inp="leadDraft" data-chg="leadDraft" data-key="followup" value="${esc(d.followup)}">
     </div>
     <div class="field-err" id="ld_error" role="alert"${ui.leads.error ? '' : ' hidden'}>${esc(ui.leads.error)}</div>
     <button class="btn" style="width:100%;margin-top:14px" data-act="saveLead">שמירת ליד</button>
@@ -3527,13 +3540,19 @@ function validateDraft(draft) {
   if (!draft.source) return { error: 'יש לבחור מקור ליד.' };
   if (needsReferrer(draft.source) && !draft.referrer.trim()) return { error: 'יש להזין את שם העובד הממליץ.' };
   if (needsEventLocation(draft.source) && !draft.eventLocation.trim()) return { error: 'יש להזין את מיקום האירוע.' };
+  if (!draft.status || draft.status === LEAD_STATUS_NEW) return { error: 'יש לבחור סטטוס ליד.' };
+  let followupAt = null;
+  if (draft.status === LEAD_STATUS_FOLLOWUP) {
+    if (!draft.followup) return { error: 'בסטטוס "המשך טיפול" יש לבחור תאריך ושעה לשיחה נוספת.' };
+    followupAt = new Date(draft.followup).toISOString();
+  }
   return {
     lead: {
       idNumber, firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), phone,
       city: draft.city.trim(), source: draft.source,
       referrerName: needsReferrer(draft.source) ? draft.referrer.trim() : null,
       eventLocation: needsEventLocation(draft.source) ? draft.eventLocation.trim() : null,
-      status: NEW_LEAD_STATUS, followupAt: null,
+      status: draft.status, followupAt,
     },
   };
 }
@@ -3819,6 +3838,11 @@ async function deleteLeadYes(el) {
 const handlers = {
   /** עדכון טיוטת הטופס בכל הקלדה או בחירה */
   leadDraft(el) { ui.leads.draft[el.dataset.key] = el.value; },
+  /** שינוי סטטוס בטופס: מעדכן את הטיוטה ומציג/מסתיר את שדה מועד השיחה */
+  leadDraftStatus(el) {
+    ui.leads.draft.status = el.value;
+    toggleFollowupField('ld_followup_wrap', el.value);
+  },
   /** בחירת מקור: פותח שדה "שם העובד הממליץ" או "מיקום האירוע" לפי המקור */
   leadDraftSource(el) {
     ui.leads.draft.source = el.value;
