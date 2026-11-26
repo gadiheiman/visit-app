@@ -212,6 +212,8 @@ header.top h1{font-size:1.7rem;display:flex;align-items:center}
 .deco-4{top:128px;left:3%;transform:rotate(10deg);width:40px;height:40px}
 .deco-5{top:6px;left:30%;transform:rotate(-5deg);width:40px;height:40px}
 @media (min-width:560px){.deco-1{right:14%}.deco-2{left:12%}.deco-3{right:10%}.deco-4{left:16%}}
+
+.lead-notes-full{white-space:pre-wrap;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px 12px;margin-bottom:8px;max-height:220px;overflow:auto}
 </style>
 </head>
 <body>
@@ -356,9 +358,14 @@ async function insertLead(lead) {
   return { lead: data && data[0] ? mapLead(data[0]) : null, error };
 }
 
-/** מעדכן סטטוס ומועד שיחה נוספת בלבד (שאר השדות קבועים אחרי היצירה) */
-async function updateLeadStatus(id, status, followupAt) {
-  const { data, error } = await sb.from('leads').update({ status, followup_at: followupAt }).eq('id', id).select();
+/**
+ * מעדכן סטטוס, מועד שיחה נוספת, ואם נשלח notes גם הערות (שאר השדות קבועים אחרי היצירה).
+ * notes חייב להתחיל בטקסט הקודם: בבסיס הנתונים יש חסימה שמונעת מחיקה או שינוי של הערות קיימות.
+ */
+async function updateLeadStatus(id, status, followupAt, notes) {
+  const row = { status, followup_at: followupAt };
+  if (notes !== undefined) row.notes = notes;
+  const { data, error } = await sb.from('leads').update(row).eq('id', id).select();
   return { lead: data && data[0] ? mapLead(data[0]) : null, error };
 }
 
@@ -965,7 +972,7 @@ function emptyLeadsUi() {
     search: '',
     coordFilter: '',
     editId: null,
-    editDraft: { status: '', followup: '' },
+    editDraft: { status: '', followup: '', addNote: '' },
     editError: '',
     confirmDelete: null,
     shown: [],        // הלידים שמוצגים כרגע בטבלה (לייצוא לאקסל)
@@ -3633,10 +3640,11 @@ function followupCell(lead) {
   return `<span class="num ${late ? 'neg' : ''}">${fmtDateTime(lead.followupAt)}</span>`;
 }
 
-/** הערות הליד (אם יש), בשורה קטנה מתחת לשם. הטקסט נחתך בתצוגה, ובמלואו בייצוא */
+/** ההערה האחרונה של הליד (אם יש), בשורה קטנה מתחת לשם. הטקסט נחתך בתצוגה; כל ההערות בפאנל העדכון ובייצוא */
 function notesLine(lead) {
   if (!lead.notes) return '';
-  const short = lead.notes.length > 80 ? lead.notes.slice(0, 80) + '…' : lead.notes;
+  const last = lead.notes.split('\n\n').pop();
+  const short = last.length > 80 ? last.slice(0, 80) + '…' : last;
   return `<div class="muted lead-notes" title="${esc(lead.notes)}">${esc(short)}</div>`;
 }
 
@@ -3704,6 +3712,9 @@ function editPanel() {
       <label for="le_followup">מועד לשיחה נוספת (תאריך ושעה)</label>
       <input type="datetime-local" id="le_followup" data-inp="leadEditFollowup" data-chg="leadEditFollowup" value="${esc(s.editDraft.followup)}">
     </div>
+    ${lead.notes ? `<label>הערות קיימות</label><div class="lead-notes-full">${esc(lead.notes)}</div>` : ''}
+    <label for="le_note">הוספת עדכון להערות</label>
+    <textarea id="le_note" rows="3" data-inp="leadEditNote" placeholder="המלל יתווסף בסוף ההערות, עם תאריך ושם. ההערות הקודמות לא נמחקות">${esc(s.editDraft.addNote)}</textarea>
     <div class="field-err" role="alert"${s.editError ? '' : ' hidden'}>${esc(s.editError)}</div>
     <div class="row" style="margin-top:12px">
       <button class="btn" data-act="saveLeadEdit" data-id="${esc(lead.id)}">שמירה</button>
@@ -3759,9 +3770,9 @@ __defs['js/ui/screens/leads.js'] = function (__exports) {
 const { ui, store, emptyLeadsUi } = __req('js/core/state.js');
 const { requestRender } = __req('js/core/bus.js');
 const { toast, rerenderKeepingFocus } = __req('js/core/dom.js');
-const { toLocalInput } = __req('js/utils/format.js');
+const { toLocalInput, fmtDateTime } = __req('js/utils/format.js');
 const { LEAD_STATUS_FOLLOWUP } = __req('js/config.js');
-const { me } = __req('js/domain/permissions.js');
+const { me, userName } = __req('js/domain/permissions.js');
 const { insertLead, updateLeadStatus, deleteLead, leadErrorText } = __req('js/api/leadsApi.js');
 const { logChange } = __req('js/api/logApi.js');
 const { exportLeads } = __req('js/exports/leadsExcel.js');
@@ -3812,20 +3823,41 @@ async function saveLead() {
 
 // ---------- עדכון ליד קיים ----------
 
+/** אורך מרבי לכלל ההערות של ליד אחד (תואם את ההגבלה בבסיס הנתונים) */
+const NOTES_TOTAL_MAX = 10000;
+
+/**
+ * מוסיף עדכון חדש בסוף ההערות הקיימות, עם תאריך ושם הכותב. הטקסט הקודם נשאר כמו שהוא.
+ * מחזיר null אם לא נכתב עדכון חדש.
+ */
+function appendNote(existing, text) {
+  const added = (text || '').trim();
+  if (!added) return null;
+  const stamp = `[${fmtDateTime(new Date().toISOString())} · ${userName(me().id)}]`;
+  return (existing ? existing + '\n\n' : '') + `${stamp} ${added}`;
+}
+
 async function saveLeadEdit(el) {
   if (ui.busy) return;
   const state = ui.leads;
   const lead = store.leads.find(l => l.id === el.dataset.id);
   if (!lead) return;
-  const { status, followup } = state.editDraft;
+  const { status, followup, addNote } = state.editDraft;
   if (status === LEAD_STATUS_FOLLOWUP && !followup) {
     state.editError = 'בסטטוס "המשך טיפול" יש לבחור תאריך ושעה לשיחה נוספת.';
     requestRender();
     return;
   }
   const followupAt = status === LEAD_STATUS_FOLLOWUP ? new Date(followup).toISOString() : null;
+  // הערה חדשה מתווספת בסוף ההערות הקיימות (עם תאריך ושם), ולא מחליפה אותן
+  const newNotes = appendNote(lead.notes, addNote);
+  if (newNotes && newNotes.length > NOTES_TOTAL_MAX) {
+    state.editError = 'ההערות ארוכות מדי. קצרו את העדכון החדש.';
+    requestRender();
+    return;
+  }
   ui.busy = true;
-  const result = await updateLeadStatus(lead.id, status, followupAt);
+  const result = await updateLeadStatus(lead.id, status, followupAt, newNotes === null ? undefined : newNotes);
   ui.busy = false;
   if (result.error || !result.lead) { state.editError = leadErrorText(result.error) || 'אין הרשאה לעדכן'; requestRender(); return; }
   Object.assign(lead, result.lead);
@@ -3875,7 +3907,7 @@ const handlers = {
     const lead = store.leads.find(l => l.id === el.dataset.id);
     if (!lead) return;
     ui.leads.editId = lead.id;
-    ui.leads.editDraft = { status: lead.status, followup: toLocalInput(lead.followupAt) };
+    ui.leads.editDraft = { status: lead.status, followup: toLocalInput(lead.followupAt), addNote: '' };
     ui.leads.editError = '';
     ui.leads.confirmDelete = null;
     requestRender();
@@ -3888,6 +3920,7 @@ const handlers = {
     toggleFollowupField('le_followup_wrap', el.value);
   },
   leadEditFollowup(el) { ui.leads.editDraft.followup = el.value; },
+  leadEditNote(el) { ui.leads.editDraft.addNote = el.value; },
   saveLeadEdit,
   cancelLeadEdit() { ui.leads.editId = null; ui.leads.editError = ''; requestRender(); },
   deleteLead(el) { ui.leads.confirmDelete = el.dataset.id; requestRender(); },
@@ -3896,6 +3929,7 @@ const handlers = {
 };
 
 __exports.render = render;
+__exports.appendNote = appendNote;
 __exports.handlers = handlers;
 };
 
